@@ -61,14 +61,14 @@ const Home: NextPage = () => {
               xmlns="http://www.w3.org/2000/svg"
             >
               <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
                 d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
               ></path>
             </svg>
             {/* Rectangle */}
-            <div className="h-5 w-10 bg-fontTertiary rounded-full">
+            <div className="h-5 w-10 bg-fontTertiary rounded-full cursor-pointer">
               {/* Circle */}
               <div></div>
             </div>
@@ -81,9 +81,9 @@ const Home: NextPage = () => {
               xmlns="http://www.w3.org/2000/svg"
             >
               <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
                 d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
               ></path>
             </svg>{" "}
@@ -98,9 +98,9 @@ const Home: NextPage = () => {
               xmlns="http://www.w3.org/2000/svg"
             >
               <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
                 d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"
               ></path>
             </svg>
@@ -111,10 +111,30 @@ const Home: NextPage = () => {
       {/* Main */}
       <main className="col-span-3">
         {/* Top Settings */}
-        <section>
-          <h1>Board Name</h1>
-          <button>+ Add New Task</button>
-          <button>Delete Board</button>
+        <section className="h-20 p-4 flex justify-between items-center">
+          <h1 className="text-2xl">Board Name</h1>
+          <div className="flex justify-center items-center gap-4">
+            <button className="py-2 px-4 bg-fontTertiary rounded-full hover:bg-fontPrimary hover:text-fontTertiary">
+              + Add New Task
+            </button>
+            {/* <button className="py-2 px-4 bg-fontPrimary text-fontTertiary rounded-full hover:bg-fontTertiary hover:text-fontPrimary">
+              Delete Board
+            </button> */}
+            <svg
+              className="w-10 h-10 p-2 text-fontSecondary rounded cursor-pointer hover:bg-darkBlue"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+              ></path>
+            </svg>
+          </div>
         </section>
         {/* Main content */}
         <section className="bg-darkBlue">
