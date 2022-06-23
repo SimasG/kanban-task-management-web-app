@@ -4,9 +4,9 @@ import type { NextPage } from "next";
 
 const Home: NextPage = () => {
   return (
-    <div className="grid grid-cols-4 bg-darkGray text-white">
+    <div className="grid grid-cols-4 bg-darkGray text-white h-screen">
       {/* Side nav bar */}
-      <nav className="col-span-1 pr-4 py-4 flex flex-col justify-between">
+      <nav className="col-span-1 max-w-40 pr-4 py-4 flex flex-col justify-between">
         {/* Logo container */}
         <a href="/" className="pl-4 flex justify-start items-center gap-2 mb-8">
           <TbLayoutBoard className="h-7 w-7" />
@@ -109,7 +109,7 @@ const Home: NextPage = () => {
         </section>
       </nav>
       {/* Main */}
-      <main className="col-span-3">
+      <main className="col-span-3 min-w-max w-auto grid-flow-col auto-cols-max">
         {/* Top Settings */}
         <section className="h-20 p-4 flex justify-between items-center">
           <h1 className="text-2xl">Board Name</h1>
@@ -137,15 +137,17 @@ const Home: NextPage = () => {
           </div>
         </section>
         {/* Main content */}
-        <section className="bg-darkBlue">
+        <section className="flex justify-start items-center gap-6 bg-darkBlue p-5 overflow-x-auto w-[500px]">
           {/* First Column */}
-          <div>
+          <div className="min-w-64 w-64 bg-red-300">
             {/* Column Title Container */}
-            <div>
+            <div className="flex justify-start items-center gap-2 mb-4">
               {/* Colorful circle */}
-              <div></div>
+              <div className="h-4 w-4 bg-todoColors-brightBlue rounded-full"></div>
               {/* Column Title */}
-              <h3>Todo (4)</h3>
+              <h3 className="uppercase text-fontSecondary font-bold">
+                Todo (4)
+              </h3>
             </div>
             {/* Task Container */}
             <div>
@@ -172,13 +174,15 @@ const Home: NextPage = () => {
             </div>
           </div>
           {/* Second Column */}
-          <div>
+          <div className="min-w-64 w-64 bg-green-300">
             {/* Column Title Container */}
-            <div>
+            <div className="flex justify-start items-center gap-2 mb-4">
               {/* Colorful circle */}
-              <div></div>
+              <div className="h-4 w-4 bg-todoColors-brightBlue rounded-full"></div>
               {/* Column Title */}
-              <h3>Doing (4)</h3>
+              <h3 className="uppercase text-fontSecondary font-bold">
+                Todo (4)
+              </h3>
             </div>
             {/* Task Container */}
             <div>
@@ -205,13 +209,15 @@ const Home: NextPage = () => {
             </div>
           </div>
           {/* Third Column */}
-          <div>
+          <div className="min-w-64 w-64 bg-purple-300">
             {/* Column Title Container */}
-            <div>
+            <div className="flex justify-start items-center gap-2 mb-4">
               {/* Colorful circle */}
-              <div></div>
+              <div className="h-4 w-4 bg-todoColors-brightBlue rounded-full"></div>
               {/* Column Title */}
-              <h3>Done (4)</h3>
+              <h3 className="uppercase text-fontSecondary font-bold">
+                Todo (4)
+              </h3>
             </div>
             {/* Task Container */}
             <div>
@@ -238,7 +244,7 @@ const Home: NextPage = () => {
             </div>
           </div>
           {/* Add New Column btn */}
-          <div>+ New Column</div>
+          <div className="min-w-60 w-60 bg-yellow-300">+ New Column</div>
         </section>
       </main>
     </div>
