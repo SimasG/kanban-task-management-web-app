@@ -9,7 +9,7 @@ module.exports = {
       // Will need to add colors for the bright theme as well
       colors: {
         fontPrimary: "#fff",
-        fontSecondary: "#686E7D",
+        fontSecondary: "#82899b",
         fontTertiary: "#645FC6",
         darkBlue: "#21212D",
         darkGray: "#2c2c38",
