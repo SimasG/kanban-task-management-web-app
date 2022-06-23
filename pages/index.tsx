@@ -1,38 +1,47 @@
-import { MdOutlineSpaceDashboard } from "react-icons/md";
+import { TbLayoutBoardSplit, TbLayoutBoard } from "react-icons/tb";
 
 import type { NextPage } from "next";
 
 const Home: NextPage = () => {
   return (
-    <div>
+    <div className="grid grid-cols-4 bg-darkGray text-white">
       {/* Side nav bar */}
-      <div>
+      <div className="col-span-1 p-4">
         <nav>
           {/* Logo container */}
-          <div></div>
+          <div className="flex justify-start items-center gap-2 mb-8">
+            <TbLayoutBoard className="h-7 w-7" />
+            <h1 className="text-3xl">kanban</h1>
+          </div>
           {/* Boards container */}
-          <section>
+          <section className="text-fontSecondary">
             {/* All Boards title */}
-            <h3></h3>
+            <h3 className="uppercase font-bold text-xs mb-4">All Boards (3)</h3>
             {/* Boards subcontainer */}
             <div>
               {/* Specific Board */}
-              <div>
-                <MdOutlineSpaceDashboard />
+              <div className="flex justify-start items-center gap-3 py-1 cursor-pointer hover:bg-fontTertiary hover:text-fontPrimary hover:rounded-r-full">
+                <TbLayoutBoardSplit />
                 {/* Individual Board name */}
                 <h4>Platform Launch</h4>
               </div>
               {/* Specific Board */}
-              <div>
-                <MdOutlineSpaceDashboard />
+              <div className="flex justify-start items-center gap-3 py-1 cursor-pointer hover:bg-fontTertiary hover:text-fontPrimary hover:rounded-r-full">
+                <TbLayoutBoardSplit />
                 {/* Individual Board name */}
                 <h4>Marketing Plan</h4>
               </div>
+              {/* Specific Board */}
+              <div className="flex justify-start items-center gap-3 py-1 cursor-pointer hover:bg-fontTertiary hover:text-fontPrimary hover:rounded-r-full">
+                <TbLayoutBoardSplit />
+                {/* Individual Board name */}
+                <h4>Roadmap</h4>
+              </div>
             </div>
             {/* Create new Board container */}
-            <div>
-              <MdOutlineSpaceDashboard />
-              <h4></h4>
+            <div className="flex justify-start items-center gap-3 py-1 text-fontTertiary">
+              <TbLayoutBoardSplit />
+              <h4>+ Create New Board</h4>
             </div>
           </section>
           {/* Log in/out btn + theme toggle + hide sidebar section */}
@@ -97,7 +106,7 @@ const Home: NextPage = () => {
         </nav>
       </div>
       {/* Main */}
-      <main>
+      <main className="col-span-3">
         {/* Top Settings */}
         <section>
           <h1>Board Name</h1>
@@ -105,7 +114,7 @@ const Home: NextPage = () => {
           <button>Delete Board</button>
         </section>
         {/* Main content */}
-        <section>
+        <section className="bg-darkBlue">
           {/* First Column */}
           <div>
             {/* Column Title Container */}
