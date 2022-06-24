@@ -8,3 +8,15 @@ html,
 body {
   height: 100%;
 }
+
+.task {
+  @apply bg-darkGray w-full px-4 py-6 rounded-md cursor-pointer;
+}
+
+.task-title {
+  @apply text-fontPrimary font-bold;
+}
+
+.task-body {
+  @apply text-fontSecondary text-sm;
+}
