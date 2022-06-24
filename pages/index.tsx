@@ -4,9 +4,9 @@ import type { NextPage } from "next";
 
 const Home: NextPage = () => {
   return (
-    <div className="grid grid-cols-4 bg-darkGray text-white h-screen overflow-x-hidden	">
+    <div className="flex justify-center text-white h-screen overflow-x-hidden	">
       {/* Side nav bar */}
-      <nav className="col-span-1 max-w-40 pr-4 py-4 flex flex-col justify-between">
+      <nav className="min-w-[250px] bg-darkGray pr-4 py-4 w-1/4">
         {/* Logo container */}
         <a href="/" className="pl-4 flex justify-start items-center gap-2 mb-8">
           <TbLayoutBoard className="h-7 w-7" />
@@ -109,17 +109,15 @@ const Home: NextPage = () => {
         </section>
       </nav>
       {/* Main */}
-      <main className="col-span-3 min-w-max w-auto grid-flow-col auto-cols-max">
+      <main className="w-3/4">
         {/* Top Settings */}
-        <section className="h-20 p-4 flex justify-between items-center">
+        <section className="h-20 min-w-[500px] p-4 flex justify-between items-center bg-darkGray">
           <h1 className="text-2xl">Board Name</h1>
           <div className="flex justify-center items-center gap-4">
             <button className="py-2 px-4 bg-fontTertiary rounded-full hover:bg-fontPrimary hover:text-fontTertiary">
               + Add New Task
             </button>
-            {/* <button className="py-2 px-4 bg-fontPrimary text-fontTertiary rounded-full hover:bg-fontTertiary hover:text-fontPrimary">
-              Delete Board
-            </button> */}
+            {/* Delete Board Btn */}
             <svg
               className="w-10 h-10 p-2 text-fontSecondary rounded cursor-pointer hover:bg-darkBlue"
               fill="none"
@@ -137,9 +135,9 @@ const Home: NextPage = () => {
           </div>
         </section>
         {/* Main content */}
-        <section className=" bg-darkBlue p-5 h-full min-w-full w-screen flex justify-start items-start gap-6 overflow-x-auto">
+        <section className="bg-darkBlue p-5 h-screen flex justify-start items-start gap-6 overflow-x-auto overflow-hidden">
           {/* First Column */}
-          <div className="min-w-[250px]">
+          <div className="min-w-[250px] max-w-[350px]">
             {/* Column Title Container */}
             <div className="flex justify-start items-center gap-2 mb-6 text-sm">
               {/* Colorful circle */}
@@ -174,246 +172,107 @@ const Home: NextPage = () => {
             </div>
           </div>
           {/* Second Column */}
-          <div className="min-w-[250px]">
+          <div className="min-w-[250px] max-w-[350px]">
             {/* Column Title Container */}
-            <div className="flex justify-start items-center gap-2 mb-4 bg-green-300">
+            <div className="flex justify-start items-center gap-2 mb-6 text-sm">
               {/* Colorful circle */}
-              <div className="h-4 w-4 bg-todoColors-brightBlue rounded-full"></div>
+              <div className="h-4 w-4 bg-todoColors-violet rounded-full"></div>
               {/* Column Title */}
               <h3 className="uppercase text-fontSecondary font-bold">
                 Todo (4)
               </h3>
             </div>
-            {/* Task Containers */}
-            <div className="flex flex-col justify-start items-center bg-green-500">
-              {/* Task Container */}
-              <div className="border-white border-2">
-                {/* Single Task Container */}
-                <div>
-                  <h2>Example todo for xyz</h2>
-                  <span>0 of 3 subtasks</span>
-                </div>
-                {/* Single Task Container */}
-                <div>
-                  <h2>Example todo for zyx</h2>
-                  <span>0 of 7 subtasks</span>
-                </div>
-                {/* Single Task Container */}
-                <div>
-                  <h2>Example todo for abc</h2>
-                  <span>1 of 3 subtasks</span>
-                </div>
-                {/* Single Task Container */}
-                <div>
-                  <h2>Example todo for cba</h2>
-                  <span>2 of 5 subtasks</span>
-                </div>
+            {/* Task Container */}
+            <div className="flex flex-col justify-start items-center gap-4">
+              {/* Single Task Container */}
+              <div className="task">
+                <h2 className="task-title">Example todo for xyz</h2>
+                <span className="task-body">0 of 3 subtasks</span>
               </div>
-              {/* Task Container */}
-              <div className="border-white border-2">
-                {/* Single Task Container */}
-                <div>
-                  <h2>Example todo for xyz</h2>
-                  <span>0 of 3 subtasks</span>
-                </div>
-                {/* Single Task Container */}
-                <div>
-                  <h2>Example todo for zyx</h2>
-                  <span>0 of 7 subtasks</span>
-                </div>
-                {/* Single Task Container */}
-                <div>
-                  <h2>Example todo for abc</h2>
-                  <span>1 of 3 subtasks</span>
-                </div>
-                {/* Single Task Container */}
-                <div>
-                  <h2>Example todo for cba</h2>
-                  <span>2 of 5 subtasks</span>
-                </div>
+              {/* Single Task Container */}
+              <div className="task">
+                <h2 className="task-title">Example todo for zyx</h2>
+                <span className="task-body">0 of 7 subtasks</span>
+              </div>
+              {/* Single Task Container */}
+              <div className="task">
+                <h2 className="task-title">Example todo for abc</h2>
+                <span className="task-body">1 of 3 subtasks</span>
+              </div>
+              {/* Single Task Container */}
+              <div className="task">
+                <h2 className="task-title">Example todo for cba</h2>
+                <span className="task-body">2 of 5 subtasks</span>
               </div>
             </div>
           </div>
           {/* Third Column */}
-          <div className="min-w-[250px] ">
+          <div className="min-w-[250px] max-w-[350px]">
             {/* Column Title Container */}
-            <div className="flex justify-start items-center gap-2 mb-4 bg-purple-100">
+            <div className="flex justify-start items-center gap-2 mb-6 text-sm">
               {/* Colorful circle */}
-              <div className="h-4 w-4 bg-todoColors-brightBlue rounded-full"></div>
+              <div className="h-4 w-4 bg-todoColors-brightGreen rounded-full"></div>
               {/* Column Title */}
               <h3 className="uppercase text-fontSecondary font-bold">
                 Todo (4)
               </h3>
             </div>
-            {/* Task Containers */}
-            <div className="flex flex-col justify-start items-center bg-purple-500">
-              {/* Task Container */}
-              <div className="border-white border-2">
-                {/* Single Task Container */}
-                <div>
-                  <h2>Example todo for xyz</h2>
-                  <span>0 of 3 subtasks</span>
-                </div>
-                {/* Single Task Container */}
-                <div>
-                  <h2>Example todo for zyx</h2>
-                  <span>0 of 7 subtasks</span>
-                </div>
-                {/* Single Task Container */}
-                <div>
-                  <h2>Example todo for abc</h2>
-                  <span>1 of 3 subtasks</span>
-                </div>
-                {/* Single Task Container */}
-                <div>
-                  <h2>Example todo for cba</h2>
-                  <span>2 of 5 subtasks</span>
-                </div>
+            {/* Task Container */}
+            <div className="flex flex-col justify-start items-center gap-4">
+              {/* Single Task Container */}
+              <div className="task">
+                <h2 className="task-title">Example todo for xyz</h2>
+                <span className="task-body">0 of 3 subtasks</span>
               </div>
-              {/* Task Container */}
-              <div className="border-white border-2">
-                {/* Single Task Container */}
-                <div>
-                  <h2>Example todo for xyz</h2>
-                  <span>0 of 3 subtasks</span>
-                </div>
-                {/* Single Task Container */}
-                <div>
-                  <h2>Example todo for zyx</h2>
-                  <span>0 of 7 subtasks</span>
-                </div>
-                {/* Single Task Container */}
-                <div>
-                  <h2>Example todo for abc</h2>
-                  <span>1 of 3 subtasks</span>
-                </div>
-                {/* Single Task Container */}
-                <div>
-                  <h2>Example todo for cba</h2>
-                  <span>2 of 5 subtasks</span>
-                </div>
+              {/* Single Task Container */}
+              <div className="task">
+                <h2 className="task-title">Example todo for zyx</h2>
+                <span className="task-body">0 of 7 subtasks</span>
+              </div>
+              {/* Single Task Container */}
+              <div className="task">
+                <h2 className="task-title">Example todo for abc</h2>
+                <span className="task-body">1 of 3 subtasks</span>
+              </div>
+              {/* Single Task Container */}
+              <div className="task">
+                <h2 className="task-title">Example todo for cba</h2>
+                <span className="task-body">2 of 5 subtasks</span>
               </div>
             </div>
           </div>
           {/* Fourth Column */}
-          <div className="min-w-[250px] ">
+          <div className="min-w-[250px] max-w-[350px]">
             {/* Column Title Container */}
-            <div className="flex justify-start items-center gap-2 mb-4 bg-purple-100">
+            <div className="flex justify-start items-center gap-2 mb-6 text-sm">
               {/* Colorful circle */}
-              <div className="h-4 w-4 bg-todoColors-brightBlue rounded-full"></div>
+              <div className="h-4 w-4 bg-todoColors-yellow rounded-full"></div>
               {/* Column Title */}
               <h3 className="uppercase text-fontSecondary font-bold">
                 Todo (4)
               </h3>
             </div>
-            {/* Task Containers */}
-            <div className="flex flex-col justify-start items-center bg-purple-500">
-              {/* Task Container */}
-              <div className="border-white border-2">
-                {/* Single Task Container */}
-                <div>
-                  <h2>Example todo for xyz</h2>
-                  <span>0 of 3 subtasks</span>
-                </div>
-                {/* Single Task Container */}
-                <div>
-                  <h2>Example todo for zyx</h2>
-                  <span>0 of 7 subtasks</span>
-                </div>
-                {/* Single Task Container */}
-                <div>
-                  <h2>Example todo for abc</h2>
-                  <span>1 of 3 subtasks</span>
-                </div>
-                {/* Single Task Container */}
-                <div>
-                  <h2>Example todo for cba</h2>
-                  <span>2 of 5 subtasks</span>
-                </div>
+            {/* Task Container */}
+            <div className="flex flex-col justify-start items-center gap-4">
+              {/* Single Task Container */}
+              <div className="task">
+                <h2 className="task-title">Example todo for xyz</h2>
+                <span className="task-body">0 of 3 subtasks</span>
               </div>
-              {/* Task Container */}
-              <div className="border-white border-2">
-                {/* Single Task Container */}
-                <div>
-                  <h2>Example todo for xyz</h2>
-                  <span>0 of 3 subtasks</span>
-                </div>
-                {/* Single Task Container */}
-                <div>
-                  <h2>Example todo for zyx</h2>
-                  <span>0 of 7 subtasks</span>
-                </div>
-                {/* Single Task Container */}
-                <div>
-                  <h2>Example todo for abc</h2>
-                  <span>1 of 3 subtasks</span>
-                </div>
-                {/* Single Task Container */}
-                <div>
-                  <h2>Example todo for cba</h2>
-                  <span>2 of 5 subtasks</span>
-                </div>
+              {/* Single Task Container */}
+              <div className="task">
+                <h2 className="task-title">Example todo for zyx</h2>
+                <span className="task-body">0 of 7 subtasks</span>
               </div>
-            </div>
-          </div>
-          {/* Fifth Column */}
-          <div className="min-w-[250px] ">
-            {/* Column Title Container */}
-            <div className="flex justify-start items-center gap-2 mb-4 bg-purple-100">
-              {/* Colorful circle */}
-              <div className="h-4 w-4 bg-todoColors-brightBlue rounded-full"></div>
-              {/* Column Title */}
-              <h3 className="uppercase text-fontSecondary font-bold">
-                Todo (4)
-              </h3>
-            </div>
-            {/* Task Containers */}
-            <div className="flex flex-col justify-start items-center bg-purple-500">
-              {/* Task Container */}
-              <div className="border-white border-2">
-                {/* Single Task Container */}
-                <div>
-                  <h2>Example todo for xyz</h2>
-                  <span>0 of 3 subtasks</span>
-                </div>
-                {/* Single Task Container */}
-                <div>
-                  <h2>Example todo for zyx</h2>
-                  <span>0 of 7 subtasks</span>
-                </div>
-                {/* Single Task Container */}
-                <div>
-                  <h2>Example todo for abc</h2>
-                  <span>1 of 3 subtasks</span>
-                </div>
-                {/* Single Task Container */}
-                <div>
-                  <h2>Example todo for cba</h2>
-                  <span>2 of 5 subtasks</span>
-                </div>
+              {/* Single Task Container */}
+              <div className="task">
+                <h2 className="task-title">Example todo for abc</h2>
+                <span className="task-body">1 of 3 subtasks</span>
               </div>
-              {/* Task Container */}
-              <div className="border-white border-2">
-                {/* Single Task Container */}
-                <div>
-                  <h2>Example todo for xyz</h2>
-                  <span>0 of 3 subtasks</span>
-                </div>
-                {/* Single Task Container */}
-                <div>
-                  <h2>Example todo for zyx</h2>
-                  <span>0 of 7 subtasks</span>
-                </div>
-                {/* Single Task Container */}
-                <div>
-                  <h2>Example todo for abc</h2>
-                  <span>1 of 3 subtasks</span>
-                </div>
-                {/* Single Task Container */}
-                <div>
-                  <h2>Example todo for cba</h2>
-                  <span>2 of 5 subtasks</span>
-                </div>
+              {/* Single Task Container */}
+              <div className="task">
+                <h2 className="task-title">Example todo for cba</h2>
+                <span className="task-body">2 of 5 subtasks</span>
               </div>
             </div>
           </div>

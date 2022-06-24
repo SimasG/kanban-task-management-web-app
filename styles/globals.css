@@ -4,11 +4,13 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Global rules */
 html,
 body {
   height: 100%;
 }
 
+/* Grouped utilities */
 .task {
   @apply bg-darkGray w-full px-4 py-6 rounded-md cursor-pointer;
 }
