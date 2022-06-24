@@ -58,9 +58,7 @@ const Home: NextPage = () => {
         </section>
         {/* Log in/out btn + theme toggle + hide sidebar section */}
         <section className="mt-auto flex flex-col">
-          <button className="ml-4 mb-6 py-2 bg-fontTertiary text-fontPrimary rounded-full hover:bg-fontPrimary hover:text-fontTertiary">
-            Log In
-          </button>
+          <button className="purpleBtn ml-4 mb-6">Log In</button>
           {/* Theme toggle */}
           <div className="ml-4 mb-4 flex justify-center items-center gap-4 bg-darkBlue p-3 rounded">
             {/* Toggle light theme icon */}
@@ -195,7 +193,7 @@ const Home: NextPage = () => {
               <div className="h-4 w-4 bg-todoColors-violet rounded-full"></div>
               {/* Column Title */}
               <h3 className="uppercase text-fontSecondary font-bold">
-                Doi g (4)
+                Doing (4)
               </h3>
             </div>
             {/* Task Container */}
@@ -258,7 +256,7 @@ const Home: NextPage = () => {
             </div>
           </div>
           {/* Add New Column btn */}
-          <div className="min-w-[250px] bg-veryDarkGray mt-11 h-5/6 flex justify-center items-center cursor-pointer">
+          <div className="min-w-[250px] bg-veryDarkGray mt-11 h-5/6 flex justify-center items-center cursor-pointer rounded-md hover:bg-opacity-50">
             <h2 className="mb-56 text-2xl text-fontSecondary font-bold">
               + New Column
             </h2>

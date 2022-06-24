@@ -12,7 +12,7 @@ body {
 
 /* Grouped utilities */
 .task {
-  @apply bg-darkGray w-full px-4 py-6 rounded-md cursor-pointer;
+  @apply bg-darkGray w-full px-4 py-6 rounded-md cursor-pointer hover:bg-opacity-50;
 }
 
 .task-title {
@@ -21,4 +21,16 @@ body {
 
 .task-body {
   @apply text-fontSecondary text-sm;
+}
+
+.input {
+  @apply border-fontSecondary border-2 bg-transparent rounded py-2 px-3 opacity-25 outline-0;
+}
+
+.textarea {
+  @apply border-fontSecondary border-2 bg-transparent rounded py-2 px-3 opacity-25 outline-0 min-h-[150px];
+}
+
+.purpleBtn {
+  @apply py-2 bg-fontTertiary text-fontPrimary font-bold rounded-full hover:bg-fontPrimary hover:text-fontTertiary;
 }
