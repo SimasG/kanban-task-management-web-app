@@ -1,12 +1,23 @@
 import { TbLayoutBoardSplit, TbLayoutBoard } from "react-icons/tb";
-
 import type { NextPage } from "next";
+import { useState } from "react";
+import AddNewTaskModal from "../components/AddNewTaskModal";
 
 const Home: NextPage = () => {
+  const [showAddTaskModal, setShowAddTaskModal] = useState(false);
+
+  const handleAddNewTaskBtn = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    setShowAddTaskModal(true);
+  };
+
   return (
-    <div className="flex justify-center text-white h-screen overflow-x-hidden	">
+    <div
+      onClick={() => setShowAddTaskModal(false)}
+      className="flex justify-center text-white h-screen overflow-x-hidden"
+    >
       {/* Side nav bar */}
-      <nav className="min-w-[250px] bg-darkGray pr-4 py-4 w-1/4">
+      <nav className="min-w-[250px] bg-darkGray pr-4 py-4 w-1/5 flex flex-col justify-between">
         {/* Logo container */}
         <a href="/" className="pl-4 flex justify-start items-center gap-2 mb-8">
           <TbLayoutBoard className="h-7 w-7" />
@@ -109,12 +120,17 @@ const Home: NextPage = () => {
         </section>
       </nav>
       {/* Main */}
-      <main className="w-3/4">
+      <main className="w-4/5">
         {/* Top Settings */}
-        <section className="h-20 min-w-[500px] p-4 flex justify-between items-center bg-darkGray">
+        <section className="h-1/6 min-w-[500px] p-4 flex justify-between items-center bg-darkGray">
           <h1 className="text-2xl">Board Name</h1>
           <div className="flex justify-center items-center gap-4">
-            <button className="py-2 px-4 bg-fontTertiary rounded-full hover:bg-fontPrimary hover:text-fontTertiary">
+            <button
+              onClick={(e) => {
+                handleAddNewTaskBtn(e);
+              }}
+              className="py-2 px-4 bg-fontTertiary rounded-full hover:bg-fontPrimary hover:text-fontTertiary"
+            >
               + Add New Task
             </button>
             {/* Delete Board Btn */}
@@ -135,7 +151,7 @@ const Home: NextPage = () => {
           </div>
         </section>
         {/* Main content */}
-        <section className="bg-darkBlue p-5 h-screen flex justify-start items-start gap-6 overflow-x-auto overflow-hidden">
+        <section className="h-5/6 bg-darkBlue p-5 flex justify-start items-start gap-6 overflow-x-auto overflow-hidden">
           {/* First Column */}
           <div className="min-w-[250px] max-w-[350px]">
             {/* Column Title Container */}
@@ -179,7 +195,7 @@ const Home: NextPage = () => {
               <div className="h-4 w-4 bg-todoColors-violet rounded-full"></div>
               {/* Column Title */}
               <h3 className="uppercase text-fontSecondary font-bold">
-                Todo (4)
+                Doi g (4)
               </h3>
             </div>
             {/* Task Container */}
@@ -214,42 +230,7 @@ const Home: NextPage = () => {
               <div className="h-4 w-4 bg-todoColors-brightGreen rounded-full"></div>
               {/* Column Title */}
               <h3 className="uppercase text-fontSecondary font-bold">
-                Todo (4)
-              </h3>
-            </div>
-            {/* Task Container */}
-            <div className="flex flex-col justify-start items-center gap-4">
-              {/* Single Task Container */}
-              <div className="task">
-                <h2 className="task-title">Example todo for xyz</h2>
-                <span className="task-body">0 of 3 subtasks</span>
-              </div>
-              {/* Single Task Container */}
-              <div className="task">
-                <h2 className="task-title">Example todo for zyx</h2>
-                <span className="task-body">0 of 7 subtasks</span>
-              </div>
-              {/* Single Task Container */}
-              <div className="task">
-                <h2 className="task-title">Example todo for abc</h2>
-                <span className="task-body">1 of 3 subtasks</span>
-              </div>
-              {/* Single Task Container */}
-              <div className="task">
-                <h2 className="task-title">Example todo for cba</h2>
-                <span className="task-body">2 of 5 subtasks</span>
-              </div>
-            </div>
-          </div>
-          {/* Fourth Column */}
-          <div className="min-w-[250px] max-w-[350px]">
-            {/* Column Title Container */}
-            <div className="flex justify-start items-center gap-2 mb-6 text-sm">
-              {/* Colorful circle */}
-              <div className="h-4 w-4 bg-todoColors-yellow rounded-full"></div>
-              {/* Column Title */}
-              <h3 className="uppercase text-fontSecondary font-bold">
-                Todo (4)
+                Done (4)
               </h3>
             </div>
             {/* Task Container */}
@@ -277,9 +258,14 @@ const Home: NextPage = () => {
             </div>
           </div>
           {/* Add New Column btn */}
-          <div className="min-w-[250px] bg-yellow-300">+ New Column</div>
+          <div className="min-w-[250px] bg-veryDarkGray mt-11 h-5/6 flex justify-center items-center cursor-pointer">
+            <h2 className="mb-56 text-2xl text-fontSecondary font-bold">
+              + New Column
+            </h2>
+          </div>
         </section>
       </main>
+      {showAddTaskModal && <AddNewTaskModal />}
     </div>
   );
 };

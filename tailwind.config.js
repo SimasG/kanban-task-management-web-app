@@ -13,6 +13,7 @@ module.exports = {
         fontTertiary: "#645FC6",
         darkBlue: "#21212D",
         darkGray: "#2c2c38",
+        veryDarkGray: "#22252e",
         todoColors: {
           brightBlue: "#4fc4ef",
           violet: "#645FC6",
