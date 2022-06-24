@@ -127,7 +127,7 @@ const Home: NextPage = () => {
               onClick={(e) => {
                 handleAddNewTaskBtn(e);
               }}
-              className="py-2 px-4 bg-fontTertiary rounded-full hover:bg-fontPrimary hover:text-fontTertiary"
+              className="px-4 purpleBtn"
             >
               + Add New Task
             </button>

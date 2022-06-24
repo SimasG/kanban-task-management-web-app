@@ -34,3 +34,7 @@ body {
 .purpleBtn {
   @apply py-2 bg-fontTertiary text-fontPrimary font-bold rounded-full hover:bg-fontPrimary hover:text-fontTertiary;
 }
+
+.whiteBtn {
+  @apply py-2 bg-fontPrimary text-fontTertiary font-bold rounded-full hover:bg-fontTertiary hover:text-fontPrimary;
+}

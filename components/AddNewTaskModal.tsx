@@ -25,7 +25,7 @@ const AddNewTaskModal = () => {
           />
         </div>
         {/* Subtask Container */}
-        <div className="flex flex-col justify-between gap-2">
+        <div className="flex flex-col justify-between gap-3">
           <span className="font-bold text-sm">Subtasks</span>
           {/* Individual Subtasks */}
           <div className="flex flex-col justify-between gap-2">
@@ -81,8 +81,20 @@ const AddNewTaskModal = () => {
             </div>
           </div>
           {/* Add Subtask Btn */}
-          <button className="purpleBtn">+ Add New Subtask</button>
+          <button className="whiteBtn text-sm">+ Add New Subtask</button>
         </div>
+        {/* Status */}
+        <div className="flex flex-col justify-between gap-2">
+          <span className="font-bold text-sm">Status</span>
+          {/* **Change to select input later */}
+          <input
+            className="input"
+            type="select"
+            placeholder="e.g. This will be a select input"
+          />
+        </div>
+        {/* Create Task Btn */}
+        <button className="purpleBtn">Create Task</button>
       </form>
     </section>
   );
