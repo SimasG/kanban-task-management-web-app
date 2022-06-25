@@ -38,3 +38,7 @@ body {
 .whiteBtn {
   @apply py-2 bg-fontPrimary text-fontTertiary font-bold rounded-full hover:bg-fontTertiary hover:text-fontPrimary;
 }
+
+.subtask {
+  @apply flex justify-start items-center gap-4 p-4 bg-darkBlue rounded;
+}

@@ -1,19 +1,29 @@
 import { TbLayoutBoardSplit, TbLayoutBoard } from "react-icons/tb";
 import type { NextPage } from "next";
-import { useState } from "react";
+import React, { useState } from "react";
 import AddNewTaskModal from "../components/AddNewTaskModal";
+import EditTaskModal from "../components/EditTaskModal";
 
 const Home: NextPage = () => {
   const [showAddTaskModal, setShowAddTaskModal] = useState(false);
+  const [showEditTaskModal, setShowEditTaskModal] = useState(false);
 
   const handleAddNewTaskBtn = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     setShowAddTaskModal(true);
   };
 
+  const handleEditTask = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+    setShowEditTaskModal(true);
+  };
+
   return (
     <div
-      onClick={() => setShowAddTaskModal(false)}
+      onClick={() => {
+        setShowAddTaskModal(false);
+        setShowEditTaskModal(false);
+      }}
       className="flex justify-center text-white h-screen overflow-x-hidden"
     >
       {/* Side nav bar */}
@@ -164,7 +174,12 @@ const Home: NextPage = () => {
             {/* Task Container */}
             <div className="flex flex-col justify-start items-center gap-4">
               {/* Single Task Container */}
-              <div className="task">
+              <div
+                onClick={(e) => {
+                  handleEditTask(e);
+                }}
+                className="task"
+              >
                 <h2 className="task-title">Example todo for xyz</h2>
                 <span className="task-body">0 of 3 subtasks</span>
               </div>
@@ -264,6 +279,7 @@ const Home: NextPage = () => {
         </section>
       </main>
       {showAddTaskModal && <AddNewTaskModal />}
+      {showEditTaskModal && <EditTaskModal />}
     </div>
   );
 };
