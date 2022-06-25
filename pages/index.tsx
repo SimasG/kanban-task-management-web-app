@@ -1,4 +1,5 @@
 import { TbLayoutBoardSplit, TbLayoutBoard } from "react-icons/tb";
+import { FcGoogle } from "react-icons/fc";
 import type { NextPage } from "next";
 import React, { useState } from "react";
 import AddNewTaskModal from "../components/AddNewTaskModal";
@@ -68,7 +69,10 @@ const Home: NextPage = () => {
         </section>
         {/* Log in/out btn + theme toggle + hide sidebar section */}
         <section className="mt-auto flex flex-col">
-          <button className="purpleBtn ml-4 mb-6">Log In</button>
+          <button className="purpleBtn w-fit mx-auto mb-6 px-6 flex justify-center items-center gap-4">
+            <span>Log In</span>
+            <FcGoogle className="w-6 h-6" />
+          </button>
           {/* Theme toggle */}
           <div className="ml-4 mb-4 flex justify-center items-center gap-4 bg-darkBlue p-3 rounded">
             {/* Toggle light theme icon */}
@@ -130,7 +134,7 @@ const Home: NextPage = () => {
       {/* Main */}
       <main className="w-4/5">
         {/* Top Settings */}
-        <section className="h-1/6 min-w-[500px] p-4 flex justify-between items-center bg-darkGray">
+        <section className="h-[10%] min-w-[500px] p-4 flex justify-between items-center bg-darkGray">
           <h1 className="text-2xl">Board Name</h1>
           <div className="flex justify-center items-center gap-4">
             <button
@@ -159,7 +163,7 @@ const Home: NextPage = () => {
           </div>
         </section>
         {/* Main content */}
-        <section className="h-5/6 bg-darkBlue p-5 flex justify-start items-start gap-6 overflow-x-auto overflow-hidden">
+        <section className="h-[90%] bg-darkBlue p-5 flex justify-start items-start gap-6 overflow-x-auto overflow-hidden">
           {/* First Column */}
           <div className="min-w-[250px] max-w-[350px]">
             {/* Column Title Container */}
