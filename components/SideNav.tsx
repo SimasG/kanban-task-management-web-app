@@ -17,6 +17,7 @@ const SideNav = () => {
       .then(async (result) => {
         const user = result.user;
         await setDoc(doc(db, "users", user.uid), {
+          id: user.uid,
           email: user.email,
           timeStamp: serverTimestamp(),
         });
@@ -45,19 +46,19 @@ const SideNav = () => {
         {/* Boards subcontainer */}
         <div>
           {/* Specific Board */}
-          <div className="pl-4 flex justify-start items-center gap-3 py-2 cursor-pointer hover:bg-fontTertiary hover:text-fontPrimary hover:rounded-r-full">
+          <div className="board">
             <TbLayoutBoardSplit />
             {/* Individual Board name */}
             <h4>Platform Launch</h4>
           </div>
           {/* Specific Board */}
-          <div className="pl-4 flex justify-start items-center gap-3 py-2 cursor-pointer hover:bg-fontTertiary hover:text-fontPrimary hover:rounded-r-full">
+          <div className="board">
             <TbLayoutBoardSplit />
             {/* Individual Board name */}
             <h4>Marketing Plan</h4>
           </div>
           {/* Specific Board */}
-          <div className="pl-4 flex justify-start items-center gap-3 py-2 cursor-pointer hover:bg-fontTertiary hover:text-fontPrimary hover:rounded-r-full">
+          <div className="board">
             <TbLayoutBoardSplit />
             {/* Individual Board name */}
             <h4>Roadmap</h4>
