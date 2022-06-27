@@ -7,8 +7,6 @@ import useGetUser from "../lib/hooks/useGetUser";
 function MyApp({ Component, pageProps }: AppProps) {
   const user = useGetUser();
 
-  console.log(user);
-
   return (
     <UserContext.Provider value={user}>
       <Component {...pageProps} />
