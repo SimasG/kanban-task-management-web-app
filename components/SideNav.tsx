@@ -8,6 +8,7 @@ import { TbLayoutBoard, TbLayoutBoardSplit } from "react-icons/tb";
 import { UserContext } from "../lib/context";
 import { auth, db } from "../lib/firebase";
 import boards from "../boards.json";
+import { v4 as uuidv4 } from "uuid";
 
 const SideNav = () => {
   const user = useContext(UserContext);
@@ -33,6 +34,7 @@ const SideNav = () => {
 
   const cleanedBoards =
     boards.users.user["8oa8jIW95xQzpwsmoq4ytDbVWuF3"].boards;
+  console.log(cleanedBoards);
 
   const exampleBoard = {
     users: {
@@ -65,12 +67,36 @@ const SideNav = () => {
   // ** Don't understand this condition
   if (typeof window !== "undefined") {
     localStorage.setItem("board", JSON.stringify(exampleBoard));
-    const localStorageBoards = JSON.parse(localStorage.getItem("board") || "");
-    console.log(localStorageBoards);
+    // const localStorageBoards = JSON.parse(localStorage.getItem("board") || "");
+    // const cleanedLocalStorageBoards =
+    //   localStorageBoards.users.user["8oa8jIW95xQzpwsmoq4ytDbVWuF3"].boards;
+  }
+
+  const localStorageBoards =
+    typeof window !== "undefined"
+      ? JSON.parse(localStorage.getItem("board") || "")
+      : null;
+
+  if (localStorageBoards) {
+    console.log(
+      localStorageBoards.users.user["8oa8jIW95xQzpwsmoq4ytDbVWuF3"].boards
+    );
   }
 
   const handleCreateNewBoard = () => {
     console.log("New Item should have been created!");
+  };
+
+  type boardType = {
+    board: {
+      title:
+        | boolean
+        | React.Key
+        | React.ReactElement<any, string | React.JSXElementConstructor<any>>
+        | React.ReactFragment
+        | null
+        | undefined;
+    };
   };
 
   return (
@@ -89,15 +115,19 @@ const SideNav = () => {
         {/* Boards subcontainer */}
         <div>
           {/* Specific Board */}
-          {cleanedBoards.map((board) => {
-            return (
-              <div className="board" key={board.board.title}>
-                <TbLayoutBoardSplit />
-                {/* Individual Board name */}
-                <h4>{board.board.title}</h4>
-              </div>
-            );
-          })}
+          {localStorageBoards &&
+            localStorageBoards.users.user[
+              "8oa8jIW95xQzpwsmoq4ytDbVWuF3"
+            ].boards.map((board: boardType) => {
+              const uid = uuidv4();
+              return (
+                <div className="board" key={uid}>
+                  <TbLayoutBoardSplit />
+                  {/* Individual Board name */}
+                  <h4>{board.board.title}</h4>
+                </div>
+              );
+            })}
         </div>
         {/* Create new Board container */}
         <div className="pl-4 flex justify-start items-center gap-3 py-1 text-fontTertiary cursor-pointer hover:bg-fontPrimary hover:text-fontTertiary hover:rounded-r-full">
