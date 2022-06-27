@@ -46,3 +46,16 @@
                 </div>
               );
             })}
+
+// \*\* Bruv
+type boardType = {
+board: {
+title:
+| boolean
+| React.Key
+| React.ReactElement<any, string | React.JSXElementConstructor<any>>
+| React.ReactFragment
+| null
+| undefined;
+};
+};

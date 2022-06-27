@@ -1,7 +1,7 @@
 import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
-import { doc, serverTimestamp, setDoc } from "firebase/firestore";
+import { collection, doc, serverTimestamp, setDoc } from "firebase/firestore";
 import Image from "next/image";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import toast from "react-hot-toast";
 import { FcGoogle } from "react-icons/fc";
 import { TbLayoutBoard, TbLayoutBoardSplit } from "react-icons/tb";
@@ -15,7 +15,7 @@ const SideNav = () => {
   const [localStorageData, setLocalStorageData] = useState({});
   const user = useContext(UserContext);
   const data = useFetchData(user?.uid);
-  // console.log(localStorageData);
+  console.log(user);
 
   // useEffect(() => {
   //   // const localStorageBoards = JSON.parse(localStorage.getItem("board") || "")
@@ -85,20 +85,12 @@ const SideNav = () => {
 
   const handleCreateNewBoard = () => {
     // console.log(localStorageBoards);
+    const uuid = uuidv4();
+    const ref = doc(db, "users", `${user?.uid}`, "boards", uuid);
+    setDoc(ref, {
+      title: "New Board",
+    });
     console.log("New Item should have been created!");
-  };
-
-  // ** Bruv
-  type boardType = {
-    board: {
-      title:
-        | boolean
-        | React.Key
-        | React.ReactElement<any, string | React.JSXElementConstructor<any>>
-        | React.ReactFragment
-        | null
-        | undefined;
-    };
   };
 
   return (
