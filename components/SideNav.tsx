@@ -1,7 +1,7 @@
 import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
 import { doc, serverTimestamp, setDoc } from "firebase/firestore";
 import Image from "next/image";
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { FcGoogle } from "react-icons/fc";
 import { TbLayoutBoard, TbLayoutBoardSplit } from "react-icons/tb";
@@ -9,9 +9,20 @@ import { UserContext } from "../lib/context";
 import { auth, db } from "../lib/firebase";
 import boards from "../boards.json";
 import { v4 as uuidv4 } from "uuid";
+import useFetchData from "../lib/hooks/useFetchData";
 
 const SideNav = () => {
+  const [localStorageData, setLocalStorageData] = useState({});
   const user = useContext(UserContext);
+  const data = useFetchData(user?.uid);
+  // console.log(localStorageData);
+
+  // useEffect(() => {
+  //   // const localStorageBoards = JSON.parse(localStorage.getItem("board") || "")
+  //   // return localStorageBoards
+  //   if (typeof window === undefined) return;
+  //   setLocalStorageData(JSON.parse(localStorage.getItem("board") || ""));
+  // }, []);
 
   const handleGoogleLogin = () => {
     const provider = new GoogleAuthProvider();
@@ -32,61 +43,52 @@ const SideNav = () => {
     signOut(auth).then(() => toast.success("Logged out!"));
   };
 
-  const cleanedBoards =
-    boards.users.user["8oa8jIW95xQzpwsmoq4ytDbVWuF3"].boards;
-  console.log(cleanedBoards);
+  // const cleanedBoards =
+  //   boards.users.user["8oa8jIW95xQzpwsmoq4ytDbVWuF3"].boards;
 
-  const exampleBoard = {
-    users: {
-      user: {
-        "8oa8jIW95xQzpwsmoq4ytDbVWuF3": {
-          email: "s.gradeckas@gmail.com",
-          id: "8oa8jIW95xQzpwsmoq4ytDbVWuF3",
-          boards: [
-            {
-              board: {
-                title: "Marketing Campaign",
-              },
-            },
-            {
-              board: {
-                title: "Sales Campaign",
-              },
-            },
-            {
-              board: {
-                title: "Customer Success",
-              },
-            },
-          ],
-        },
-      },
-    },
-  };
+  // const exampleBoard = {
+  //   users: {
+  //     user: {
+  //       "8oa8jIW95xQzpwsmoq4ytDbVWuF3": {
+  //         email: "s.gradeckas@gmail.com",
+  //         id: "8oa8jIW95xQzpwsmoq4ytDbVWuF3",
+  //         boards: [
+  //           {
+  //             board: {
+  //               title: "Marketing Campaign",
+  //             },
+  //           },
+  //           {
+  //             board: {
+  //               title: "Sales Campaign",
+  //             },
+  //           },
+  //           {
+  //             board: {
+  //               title: "Customer Success",
+  //             },
+  //           },
+  //         ],
+  //       },
+  //     },
+  //   },
+  // };
 
-  // ** Don't understand this condition
-  if (typeof window !== "undefined") {
-    localStorage.setItem("board", JSON.stringify(exampleBoard));
-    // const localStorageBoards = JSON.parse(localStorage.getItem("board") || "");
-    // const cleanedLocalStorageBoards =
-    //   localStorageBoards.users.user["8oa8jIW95xQzpwsmoq4ytDbVWuF3"].boards;
-  }
+  // if (typeof window !== "undefined") {
+  //   localStorage.setItem("board", JSON.stringify(exampleBoard));
+  // }
 
-  const localStorageBoards =
-    typeof window !== "undefined"
-      ? JSON.parse(localStorage.getItem("board") || "")
-      : null;
-
-  if (localStorageBoards) {
-    console.log(
-      localStorageBoards.users.user["8oa8jIW95xQzpwsmoq4ytDbVWuF3"].boards
-    );
-  }
+  // const localStorageBoards =
+  //   typeof window !== "undefined"
+  //     ? JSON.parse(localStorage.getItem("board") || "")
+  //     : null;
 
   const handleCreateNewBoard = () => {
+    // console.log(localStorageBoards);
     console.log("New Item should have been created!");
   };
 
+  // ** Bruv
   type boardType = {
     board: {
       title:
@@ -107,34 +109,34 @@ const SideNav = () => {
         <h1 className="text-3xl">kanban</h1>
       </a>
       {/* Boards container */}
-      <section className="text-fontSecondary">
-        {/* All Boards title */}
-        <h3 className="pl-4 uppercase font-bold text-xs mb-4">
-          All Boards (3)
-        </h3>
-        {/* Boards subcontainer */}
-        <div>
-          {/* Specific Board */}
-          {localStorageBoards &&
-            localStorageBoards.users.user[
-              "8oa8jIW95xQzpwsmoq4ytDbVWuF3"
-            ].boards.map((board: boardType) => {
-              const uid = uuidv4();
-              return (
-                <div className="board" key={uid}>
-                  <TbLayoutBoardSplit />
-                  {/* Individual Board name */}
-                  <h4>{board.board.title}</h4>
-                </div>
-              );
-            })}
-        </div>
-        {/* Create new Board container */}
-        <div className="pl-4 flex justify-start items-center gap-3 py-1 text-fontTertiary cursor-pointer hover:bg-fontPrimary hover:text-fontTertiary hover:rounded-r-full">
-          <TbLayoutBoardSplit />
-          <button onClick={handleCreateNewBoard}>+ Create New Board</button>
-        </div>
-      </section>
+      {user && (
+        <section className="text-fontSecondary">
+          {/* All Boards title */}
+          <h3 className="pl-4 uppercase font-bold text-xs mb-4">
+            All Boards (3)
+          </h3>
+          {/* Boards subcontainer */}
+          <div>
+            {/* Specific Board */}
+            {data &&
+              data.map((board) => {
+                const uid = uuidv4();
+                return (
+                  <div className="board" key={uid}>
+                    <TbLayoutBoardSplit />
+                    {/* Individual Board name */}
+                    <h4>{board.title}</h4>
+                  </div>
+                );
+              })}
+          </div>
+          {/* Create new Board container */}
+          <div className="pl-4 flex justify-start items-center gap-3 py-1 text-fontTertiary cursor-pointer hover:bg-fontPrimary hover:text-fontTertiary hover:rounded-r-full">
+            <TbLayoutBoardSplit />
+            <button onClick={handleCreateNewBoard}>+ Create New Board</button>
+          </div>
+        </section>
+      )}
       {/* Log in/out btn + theme toggle + hide sidebar section */}
       <section className="mt-auto flex flex-col">
         {user ? (
