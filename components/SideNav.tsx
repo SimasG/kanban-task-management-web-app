@@ -7,6 +7,7 @@ import { FcGoogle } from "react-icons/fc";
 import { TbLayoutBoard, TbLayoutBoardSplit } from "react-icons/tb";
 import { UserContext } from "../lib/context";
 import { auth, db } from "../lib/firebase";
+import boards from "../boards.json";
 
 const SideNav = () => {
   const user = useContext(UserContext);
@@ -30,6 +31,48 @@ const SideNav = () => {
     signOut(auth).then(() => toast.success("Logged out!"));
   };
 
+  const cleanedBoards =
+    boards.users.user["8oa8jIW95xQzpwsmoq4ytDbVWuF3"].boards;
+
+  const exampleBoard = {
+    users: {
+      user: {
+        "8oa8jIW95xQzpwsmoq4ytDbVWuF3": {
+          email: "s.gradeckas@gmail.com",
+          id: "8oa8jIW95xQzpwsmoq4ytDbVWuF3",
+          boards: [
+            {
+              board: {
+                title: "Marketing Campaign",
+              },
+            },
+            {
+              board: {
+                title: "Sales Campaign",
+              },
+            },
+            {
+              board: {
+                title: "Customer Success",
+              },
+            },
+          ],
+        },
+      },
+    },
+  };
+
+  // ** Don't understand this condition
+  if (typeof window !== "undefined") {
+    localStorage.setItem("board", JSON.stringify(exampleBoard));
+    const localStorageBoards = JSON.parse(localStorage.getItem("board") || "");
+    console.log(localStorageBoards);
+  }
+
+  const handleCreateNewBoard = () => {
+    console.log("New Item should have been created!");
+  };
+
   return (
     <nav className="min-w-[250px] bg-darkGray pr-4 py-4 w-1/5 flex flex-col justify-between">
       {/* Logo container */}
@@ -46,28 +89,20 @@ const SideNav = () => {
         {/* Boards subcontainer */}
         <div>
           {/* Specific Board */}
-          <div className="board">
-            <TbLayoutBoardSplit />
-            {/* Individual Board name */}
-            <h4>Platform Launch</h4>
-          </div>
-          {/* Specific Board */}
-          <div className="board">
-            <TbLayoutBoardSplit />
-            {/* Individual Board name */}
-            <h4>Marketing Plan</h4>
-          </div>
-          {/* Specific Board */}
-          <div className="board">
-            <TbLayoutBoardSplit />
-            {/* Individual Board name */}
-            <h4>Roadmap</h4>
-          </div>
+          {cleanedBoards.map((board) => {
+            return (
+              <div className="board" key={board.board.title}>
+                <TbLayoutBoardSplit />
+                {/* Individual Board name */}
+                <h4>{board.board.title}</h4>
+              </div>
+            );
+          })}
         </div>
         {/* Create new Board container */}
         <div className="pl-4 flex justify-start items-center gap-3 py-1 text-fontTertiary cursor-pointer hover:bg-fontPrimary hover:text-fontTertiary hover:rounded-r-full">
           <TbLayoutBoardSplit />
-          <h4>+ Create New Board</h4>
+          <button onClick={handleCreateNewBoard}>+ Create New Board</button>
         </div>
       </section>
       {/* Log in/out btn + theme toggle + hide sidebar section */}

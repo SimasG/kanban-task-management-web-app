@@ -1,0 +1,27 @@
+{
+  "users": {
+    "user": {
+      "8oa8jIW95xQzpwsmoq4ytDbVWuF3": {
+        "email": "s.gradeckas@gmail.com",
+        "id": "8oa8jIW95xQzpwsmoq4ytDbVWuF3",
+        "boards": [
+          {
+            "board": {
+              "title": "Marketing Campaign"
+            }
+          },
+          {
+            "board": {
+              "title": "Sales Campaign"
+            }
+          },
+          {
+            "board": {
+              "title": "Customer Success"
+            }
+          }
+        ]
+      }
+    }
+  }
+}
