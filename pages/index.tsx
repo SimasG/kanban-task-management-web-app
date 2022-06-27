@@ -1,13 +1,26 @@
 import { TbLayoutBoardSplit, TbLayoutBoard } from "react-icons/tb";
 import { FcGoogle } from "react-icons/fc";
 import type { NextPage } from "next";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import AddNewTaskModal from "../components/AddNewTaskModal";
 import EditTaskModal from "../components/EditTaskModal";
+import {
+  // Google auth
+  GoogleAuthProvider,
+  signInWithPopup,
+  signOut,
+} from "firebase/auth";
+import { auth, db } from "../lib/firebase";
+import { doc, setDoc, serverTimestamp } from "firebase/firestore";
+import toast from "react-hot-toast";
+import { UserContext } from "../lib/context";
+import Image from "next/image";
 
 const Home: NextPage = () => {
   const [showAddTaskModal, setShowAddTaskModal] = useState(false);
   const [showEditTaskModal, setShowEditTaskModal] = useState(false);
+
+  const user = useContext(UserContext);
 
   const handleAddNewTaskBtn = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
@@ -17,6 +30,23 @@ const Home: NextPage = () => {
   const handleEditTask = (e: React.MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
     setShowEditTaskModal(true);
+  };
+
+  const handleGoogleLogin = () => {
+    const provider = new GoogleAuthProvider();
+    signInWithPopup(auth, provider)
+      .then(async (result) => {
+        const user = result.user;
+        await setDoc(doc(db, "users", user.uid), {
+          email: user.email,
+          timeStamp: serverTimestamp(),
+        });
+      })
+      .catch((err) => console.log(err));
+  };
+
+  const signOutUser = () => {
+    signOut(auth).then(() => toast.success("Logged out!"));
   };
 
   return (
@@ -69,10 +99,29 @@ const Home: NextPage = () => {
         </section>
         {/* Log in/out btn + theme toggle + hide sidebar section */}
         <section className="mt-auto flex flex-col">
-          <button className="purpleBtn w-fit mx-auto mb-6 px-6 flex justify-center items-center gap-4">
-            <span>Log In</span>
-            <FcGoogle className="w-6 h-6" />
-          </button>
+          {user ? (
+            <div className="flex justify-center items-center gap-4 mb-6">
+              <button onClick={signOutUser} className="purpleBtn w-fit px-6">
+                Log Out
+              </button>
+              <Image
+                className="w-8 h-8 rounded-full"
+                src={user?.photoURL || "hacker.png"}
+                height={32}
+                width={32}
+                alt="user photo"
+              />
+            </div>
+          ) : (
+            <button
+              onClick={handleGoogleLogin}
+              className="purpleBtn w-fit mx-auto mb-6 px-6 flex justify-center items-center gap-4"
+            >
+              <span>Log In</span>
+              <FcGoogle className="w-6 h-6" />
+            </button>
+          )}
+
           {/* Theme toggle */}
           <div className="ml-4 mb-4 flex justify-center items-center gap-4 bg-darkBlue p-3 rounded">
             {/* Toggle light theme icon */}
