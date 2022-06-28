@@ -20,8 +20,14 @@ import useFetchData from "../lib/hooks/useFetchData";
 const SideNav = () => {
   const [localStorageData, setLocalStorageData] = useState({});
   const user = useContext(UserContext);
-  const data = useFetchData(user?.uid);
-  console.log(data !== undefined);
+  // ** Putting any as the time for now
+  const data: any = useFetchData(user?.uid);
+  // if (data === []) {
+  //   console.log("data is []");
+  // } else {
+  //   console.log(data.length);
+  // }
+
   // console.log(localStorageData.users["8oa8jIW95xQzpwsmoq4ytDbVWuF3"].boards);
 
   useEffect(() => {
@@ -121,7 +127,7 @@ const SideNav = () => {
             {/* Specific Board */}
             {
               localStorageData
-                ? data !== []
+                ? data.length !== 0
                   ? "Firestore data!"
                   : "localStorage data!"
                 : "No Data!"
