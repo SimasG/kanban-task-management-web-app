@@ -17,16 +17,35 @@ import boards from "../boards.json";
 import { v4 as uuidv4 } from "uuid";
 import useFetchData from "../lib/hooks/useFetchData";
 
+type LocalStorageDataProps = {
+  users: UserProps;
+};
+
+type UserProps = {
+  userId: {
+    email: string;
+    id: string;
+    boards: BoardsProps[];
+  };
+};
+
+type BoardsProps = {
+  board: BoardProps;
+};
+
+type BoardProps = {
+  title: string;
+};
+
 const SideNav = () => {
-  const [localStorageData, setLocalStorageData] = useState({});
+  // ** Putting "any" type for now
+  const [localStorageData, setLocalStorageData] =
+    useState<LocalStorageDataProps | null>(null);
   const user = useContext(UserContext);
   // ** Putting any as the time for now
   const data: any = useFetchData(user?.uid);
-  // if (data === []) {
-  //   console.log("data is []");
-  // } else {
-  //   console.log(data.length);
-  // }
+  console.log(`Firestore data`, data);
+  console.log(`localStorage data`, localStorageData?.users.userId.boards);
 
   // console.log(localStorageData.users["8oa8jIW95xQzpwsmoq4ytDbVWuF3"].boards);
 
@@ -55,43 +74,30 @@ const SideNav = () => {
     signOut(auth).then(() => toast.success("Logged out!"));
   };
 
-  // const cleanedBoards =
-  //   boards.users["8oa8jIW95xQzpwsmoq4ytDbVWuF3"].boards;
-
-  // const exampleBoard = {
-  //   users: {
-  //     "8oa8jIW95xQzpwsmoq4ytDbVWuF3": {
-  //       email: "s.gradeckas@gmail.com",
-  //       id: "8oa8jIW95xQzpwsmoq4ytDbVWuF3",
-  //       boards: [
-  //         {
-  //           board: {
-  //             title: "Marketing Campaign",
-  //           },
-  //         },
-  //         {
-  //           board: {
-  //             title: "Sales Campaign",
-  //           },
-  //         },
-  //         {
-  //           board: {
-  //             title: "Customer Success",
-  //           },
-  //         },
-  //       ],
-  //     },
-  //   },
-  // };
+  const exampleBoard = {
+    users: {
+      // Why can't I have "user?.uid" here?
+      "8oa8jIW95xQzpwsmoq4ytDbVWuF3": {
+        email: user?.email,
+        id: user?.uid,
+        boards: [
+          {
+            title: "Marketing Campaign",
+          },
+          {
+            title: "Sales Campaign",
+          },
+          {
+            title: "Customer Success",
+          },
+        ],
+      },
+    },
+  };
 
   // if (typeof window !== "undefined") {
   //   localStorage.setItem("board", JSON.stringify(exampleBoard));
   // }
-
-  // const localStorageBoards =
-  //   typeof window !== "undefined"
-  //     ? JSON.parse(localStorage.getItem("board") || "")
-  //     : null;
 
   const handleCreateNewBoard = () => {
     // const uuid = uuidv4();
@@ -102,11 +108,11 @@ const SideNav = () => {
     console.log("New Item should have been created!");
   };
 
-  type boardProps = {
-    board: {
-      title: string;
-    };
-  }[];
+  // type boardProps = {
+  //   board: {
+  //     title: string;
+  //   };
+  // }[];
 
   return (
     <nav className="min-w-[250px] bg-darkGray pr-4 py-4 w-1/5 flex flex-col justify-between">
@@ -127,10 +133,30 @@ const SideNav = () => {
             {/* Specific Board */}
             {
               localStorageData
-                ? data.length !== 0
-                  ? "Firestore data!"
-                  : "localStorage data!"
-                : "No Data!"
+                ? data?.length !== 0
+                  ? data?.map((board: BoardsProps) => {
+                      const uid = uuidv4();
+                      return (
+                        <div className="board" key={uid}>
+                          <TbLayoutBoardSplit />
+                          {/* Individual Board name */}
+                          <h4>{board.board.title}</h4>
+                        </div>
+                      );
+                    })
+                  : localStorageData.users.userId.boards.map(
+                      (board: BoardsProps) => {
+                        const uid = uuidv4();
+                        return (
+                          <div className="board" key={uid}>
+                            <TbLayoutBoardSplit />
+                            {/* Individual Board name */}
+                            <h4>{board.board.title}</h4>
+                          </div>
+                        );
+                      }
+                    )
+                : ""
 
               // localStorageData ?
               //   data ? return <div>Firestore data!</div> : return <div>localStorage data!</div> : <div>No data!</div>
