@@ -59,3 +59,15 @@ title:
 | undefined;
 };
 };
+
+            {data &&
+              data.map((board) => {
+                const uid = uuidv4();
+                return (
+                  <div className="board" key={uid}>
+                    <TbLayoutBoardSplit />
+                    {/* Individual Board name */}
+                    <h4>{board.title}</h4>
+                  </div>
+                );
+              })}

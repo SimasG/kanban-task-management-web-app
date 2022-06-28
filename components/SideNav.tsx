@@ -1,7 +1,13 @@
 import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
-import { collection, doc, serverTimestamp, setDoc } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  DocumentData,
+  serverTimestamp,
+  setDoc,
+} from "firebase/firestore";
 import Image from "next/image";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { FcGoogle } from "react-icons/fc";
 import { TbLayoutBoard, TbLayoutBoardSplit } from "react-icons/tb";
@@ -15,14 +21,14 @@ const SideNav = () => {
   const [localStorageData, setLocalStorageData] = useState({});
   const user = useContext(UserContext);
   const data = useFetchData(user?.uid);
-  console.log(user);
+  console.log(data !== undefined);
+  // console.log(localStorageData.users["8oa8jIW95xQzpwsmoq4ytDbVWuF3"].boards);
 
-  // useEffect(() => {
-  //   // const localStorageBoards = JSON.parse(localStorage.getItem("board") || "")
-  //   // return localStorageBoards
-  //   if (typeof window === undefined) return;
-  //   setLocalStorageData(JSON.parse(localStorage.getItem("board") || ""));
-  // }, []);
+  useEffect(() => {
+    // ** Use state to populate the UI and keep the UI in sync with local storage changes
+
+    setLocalStorageData(JSON.parse(localStorage.getItem("board") || ""));
+  }, []);
 
   const handleGoogleLogin = () => {
     const provider = new GoogleAuthProvider();
@@ -44,32 +50,30 @@ const SideNav = () => {
   };
 
   // const cleanedBoards =
-  //   boards.users.user["8oa8jIW95xQzpwsmoq4ytDbVWuF3"].boards;
+  //   boards.users["8oa8jIW95xQzpwsmoq4ytDbVWuF3"].boards;
 
   // const exampleBoard = {
   //   users: {
-  //     user: {
-  //       "8oa8jIW95xQzpwsmoq4ytDbVWuF3": {
-  //         email: "s.gradeckas@gmail.com",
-  //         id: "8oa8jIW95xQzpwsmoq4ytDbVWuF3",
-  //         boards: [
-  //           {
-  //             board: {
-  //               title: "Marketing Campaign",
-  //             },
+  //     "8oa8jIW95xQzpwsmoq4ytDbVWuF3": {
+  //       email: "s.gradeckas@gmail.com",
+  //       id: "8oa8jIW95xQzpwsmoq4ytDbVWuF3",
+  //       boards: [
+  //         {
+  //           board: {
+  //             title: "Marketing Campaign",
   //           },
-  //           {
-  //             board: {
-  //               title: "Sales Campaign",
-  //             },
+  //         },
+  //         {
+  //           board: {
+  //             title: "Sales Campaign",
   //           },
-  //           {
-  //             board: {
-  //               title: "Customer Success",
-  //             },
+  //         },
+  //         {
+  //           board: {
+  //             title: "Customer Success",
   //           },
-  //         ],
-  //       },
+  //         },
+  //       ],
   //     },
   //   },
   // };
@@ -84,14 +88,19 @@ const SideNav = () => {
   //     : null;
 
   const handleCreateNewBoard = () => {
-    // console.log(localStorageBoards);
-    const uuid = uuidv4();
-    const ref = doc(db, "users", `${user?.uid}`, "boards", uuid);
-    setDoc(ref, {
-      title: "New Board",
-    });
+    // const uuid = uuidv4();
+    // const ref = doc(db, "users", `${user?.uid}`, "boards", uuid);
+    // setDoc(ref, {
+    //   title: "New Board",
+    // });
     console.log("New Item should have been created!");
   };
+
+  type boardProps = {
+    board: {
+      title: string;
+    };
+  }[];
 
   return (
     <nav className="min-w-[250px] bg-darkGray pr-4 py-4 w-1/5 flex flex-col justify-between">
@@ -110,17 +119,16 @@ const SideNav = () => {
           {/* Boards subcontainer */}
           <div>
             {/* Specific Board */}
-            {data &&
-              data.map((board) => {
-                const uid = uuidv4();
-                return (
-                  <div className="board" key={uid}>
-                    <TbLayoutBoardSplit />
-                    {/* Individual Board name */}
-                    <h4>{board.title}</h4>
-                  </div>
-                );
-              })}
+            {
+              localStorageData
+                ? data !== []
+                  ? "Firestore data!"
+                  : "localStorage data!"
+                : "No Data!"
+
+              // localStorageData ?
+              //   data ? return <div>Firestore data!</div> : return <div>localStorage data!</div> : <div>No data!</div>
+            }
           </div>
           {/* Create new Board container */}
           <div className="pl-4 flex justify-start items-center gap-3 py-1 text-fontTertiary cursor-pointer hover:bg-fontPrimary hover:text-fontTertiary hover:rounded-r-full">
