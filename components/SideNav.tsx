@@ -22,7 +22,7 @@ type LocalStorageDataProps = {
 };
 
 type UserProps = {
-  userId: {
+  [key: string]: {
     email: string;
     id: string;
     boards: BoardsProps[];
@@ -38,21 +38,30 @@ type BoardProps = {
 };
 
 const SideNav = () => {
-  // ** Putting "any" type for now
   const [localStorageData, setLocalStorageData] =
     useState<LocalStorageDataProps | null>(null);
   const user = useContext(UserContext);
   // ** Putting any as the time for now
   const data: any = useFetchData(user?.uid);
-  console.log(`Firestore data`, data);
-  console.log(`localStorage data`, localStorageData?.users.userId.boards);
+
+  type LocalStorageDataStructure = {
+    users: {
+      [key: string]: {
+        email: string;
+        id: string;
+        boards: {
+          title: string;
+        }[];
+      };
+    };
+  };
 
   // console.log(localStorageData.users["8oa8jIW95xQzpwsmoq4ytDbVWuF3"].boards);
 
   useEffect(() => {
     // ** Use state to populate the UI and keep the UI in sync with local storage changes
 
-    setLocalStorageData(JSON.parse(localStorage.getItem("board") || ""));
+    setLocalStorageData(JSON.parse(localStorage.getItem("boardData") || ""));
   }, []);
 
   const handleGoogleLogin = () => {
@@ -68,6 +77,10 @@ const SideNav = () => {
         toast.success(`Welcome ${user.displayName}!`);
       })
       .catch((err) => console.log(err));
+
+    // Store localStorage data into Firestore
+    const lsData = JSON.parse(localStorage.getItem("boardData") || "");
+    console.log(lsData);
   };
 
   const signOutUser = () => {
@@ -76,8 +89,7 @@ const SideNav = () => {
 
   const exampleBoard = {
     users: {
-      // Why can't I have "user?.uid" here?
-      "8oa8jIW95xQzpwsmoq4ytDbVWuF3": {
+      userId: {
         email: user?.email,
         id: user?.uid,
         boards: [
@@ -96,23 +108,23 @@ const SideNav = () => {
   };
 
   // if (typeof window !== "undefined") {
-  //   localStorage.setItem("board", JSON.stringify(exampleBoard));
+  //   localStorage.setItem("boardData", JSON.stringify(exampleBoard));
   // }
 
-  const handleCreateNewBoard = () => {
+  const handleCreateNewBoardFirestore = () => {
     // const uuid = uuidv4();
     // const ref = doc(db, "users", `${user?.uid}`, "boards", uuid);
     // setDoc(ref, {
     //   title: "New Board",
     // });
-    console.log("New Item should have been created!");
+    console.log("Creating new board in Firestore");
   };
 
-  // type boardProps = {
-  //   board: {
-  //     title: string;
-  //   };
-  // }[];
+  const handleCreateNewBoardLs = () => {
+    console.log("Creating new board in localStorage");
+    setLocalStorageData(JSON.parse(localStorage.getItem("boardData") || ""));
+    localStorageData?.users.userId.boards.map((board) => console.log(board));
+  };
 
   return (
     <nav className="min-w-[250px] bg-darkGray pr-4 py-4 w-1/5 flex flex-col justify-between">
@@ -122,53 +134,58 @@ const SideNav = () => {
         <h1 className="text-3xl">kanban</h1>
       </a>
       {/* Boards container */}
-      {user && (
-        <section className="text-fontSecondary">
-          {/* All Boards title */}
-          <h3 className="pl-4 uppercase font-bold text-xs mb-4">
-            All Boards (3)
-          </h3>
-          {/* Boards subcontainer */}
-          <div>
-            {/* Specific Board */}
-            {
-              localStorageData
-                ? data?.length !== 0
-                  ? data?.map((board: BoardsProps) => {
-                      const uid = uuidv4();
-                      return (
-                        <div className="board" key={uid}>
-                          <TbLayoutBoardSplit />
-                          {/* Individual Board name */}
-                          <h4>{board.board.title}</h4>
-                        </div>
-                      );
-                    })
-                  : localStorageData.users.userId.boards.map(
-                      (board: BoardsProps) => {
-                        const uid = uuidv4();
-                        return (
-                          <div className="board" key={uid}>
-                            <TbLayoutBoardSplit />
-                            {/* Individual Board name */}
-                            <h4>{board.board.title}</h4>
-                          </div>
-                        );
-                      }
-                    )
+      <section className="text-fontSecondary">
+        {/* All Boards title */}
+        <h3 className="pl-4 uppercase font-bold text-xs mb-4">
+          All Boards (3)
+        </h3>
+        {/* Boards subcontainer */}
+        <div>
+          {/* Specific Board */}
+          {
+            localStorageData
+              ? data?.length !== 0
+                ? data?.map((board: BoardProps) => {
+                    const uid = uuidv4();
+                    return (
+                      <div className="board" key={uid}>
+                        <TbLayoutBoardSplit />
+                        {/* Individual Board name */}
+                        <h4>{board?.title}</h4>
+                      </div>
+                    );
+                  })
                 : ""
-
-              // localStorageData ?
-              //   data ? return <div>Firestore data!</div> : return <div>localStorage data!</div> : <div>No data!</div>
+              : // localStorageData?.users[`${user?.uid}`].boards.map(
+                //     // ** Re-assign board type later
+                //     (board: any) => {
+                //       const uid = uuidv4();
+                //       return (
+                //         <div className="board" key={uid}>
+                //           <TbLayoutBoardSplit />
+                //           {/* Individual Board name */}
+                //           <h4>{board.title}</h4>
+                //         </div>
+                //       );
+                //     }
+                //   )
+                ""
+            // localStorageData ?
+            //   data ? return <div>Firestore data!</div> : return <div>localStorage data!</div> : <div>No data!</div>
+          }
+        </div>
+        {/* Create new Board container */}
+        <div className="pl-4 flex justify-start items-center gap-3 py-1 text-fontTertiary cursor-pointer hover:bg-fontPrimary hover:text-fontTertiary hover:rounded-r-full">
+          <TbLayoutBoardSplit />
+          <button
+            onClick={
+              user ? handleCreateNewBoardFirestore : handleCreateNewBoardLs
             }
-          </div>
-          {/* Create new Board container */}
-          <div className="pl-4 flex justify-start items-center gap-3 py-1 text-fontTertiary cursor-pointer hover:bg-fontPrimary hover:text-fontTertiary hover:rounded-r-full">
-            <TbLayoutBoardSplit />
-            <button onClick={handleCreateNewBoard}>+ Create New Board</button>
-          </div>
-        </section>
-      )}
+          >
+            + Create New Board
+          </button>
+        </div>
+      </section>
       {/* Log in/out btn + theme toggle + hide sidebar section */}
       <section className="mt-auto flex flex-col">
         {user ? (
