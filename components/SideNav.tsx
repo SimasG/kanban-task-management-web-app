@@ -13,10 +13,8 @@ import { FcGoogle } from "react-icons/fc";
 import { TbLayoutBoard, TbLayoutBoardSplit } from "react-icons/tb";
 import { UserContext } from "../lib/context";
 import { auth, db } from "../lib/firebase";
-import boards from "../boards.json";
 import { v4 as uuidv4 } from "uuid";
-import useFetchData from "../lib/hooks/useFetchData";
-import { basename } from "node:path/win32";
+import useFetchFirestoreData from "../lib/hooks/useFetchFsData";
 
 // type LocalStorageDataProps = {
 //   users: UserProps;
@@ -48,13 +46,17 @@ type LocalStorageBoardSchema = {
 
 const SideNav = () => {
   const [localStorageBoards, setLocalStorageBoards] = useState<
+    // ** Change "any" later
     LocalStorageBoardSchema | null | any
   >(null);
-  // const [boardTitleList, setBoardTitleList] = useState([])
-
   const user = useContext(UserContext);
   // ** Putting any as the time for now
-  const data: any = useFetchData(user?.uid);
+  const data: any = useFetchFirestoreData(user?.uid);
+
+  // let data: any;
+  // user
+  //   ? (data = useFetchFirestoreData(user?.uid))
+  //   : (data = useFetchLocalStorageData());
 
   // console.log(localStorageBoards.users["8oa8jIW95xQzpwsmoq4ytDbVWuF3"].boards);
 
@@ -118,7 +120,6 @@ const SideNav = () => {
   };
 
   const handleCreateNewBoardLS = () => {
-    console.log("Creating new board in localStorage");
     const oldData = JSON.parse(localStorage.getItem("boards") || "").boards;
     const newData = {
       boards: [
@@ -144,7 +145,12 @@ const SideNav = () => {
       <section className="text-fontSecondary">
         {/* All Boards title */}
         <h3 className="pl-4 uppercase font-bold text-xs mb-4">
-          All Boards (3)
+          {/* Would like to change the initial "undefined" value of "localStorageBoards?.boards?.length" */}
+          {data?.length !== 0
+            ? `All Boards (${data?.length})`
+            : localStorageBoards?.boards?.length !== 0
+            ? `All Boards (${localStorageBoards?.boards?.length})`
+            : "No Boards!"}
         </h3>
         {/* Boards subcontainer */}
         <div>
@@ -169,11 +175,11 @@ const SideNav = () => {
                         <TbLayoutBoardSplit />
                         {/* Individual Board name */}
                         <input
-                          className="bg-none text-black"
+                          className="bg-transparent cursor-pointer outline-none"
                           type="text"
                           value={board?.title}
+                          // Having trouble refactoring the logic in a separate func
                           onChange={(e) => {
-                            // console.log("before:", localStorageBoards);
                             // ** Putting "any" type for now
                             const newBoardList: any = {
                               boards: [],
@@ -186,6 +192,10 @@ const SideNav = () => {
                                   })
                                 : newBoardList.boards.push(b);
                             });
+                            localStorage.setItem(
+                              "boards",
+                              JSON.stringify(newBoardList)
+                            );
                             setLocalStorageBoards(newBoardList);
                           }}
                         />

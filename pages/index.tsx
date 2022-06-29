@@ -1,12 +1,41 @@
 import type { NextPage } from "next";
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import AddNewTaskModal from "../components/AddNewTaskModal";
 import EditTaskModal from "../components/EditTaskModal";
 import SideNav from "../components/SideNav";
+import { UserContext } from "../lib/context";
+import useFetchFirestoreData from "../lib/hooks/useFetchFsData";
+
+type LocalStorageBoardSchema = {
+  boards: {
+    title: string;
+    id: string;
+  }[];
+};
 
 const Home: NextPage = () => {
+  const user = useContext(UserContext);
+  const firestoreData = useFetchFirestoreData(user?.uid);
+
+  const [localStorageBoards, setLocalStorageBoards] = useState<
+    // ** Change "any" later
+    LocalStorageBoardSchema | null | any
+  >(null);
+
   const [showAddTaskModal, setShowAddTaskModal] = useState(false);
   const [showEditTaskModal, setShowEditTaskModal] = useState(false);
+
+  useEffect(() => {
+    setLocalStorageBoards(JSON.parse(localStorage.getItem("boards") || ""));
+  }, []);
+
+  let data: any;
+  user ? (data = firestoreData) : (data = localStorageBoards);
+
+  // const [id, setId] = useState(null);
+
+  // useEffect(() => {
+  // })
 
   const handleAddNewTaskBtn = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();

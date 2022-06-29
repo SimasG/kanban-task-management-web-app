@@ -3,7 +3,7 @@ import { useCollectionData } from "react-firebase-hooks/firestore";
 import { db } from "../firebase";
 
 // WHen is uid null?
-const useFetchData = (uid: string | null | undefined) => {
+const useFetchFirestoreData = (uid: string | null | undefined) => {
   const data = useCollectionData(collection(db, "users", `${uid}`, "boards"));
 
   // Why am I not receiving the array of data I want to fetch immediately
@@ -11,4 +11,4 @@ const useFetchData = (uid: string | null | undefined) => {
   return data[0];
 };
 
-export default useFetchData;
+export default useFetchFirestoreData;
