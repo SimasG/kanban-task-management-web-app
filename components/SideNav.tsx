@@ -17,51 +17,45 @@ import boards from "../boards.json";
 import { v4 as uuidv4 } from "uuid";
 import useFetchData from "../lib/hooks/useFetchData";
 
-type LocalStorageDataProps = {
-  users: UserProps;
-};
+// type LocalStorageDataProps = {
+//   users: UserProps;
+// };
 
-type UserProps = {
-  [key: string]: {
-    email: string;
-    id: string;
-    boards: BoardsProps[];
-  };
-};
+// type UserProps = {
+//   [key: string]: {
+//     email: string;
+//     id: string;
+//     boards: BoardsProps[];
+//   };
+// };
 
-type BoardsProps = {
-  board: BoardProps;
-};
+// type BoardsProps = {
+//   board: BoardProps;
+// };
 
-type BoardProps = {
+type BoardSchema = {
   title: string;
 };
 
+type LocalStorageBoardSchema = {
+  boards: {
+    title: string;
+  }[];
+};
+
 const SideNav = () => {
-  const [localStorageData, setLocalStorageData] =
-    useState<LocalStorageDataProps | null>(null);
+  const [localStorageBoards, setLocalStorageBoards] =
+    useState<LocalStorageBoardSchema | null>(null);
   const user = useContext(UserContext);
   // ** Putting any as the time for now
   const data: any = useFetchData(user?.uid);
 
-  type LocalStorageDataStructure = {
-    users: {
-      [key: string]: {
-        email: string;
-        id: string;
-        boards: {
-          title: string;
-        }[];
-      };
-    };
-  };
-
-  // console.log(localStorageData.users["8oa8jIW95xQzpwsmoq4ytDbVWuF3"].boards);
+  // console.log(localStorageBoards.users["8oa8jIW95xQzpwsmoq4ytDbVWuF3"].boards);
 
   useEffect(() => {
     // ** Use state to populate the UI and keep the UI in sync with local storage changes
 
-    setLocalStorageData(JSON.parse(localStorage.getItem("boardData") || ""));
+    setLocalStorageBoards(JSON.parse(localStorage.getItem("boards") || ""));
   }, []);
 
   const handleGoogleLogin = () => {
@@ -79,7 +73,7 @@ const SideNav = () => {
       .catch((err) => console.log(err));
 
     // Store localStorage data into Firestore
-    const lsData = JSON.parse(localStorage.getItem("boardData") || "");
+    const lsData = JSON.parse(localStorage.getItem("boards") || "");
     console.log(lsData);
   };
 
@@ -87,28 +81,22 @@ const SideNav = () => {
     signOut(auth).then(() => toast.success("Logged out!"));
   };
 
-  const exampleBoard = {
-    users: {
-      userId: {
-        email: user?.email,
-        id: user?.uid,
-        boards: [
-          {
-            title: "Marketing Campaign",
-          },
-          {
-            title: "Sales Campaign",
-          },
-          {
-            title: "Customer Success",
-          },
-        ],
+  const exampleBoards = {
+    boards: [
+      {
+        title: "Marketing Campaign",
       },
-    },
+      {
+        title: "Sales Campaign",
+      },
+      {
+        title: "Customer Success",
+      },
+    ],
   };
 
   // if (typeof window !== "undefined") {
-  //   localStorage.setItem("boardData", JSON.stringify(exampleBoard));
+  //   localStorage.setItem("boards", JSON.stringify(exampleBoards));
   // }
 
   const handleCreateNewBoardFirestore = () => {
@@ -120,10 +108,19 @@ const SideNav = () => {
     console.log("Creating new board in Firestore");
   };
 
-  const handleCreateNewBoardLs = () => {
+  const handleCreateNewBoardLS = () => {
     console.log("Creating new board in localStorage");
-    setLocalStorageData(JSON.parse(localStorage.getItem("boardData") || ""));
-    localStorageData?.users.userId.boards.map((board) => console.log(board));
+    const oldData = JSON.parse(localStorage.getItem("boards") || "").boards;
+    const newData = {
+      boards: [
+        ...oldData,
+        {
+          title: "New Board",
+        },
+      ],
+    };
+    localStorage.setItem("boards", JSON.stringify(newData));
+    setLocalStorageBoards(newData);
   };
 
   return (
@@ -142,10 +139,21 @@ const SideNav = () => {
         {/* Boards subcontainer */}
         <div>
           {/* Specific Board */}
-          {
-            localStorageData
-              ? data?.length !== 0
-                ? data?.map((board: BoardProps) => {
+          {localStorageBoards
+            ? data?.length !== 0
+              ? data?.map((board: BoardSchema) => {
+                  const uid = uuidv4();
+                  return (
+                    <div className="board" key={uid}>
+                      <TbLayoutBoardSplit />
+                      {/* Individual Board name */}
+                      <h4>{board?.title}</h4>
+                    </div>
+                  );
+                })
+              : localStorageBoards?.boards.map(
+                  // ** Re-assign board type later
+                  (board: any) => {
                     const uid = uuidv4();
                     return (
                       <div className="board" key={uid}>
@@ -154,32 +162,16 @@ const SideNav = () => {
                         <h4>{board?.title}</h4>
                       </div>
                     );
-                  })
-                : ""
-              : // localStorageData?.users[`${user?.uid}`].boards.map(
-                //     // ** Re-assign board type later
-                //     (board: any) => {
-                //       const uid = uuidv4();
-                //       return (
-                //         <div className="board" key={uid}>
-                //           <TbLayoutBoardSplit />
-                //           {/* Individual Board name */}
-                //           <h4>{board.title}</h4>
-                //         </div>
-                //       );
-                //     }
-                //   )
-                ""
-            // localStorageData ?
-            //   data ? return <div>Firestore data!</div> : return <div>localStorage data!</div> : <div>No data!</div>
-          }
+                  }
+                )
+            : ""}
         </div>
         {/* Create new Board container */}
         <div className="pl-4 flex justify-start items-center gap-3 py-1 text-fontTertiary cursor-pointer hover:bg-fontPrimary hover:text-fontTertiary hover:rounded-r-full">
           <TbLayoutBoardSplit />
           <button
             onClick={
-              user ? handleCreateNewBoardFirestore : handleCreateNewBoardLs
+              user ? handleCreateNewBoardFirestore : handleCreateNewBoardLS
             }
           >
             + Create New Board

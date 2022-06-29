@@ -71,3 +71,35 @@ title:
                   </div>
                 );
               })}
+
+const exampleBoardOld = {
+users: {
+userId: {
+email: user?.email,
+id: user?.uid,
+boards: [
+{
+title: "Marketing Campaign",
+},
+{
+title: "Sales Campaign",
+},
+{
+title: "Customer Success",
+},
+],
+},
+},
+};
+
+type LocalStorageDataStructure = {
+users: {
+[key: string]: {
+email: string;
+id: string;
+boards: {
+title: string;
+}[];
+};
+};
+};
