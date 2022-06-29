@@ -16,6 +16,7 @@ import { auth, db } from "../lib/firebase";
 import boards from "../boards.json";
 import { v4 as uuidv4 } from "uuid";
 import useFetchData from "../lib/hooks/useFetchData";
+import { basename } from "node:path/win32";
 
 // type LocalStorageDataProps = {
 //   users: UserProps;
@@ -35,17 +36,22 @@ import useFetchData from "../lib/hooks/useFetchData";
 
 type BoardSchema = {
   title: string;
+  id: string;
 };
 
 type LocalStorageBoardSchema = {
   boards: {
     title: string;
+    id: string;
   }[];
 };
 
 const SideNav = () => {
-  const [localStorageBoards, setLocalStorageBoards] =
-    useState<LocalStorageBoardSchema | null>(null);
+  const [localStorageBoards, setLocalStorageBoards] = useState<
+    LocalStorageBoardSchema | null | any
+  >(null);
+  // const [boardTitleList, setBoardTitleList] = useState([])
+
   const user = useContext(UserContext);
   // ** Putting any as the time for now
   const data: any = useFetchData(user?.uid);
@@ -84,12 +90,15 @@ const SideNav = () => {
   const exampleBoards = {
     boards: [
       {
+        id: uuidv4(),
         title: "Marketing Campaign",
       },
       {
+        id: uuidv4(),
         title: "Sales Campaign",
       },
       {
+        id: uuidv4(),
         title: "Customer Success",
       },
     ],
@@ -115,6 +124,7 @@ const SideNav = () => {
       boards: [
         ...oldData,
         {
+          id: uuidv4(),
           title: "New Board",
         },
       ],
@@ -154,12 +164,31 @@ const SideNav = () => {
               : localStorageBoards?.boards.map(
                   // ** Re-assign board type later
                   (board: any) => {
-                    const uid = uuidv4();
                     return (
-                      <div className="board" key={uid}>
+                      <div className="board" key={board?.id}>
                         <TbLayoutBoardSplit />
                         {/* Individual Board name */}
-                        <h4>{board?.title}</h4>
+                        <input
+                          className="bg-none text-black"
+                          type="text"
+                          value={board?.title}
+                          onChange={(e) => {
+                            // console.log("before:", localStorageBoards);
+                            // ** Putting "any" type for now
+                            const newBoardList: any = {
+                              boards: [],
+                            };
+                            localStorageBoards.boards.map((b: BoardSchema) => {
+                              b.id === board.id
+                                ? newBoardList.boards.push({
+                                    ...board,
+                                    title: e.target.value,
+                                  })
+                                : newBoardList.boards.push(b);
+                            });
+                            setLocalStorageBoards(newBoardList);
+                          }}
+                        />
                       </div>
                     );
                   }
