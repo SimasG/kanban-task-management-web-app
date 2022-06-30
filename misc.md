@@ -199,3 +199,12 @@ title: "Customer Success",
                   }
                 )
             : "No LS or FS data found :("}
+
+// let data: any;
+// user ? (data = firestoreData) : (data = localStorageBoards);
+
+const [localStorageBoards, setLocalStorageBoards] = useState<
+// \*\* Change "any" later
+LocalStorageBoardSchema | null | any
+
+> (null);

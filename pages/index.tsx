@@ -22,46 +22,38 @@ const Home: NextPage = () => {
   // Pre-fetching data
   const user = useContext(UserContext);
   const firestoreData = useFetchFirestoreData(user?.uid);
-  // Why am I calling it "localStorage" to begin with?
-  // const [localStorageBoards, setLocalStorageBoards] = useState<
-  //   // ** Change "any" later
-  //   LocalStorageBoardSchema | null | any
-  // >(null);
+
+  // States
   const [boards, setBoards] = useState<
     // ** Change "any" later
     LocalStorageBoardSchema | null | any
   >(null);
-
-  // States
   const [showAddTaskModal, setShowAddTaskModal] = useState(false);
   const [showEditTaskModal, setShowEditTaskModal] = useState(false);
   const [id, setId] = useState<string | null | undefined>(null);
   // ** Putting "any" for now
   const [activeBoard, setActiveBoard] = useState<any | null>(null);
 
+  // Setting main state either from localStorage or Firestore
+  // ** Why is this useEffect running each time anything in my code changes (not just "user")?
   useEffect(() => {
     if (!user) {
-      // console.log("Boards from localStorage:");
-      // console.log(JSON.parse(localStorage.getItem("boards") || ""));
       setBoards(JSON.parse(localStorage.getItem("boards") || ""));
-    } else {
-      // console.log("Boards from Firestore:");
-      // console.log(firestoreData);
-      setBoards(firestoreData);
     }
-  }, [user]);
-
-  // let data: any;
-  // user ? (data = firestoreData) : (data = localStorageBoards);
+    // Ensuring that I only set the main state from Firestore once the data has been fetched (async protection)
+    if (!firestoreData) return;
+    setBoards(firestoreData);
+    setId(firestoreData?.[0].id);
+  }, [firestoreData]);
 
   // ** useEffects
-  // Setting default active Board from localStorage
+  // Setting default active Board
   useEffect(() => {
-    if (user) return;
+    // if (user) return;
     if (!boards || boards?.length === 0) return;
     if (id) return;
     setId(boards?.[0].id);
-  }, [user, boards]);
+  }, [boards]);
 
   // Setting a current active Board
   useEffect(() => {
