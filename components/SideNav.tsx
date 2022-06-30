@@ -79,18 +79,24 @@ const SideNav = ({
     signInWithPopup(auth, provider)
       .then(async (result) => {
         const user = result.user;
+        // Creating user doc if it doesn't exist already
         await setDoc(doc(db, "users", user.uid), {
           id: user.uid,
           email: user.email,
           timeStamp: serverTimestamp(),
+        }).then(async () => {
+          // Storing localStorage data into Firestore
+          const lsData = JSON.parse(localStorage.getItem("boards") || "");
+          // How do store multiple docs from localStorage to Firestore at once?
+          lsData.forEach(async (board: BoardSchema) => {
+            const ref = doc(db, "users", user.uid, "boards", board.id);
+            await setDoc(ref, board);
+          });
         });
+
         toast.success(`Welcome ${user.displayName}!`);
       })
       .catch((err) => console.log(err));
-
-    // Store localStorage data into Firestore
-    const lsData = JSON.parse(localStorage.getItem("boards") || "");
-    console.log(lsData);
   };
 
   const signOutUser = () => {
@@ -204,7 +210,6 @@ const SideNav = ({
                           value={board?.title}
                           // ** Having trouble refactoring the logic in a separate func
                           onChange={(e) => {
-                            // ** Putting "any" type for now
                             const newBoardList: {}[] = [];
                             localStorageBoards.map((b: BoardSchema) => {
                               b.id === board.id
@@ -218,8 +223,8 @@ const SideNav = ({
                               "boards",
                               JSON.stringify(newBoardList)
                             );
-                            setId(board.id);
                             setLocalStorageBoards(newBoardList);
+                            setId(board?.id);
                           }}
                         />
                       </div>
