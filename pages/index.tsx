@@ -77,6 +77,7 @@ const Home: NextPage = () => {
       const newData = lsData.filter((board: BoardSchema) => board.id !== id);
       localStorage.setItem("boards", JSON.stringify(newData));
       setLocalStorageBoards(newData);
+      setId(newData?.[0].id);
     } else {
       // Deleting Board from Firestore
     }
