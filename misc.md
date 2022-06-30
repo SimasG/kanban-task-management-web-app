@@ -120,3 +120,7 @@ title: "Customer Success",
 },
 ],
 };
+
+// if (typeof window !== "undefined") {
+// localStorage.setItem("boards", JSON.stringify(exampleBoards));
+// }

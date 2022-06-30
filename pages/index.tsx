@@ -92,6 +92,7 @@ const Home: NextPage = () => {
       className="flex justify-center text-white h-screen overflow-x-hidden"
     >
       <SideNav
+        // ** Wonder if I would decrease the number of props here?
         localStorageBoards={localStorageBoards}
         setLocalStorageBoards={setLocalStorageBoards}
         id={id}

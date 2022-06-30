@@ -1,13 +1,13 @@
 import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
 import {
-  collection,
   doc,
   DocumentData,
   serverTimestamp,
   setDoc,
+  updateDoc,
 } from "firebase/firestore";
 import Image from "next/image";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect } from "react";
 import toast from "react-hot-toast";
 import { FcGoogle } from "react-icons/fc";
 import { TbLayoutBoard, TbLayoutBoardSplit } from "react-icons/tb";
@@ -61,16 +61,8 @@ const SideNav = ({
   // ** Putting any as the time for now
   const data: any = useFetchFirestoreData(user?.uid);
 
-  // let data: any;
-  // user
-  //   ? (data = useFetchFirestoreData(user?.uid))
-  //   : (data = useFetchLocalStorageData());
-
-  // console.log(localStorageBoards.users["8oa8jIW95xQzpwsmoq4ytDbVWuF3"].boards);
-
   useEffect(() => {
     // ** Use state to populate the UI and keep the UI in sync with local storage changes
-
     setLocalStorageBoards(JSON.parse(localStorage.getItem("boards") || ""));
   }, []);
 
@@ -87,20 +79,20 @@ const SideNav = ({
         }).then(async () => {
           // Storing localStorage data into Firestore
           const lsData = JSON.parse(localStorage.getItem("boards") || "");
-          // How do store multiple docs from localStorage to Firestore at once?
           lsData.forEach(async (board: BoardSchema) => {
             const ref = doc(db, "users", user.uid, "boards", board.id);
             await setDoc(ref, board);
           });
         });
-
         toast.success(`Welcome ${user.displayName}!`);
       })
       .catch((err) => console.log(err));
   };
 
   const signOutUser = () => {
-    signOut(auth).then(() => toast.success("Logged out!"));
+    // Storing Firestore data into localStorage
+    // console.log(user);
+    // signOut(auth).then(() => toast.success("Logged out!"));
   };
 
   const exampleBoards = [
@@ -118,20 +110,8 @@ const SideNav = ({
     },
   ];
 
-  // if (typeof window !== "undefined") {
-  //   localStorage.setItem("boards", JSON.stringify(exampleBoards));
-  // }
-
-  // const handleCreateNewBoardFirestore = () => {
-  // const uuid = uuidv4();
-  // const ref = doc(db, "users", `${user?.uid}`, "boards", uuid);
-  // setDoc(ref, {
-  //   title: "New Board",
-  // });
-  //   console.log("Creating new board in Firestore");
-  // };
-
   const handleCreateNewBoard = () => {
+    // Creating new Board in localStorage
     if (!user) {
       const oldData = JSON.parse(localStorage.getItem("boards") || "");
       const newData = [
@@ -144,13 +124,22 @@ const SideNav = ({
       localStorage.setItem("boards", JSON.stringify(newData));
       setLocalStorageBoards(newData);
     } else {
-      // const uuid = uuidv4();
-      // const ref = doc(db, "users", `${user?.uid}`, "boards", uuid);
-      // setDoc(ref, {
-      //   title: "New Board",
-      // });
-      //   console.log("Creating new board in Firestore");
+      // Creating new Board in Firestore
+      const uuid = uuidv4();
+      const ref = doc(db, "users", `${user?.uid}`, "boards", uuid);
+      setDoc(ref, {
+        title: "New Board",
+        id: uuid,
+      });
     }
+  };
+
+  // U -> Firestore
+  const updateBoardName = async (id: string, newName: string) => {
+    const ref = doc(db, "users", `${user?.uid}`, "boards", id);
+    await updateDoc(ref, {
+      title: newName,
+    });
   };
 
   return (
@@ -181,8 +170,18 @@ const SideNav = ({
                   return (
                     <div className="board" key={uid}>
                       <TbLayoutBoardSplit />
-                      {/* Individual Board name */}
-                      <h4>{board?.title}</h4>
+                      {/* <h4>{board?.title}</h4> */}
+                      <input
+                        className="bg-transparent cursor-pointer outline-none"
+                        type="text"
+                        value={board?.title}
+                        // ** Having trouble refactoring the logic in a separate func
+                        onChange={(e) => {
+                          updateBoardName(board.id, e.target.value);
+                          // setLocalStorageBoards(newBoardList);
+                          // setId(board?.id);
+                        }}
+                      />
                     </div>
                   );
                 })
@@ -203,7 +202,6 @@ const SideNav = ({
                         }}
                       >
                         <TbLayoutBoardSplit />
-                        {/* Individual Board name */}
                         <input
                           className="bg-transparent cursor-pointer outline-none"
                           type="text"
