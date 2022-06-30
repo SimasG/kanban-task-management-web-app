@@ -216,3 +216,5 @@ if (!boards || boards?.length === 0) return;
 if (id) return;
 setId(boards?.[0].id);
 }, [boards]);
+
+console.log(boards?.indexOf(activeBoard?.[0]));

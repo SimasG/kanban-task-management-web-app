@@ -37,15 +37,22 @@ const Home: NextPage = () => {
   const [activeBoard, setActiveBoard] = useState<any | null>(null);
 
   // Setting main state either from localStorage or Firestore
-  // ** Why is this useEffect running each time anything in my code changes (not just "user")?
   useEffect(() => {
     if (!user) {
       setBoards(JSON.parse(localStorage.getItem("boards") || ""));
     }
     // Ensuring that I only set the main state from Firestore once the data has been fetched (async protection)
     if (!firestoreData) return;
-    setBoards(firestoreData);
-    setId(firestoreData?.[0].id);
+    if (firestoreData) {
+      setBoards(firestoreData);
+    }
+    if (firestoreData && !activeBoard) {
+      setId(firestoreData?.[0].id);
+    }
+    if (firestoreData && activeBoard) {
+      const index = boards?.indexOf(activeBoard?.[0]);
+      setId(firestoreData?.[index].id);
+    }
   }, [firestoreData]);
 
   // Setting a current active Board
@@ -56,7 +63,7 @@ const Home: NextPage = () => {
       );
       setActiveBoard(currentBoard);
     }
-  }, [id]);
+  }, [id, boards]);
 
   // Buttons
   const handleAddNewTaskBtn = (e: React.MouseEvent<HTMLButtonElement>) => {
