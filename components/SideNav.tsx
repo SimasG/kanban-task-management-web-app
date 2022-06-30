@@ -135,6 +135,8 @@ const SideNav = ({ boards, setBoards, id, setId }: SideNavProps) => {
     await updateDoc(ref, {
       title: newName,
     });
+    console.log("updateBoardName func run");
+    console.log(boards);
     // console.log(ref);
   };
 

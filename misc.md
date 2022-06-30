@@ -208,3 +208,11 @@ const [localStorageBoards, setLocalStorageBoards] = useState<
 LocalStorageBoardSchema | null | any
 
 > (null);
+
+// Setting default active Board
+useEffect(() => {
+// if (user) return;
+if (!boards || boards?.length === 0) return;
+if (id) return;
+setId(boards?.[0].id);
+}, [boards]);

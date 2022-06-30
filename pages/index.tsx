@@ -1,9 +1,11 @@
+import { deleteDoc, doc } from "firebase/firestore";
 import type { NextPage } from "next";
 import React, { useContext, useEffect, useState } from "react";
 import AddNewTaskModal from "../components/AddNewTaskModal";
 import EditTaskModal from "../components/EditTaskModal";
 import SideNav from "../components/SideNav";
 import { UserContext } from "../lib/context";
+import { db } from "../lib/firebase";
 import useFetchFirestoreData from "../lib/hooks/useFetchFsData";
 
 type LocalStorageBoardSchema = {
@@ -46,14 +48,7 @@ const Home: NextPage = () => {
     setId(firestoreData?.[0].id);
   }, [firestoreData]);
 
-  // ** useEffects
-  // Setting default active Board
-  useEffect(() => {
-    // if (user) return;
-    if (!boards || boards?.length === 0) return;
-    if (id) return;
-    setId(boards?.[0].id);
-  }, [boards]);
+  console.log(user);
 
   // Setting a current active Board
   useEffect(() => {
@@ -76,7 +71,7 @@ const Home: NextPage = () => {
     setShowEditTaskModal(true);
   };
 
-  const handleDeleteBoard = (id: string | null | undefined) => {
+  const handleDeleteBoard = async (id: string | null | undefined) => {
     // Deleting Board from localStorage
     if (!user) {
       const lsData = JSON.parse(localStorage.getItem("boards") || "");
@@ -86,6 +81,9 @@ const Home: NextPage = () => {
       setId(newData?.[0].id);
     } else {
       // Deleting Board from Firestore
+      const docRef = doc(db, "users", `${user?.uid}`, "boards", `${id}`);
+      setId(boards?.[0].id);
+      await deleteDoc(docRef);
     }
   };
 
