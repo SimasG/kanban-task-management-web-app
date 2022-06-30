@@ -48,12 +48,14 @@ type SideNavProps = {
   localStorageBoards: any;
   setLocalStorageBoards: React.Dispatch<any>;
   id: string | null | undefined;
+  setId: React.Dispatch<React.SetStateAction<string | null | undefined>>;
 };
 
 const SideNav = ({
   localStorageBoards,
   setLocalStorageBoards,
   id,
+  setId,
 }: SideNavProps) => {
   const user = useContext(UserContext);
   // ** Putting any as the time for now
@@ -93,23 +95,6 @@ const SideNav = ({
 
   const signOutUser = () => {
     signOut(auth).then(() => toast.success("Logged out!"));
-  };
-
-  const exampleBoardsOld = {
-    boards: [
-      {
-        id: uuidv4(),
-        title: "Marketing Campaign",
-      },
-      {
-        id: uuidv4(),
-        title: "Sales Campaign",
-      },
-      {
-        id: uuidv4(),
-        title: "Customer Success",
-      },
-    ],
   };
 
   const exampleBoards = [
@@ -192,7 +177,18 @@ const SideNav = ({
                   // ** Re-assign board type later
                   (board: any) => {
                     return (
-                      <div className="board" key={board?.id}>
+                      // <div className="board" key={board?.id}>
+                      <div
+                        className={
+                          board?.id === id
+                            ? "board bg-fontTertiary text-fontPrimary rounded-r-full"
+                            : "board"
+                        }
+                        key={board?.id}
+                        onClick={() => {
+                          setId(board?.id);
+                        }}
+                      >
                         <TbLayoutBoardSplit />
                         {/* Individual Board name */}
                         <input

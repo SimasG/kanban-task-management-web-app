@@ -70,11 +70,14 @@ const Home: NextPage = () => {
   };
 
   const handleDeleteBoard = (id: string | null | undefined) => {
+    // Deleting Board from localStorage
     if (!user) {
       const lsData = JSON.parse(localStorage.getItem("boards") || "");
       const newData = lsData.filter((board: BoardSchema) => board.id !== id);
       localStorage.setItem("boards", JSON.stringify(newData));
       setLocalStorageBoards(newData);
+    } else {
+      // Deleting Board from Firestore
     }
   };
 
@@ -90,6 +93,7 @@ const Home: NextPage = () => {
         localStorageBoards={localStorageBoards}
         setLocalStorageBoards={setLocalStorageBoards}
         id={id}
+        setId={setId}
       />
       {/* Main */}
       <main className="w-4/5">

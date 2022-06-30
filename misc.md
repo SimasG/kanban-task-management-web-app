@@ -103,3 +103,20 @@ title: string;
 };
 };
 };
+
+const exampleBoardsOld = {
+boards: [
+{
+id: uuidv4(),
+title: "Marketing Campaign",
+},
+{
+id: uuidv4(),
+title: "Sales Campaign",
+},
+{
+id: uuidv4(),
+title: "Customer Success",
+},
+],
+};
