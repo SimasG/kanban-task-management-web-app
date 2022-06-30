@@ -1,4 +1,4 @@
-import { deleteDoc, doc } from "firebase/firestore";
+import { deleteDoc, doc, updateDoc } from "firebase/firestore";
 import type { NextPage } from "next";
 import React, { useContext, useEffect, useState } from "react";
 import AddNewTaskModal from "../components/AddNewTaskModal";
@@ -48,8 +48,6 @@ const Home: NextPage = () => {
     setId(firestoreData?.[0].id);
   }, [firestoreData]);
 
-  console.log(user);
-
   // Setting a current active Board
   useEffect(() => {
     if (id) {
@@ -87,6 +85,13 @@ const Home: NextPage = () => {
     }
   };
 
+  const updateBoardName = async (id: string, newName: string) => {
+    const ref = doc(db, "users", `${user?.uid}`, "boards", id);
+    await updateDoc(ref, {
+      title: newName,
+    });
+  };
+
   return (
     <div
       onClick={() => {
@@ -106,10 +111,41 @@ const Home: NextPage = () => {
       <main className="w-4/5">
         {/* Top Settings */}
         <section className="h-[10%] min-w-[500px] p-4 flex justify-between items-center bg-darkGray">
-          <h1 className="text-2xl">
-            {activeBoard?.[0]?.title || "Future Board Name 🤓"}
-            {/* {activeBoard[0]?.title || "Future Board Name 🤓"} */}
-          </h1>
+          {/* <h1 className="text-2xl">
+            {(activeBoard && activeBoard?.[0]?.title) || "Future Board Name 🤓"}
+          </h1> */}
+          <input
+            className="text-2xl bg-transparent cursor-pointer outline-none"
+            type="text"
+            value={
+              (activeBoard && activeBoard?.[0]?.title) || "Future Board Name 🤓"
+            }
+            onChange={
+              user
+                ? // If user is authenticated, update Firestore
+                  (e) => {
+                    updateBoardName(activeBoard?.[0]?.id, e.target.value);
+                  }
+                : // If user is not authenticated, update localStorage
+                  (e) => {
+                    const newBoardList: {}[] = [];
+                    boards.map((b: BoardSchema) => {
+                      b.id === activeBoard?.[0]?.id
+                        ? newBoardList.push({
+                            ...activeBoard?.[0],
+                            title: e.target.value,
+                          })
+                        : newBoardList.push(b);
+                    });
+                    localStorage.setItem(
+                      "boards",
+                      JSON.stringify(newBoardList)
+                    );
+                    setBoards(newBoardList);
+                    setId(activeBoard?.[0]?.id);
+                  }
+            }
+          />
           <div className="flex justify-center items-center gap-4">
             <button
               onClick={(e) => {
