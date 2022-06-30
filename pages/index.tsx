@@ -9,34 +9,56 @@ import useFetchFirestoreData from "../lib/hooks/useFetchFsData";
 type LocalStorageBoardSchema = {
   boards: {
     title: string;
-    id: string;
+    id: string | null | undefined;
   }[];
 };
 
+type BoardSchema = {
+  title: string;
+  id: string | null | undefined;
+};
+
 const Home: NextPage = () => {
+  // Pre-fetching data
   const user = useContext(UserContext);
   const firestoreData = useFetchFirestoreData(user?.uid);
-
+  useEffect(() => {
+    setLocalStorageBoards(JSON.parse(localStorage.getItem("boards") || ""));
+  }, []);
   const [localStorageBoards, setLocalStorageBoards] = useState<
     // ** Change "any" later
     LocalStorageBoardSchema | null | any
   >(null);
 
+  // States
   const [showAddTaskModal, setShowAddTaskModal] = useState(false);
   const [showEditTaskModal, setShowEditTaskModal] = useState(false);
-
-  useEffect(() => {
-    setLocalStorageBoards(JSON.parse(localStorage.getItem("boards") || ""));
-  }, []);
+  const [id, setId] = useState<string | null | undefined>(null);
+  // ** Putting "any" for now
+  const [activeBoard, setActiveBoard] = useState<any | null>(null);
 
   let data: any;
   user ? (data = firestoreData) : (data = localStorageBoards);
 
-  // const [id, setId] = useState(null);
+  // ** useEffects
+  // Setting default active Board from localStorage
+  useEffect(() => {
+    if (user) return;
+    if (!localStorageBoards || localStorageBoards?.length === 0) return;
+    setId(localStorageBoards?.[0].id);
+  }, [user, localStorageBoards]);
 
-  // useEffect(() => {
-  // })
+  // Setting a current active Board
+  useEffect(() => {
+    if (id) {
+      const currentBoard = data?.filter(
+        (board: BoardSchema) => board.id === id
+      );
+      setActiveBoard(currentBoard);
+    }
+  }, [id]);
 
+  // Buttons
   const handleAddNewTaskBtn = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     setShowAddTaskModal(true);
@@ -47,6 +69,15 @@ const Home: NextPage = () => {
     setShowEditTaskModal(true);
   };
 
+  const handleDeleteBoard = (id: string | null | undefined) => {
+    if (!user) {
+      const lsData = JSON.parse(localStorage.getItem("boards") || "");
+      const newData = lsData.filter((board: BoardSchema) => board.id !== id);
+      localStorage.setItem("boards", JSON.stringify(newData));
+      setLocalStorageBoards(newData);
+    }
+  };
+
   return (
     <div
       onClick={() => {
@@ -55,12 +86,19 @@ const Home: NextPage = () => {
       }}
       className="flex justify-center text-white h-screen overflow-x-hidden"
     >
-      <SideNav />
+      <SideNav
+        localStorageBoards={localStorageBoards}
+        setLocalStorageBoards={setLocalStorageBoards}
+        id={id}
+      />
       {/* Main */}
       <main className="w-4/5">
         {/* Top Settings */}
         <section className="h-[10%] min-w-[500px] p-4 flex justify-between items-center bg-darkGray">
-          <h1 className="text-2xl">Board Name</h1>
+          <h1 className="text-2xl">
+            {activeBoard?.[0]?.title || "Future Board Name 🤓"}
+            {/* {activeBoard[0]?.title || "Future Board Name 🤓"} */}
+          </h1>
           <div className="flex justify-center items-center gap-4">
             <button
               onClick={(e) => {
@@ -72,6 +110,7 @@ const Home: NextPage = () => {
             </button>
             {/* Delete Board Btn */}
             <svg
+              onClick={() => handleDeleteBoard(id)}
               className="w-10 h-10 p-2 text-fontSecondary rounded cursor-pointer hover:bg-darkBlue"
               fill="none"
               stroke="currentColor"

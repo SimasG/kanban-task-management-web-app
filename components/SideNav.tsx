@@ -44,11 +44,17 @@ type LocalStorageBoardSchema = {
   }[];
 };
 
-const SideNav = () => {
-  const [localStorageBoards, setLocalStorageBoards] = useState<
-    // ** Change "any" later
-    LocalStorageBoardSchema | null | any
-  >(null);
+type SideNavProps = {
+  localStorageBoards: any;
+  setLocalStorageBoards: React.Dispatch<any>;
+  id: string | null | undefined;
+};
+
+const SideNav = ({
+  localStorageBoards,
+  setLocalStorageBoards,
+  id,
+}: SideNavProps) => {
   const user = useContext(UserContext);
   // ** Putting any as the time for now
   const data: any = useFetchFirestoreData(user?.uid);
@@ -89,7 +95,7 @@ const SideNav = () => {
     signOut(auth).then(() => toast.success("Logged out!"));
   };
 
-  const exampleBoards = {
+  const exampleBoardsOld = {
     boards: [
       {
         id: uuidv4(),
@@ -105,6 +111,21 @@ const SideNav = () => {
       },
     ],
   };
+
+  const exampleBoards = [
+    {
+      id: uuidv4(),
+      title: "Marketing Campaign",
+    },
+    {
+      id: uuidv4(),
+      title: "Sales Campaign",
+    },
+    {
+      id: uuidv4(),
+      title: "Customer Success",
+    },
+  ];
 
   // if (typeof window !== "undefined") {
   //   localStorage.setItem("boards", JSON.stringify(exampleBoards));
@@ -148,8 +169,8 @@ const SideNav = () => {
           {/* Would like to change the initial "undefined" value of "localStorageBoards?.boards?.length" */}
           {data?.length !== 0
             ? `All Boards (${data?.length})`
-            : localStorageBoards?.boards?.length !== 0
-            ? `All Boards (${localStorageBoards?.boards?.length})`
+            : localStorageBoards?.length !== 0
+            ? `All Boards (${localStorageBoards?.length})`
             : "No Boards!"}
         </h3>
         {/* Boards subcontainer */}
@@ -167,7 +188,7 @@ const SideNav = () => {
                     </div>
                   );
                 })
-              : localStorageBoards?.boards.map(
+              : localStorageBoards?.map(
                   // ** Re-assign board type later
                   (board: any) => {
                     return (
@@ -203,7 +224,7 @@ const SideNav = () => {
                     );
                   }
                 )
-            : ""}
+            : "No LS or FS data found :("}
         </div>
         {/* Create new Board container */}
         <div className="pl-4 flex justify-start items-center gap-3 py-1 text-fontTertiary cursor-pointer hover:bg-fontPrimary hover:text-fontTertiary hover:rounded-r-full">
