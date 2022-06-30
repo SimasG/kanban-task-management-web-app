@@ -124,3 +124,78 @@ title: "Customer Success",
 // if (typeof window !== "undefined") {
 // localStorage.setItem("boards", JSON.stringify(exampleBoards));
 // }
+
+          {boards
+            ? data?.length !== 0
+              ? data?.map((board: BoardSchema) => {
+                  // const uid = uuidv4();
+                  return (
+                    <div
+                      className="board"
+                      key={board?.id}
+                      onClick={() => {
+                        setId(board?.id);
+                      }}
+                    >
+                      <TbLayoutBoardSplit />
+                      {/* <h4>{board?.title}</h4> */}
+                      <input
+                        className="bg-transparent cursor-pointer outline-none"
+                        type="text"
+                        value={board?.title}
+                        // ** Having trouble refactoring the logic in a separate func
+                        onChange={(e) => {
+                          updateBoardName(board.id, e.target.value);
+                          // setLocalStorageBoards(newBoardList);
+                          // setId(board?.id);
+                        }}
+                      />
+                    </div>
+                  );
+                })
+              :
+              boards?.map(
+                  // ** Re-assign board type later
+                  (board: any) => {
+                    return (
+                      // <div className="board" key={board?.id}>
+                      <div
+                        className={
+                          board?.id === id
+                            ? "board bg-fontTertiary text-fontPrimary rounded-r-full"
+                            : "board"
+                        }
+                        key={board?.id}
+                        onClick={() => {
+                          setId(board?.id);
+                        }}
+                      >
+                        <TbLayoutBoardSplit />
+                        <input
+                          className="bg-transparent cursor-pointer outline-none"
+                          type="text"
+                          value={board?.title}
+                          // ** Having trouble refactoring the logic in a separate func
+                          onChange={(e) => {
+                            const newBoardList: {}[] = [];
+                            boards.map((b: BoardSchema) => {
+                              b.id === board.id
+                                ? newBoardList.push({
+                                    ...board,
+                                    title: e.target.value,
+                                  })
+                                : newBoardList.push(b);
+                            });
+                            localStorage.setItem(
+                              "boards",
+                              JSON.stringify(newBoardList)
+                            );
+                            setBoards(newBoardList);
+                            setId(board?.id);
+                          }}
+                        />
+                      </div>
+                    );
+                  }
+                )
+            : "No LS or FS data found :("}

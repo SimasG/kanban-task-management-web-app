@@ -45,25 +45,20 @@ type LocalStorageBoardSchema = {
 };
 
 type SideNavProps = {
-  localStorageBoards: any;
-  setLocalStorageBoards: React.Dispatch<any>;
+  boards: any;
+  setBoards: React.Dispatch<any>;
   id: string | null | undefined;
   setId: React.Dispatch<React.SetStateAction<string | null | undefined>>;
 };
 
-const SideNav = ({
-  localStorageBoards,
-  setLocalStorageBoards,
-  id,
-  setId,
-}: SideNavProps) => {
+const SideNav = ({ boards, setBoards, id, setId }: SideNavProps) => {
   const user = useContext(UserContext);
-  // ** Putting any as the time for now
-  const data: any = useFetchFirestoreData(user?.uid);
+  // // ** Putting any as the time for now
+  // const data: any = useFetchFirestoreData(user?.uid);
 
   useEffect(() => {
     // ** Use state to populate the UI and keep the UI in sync with local storage changes
-    setLocalStorageBoards(JSON.parse(localStorage.getItem("boards") || ""));
+    setBoards(JSON.parse(localStorage.getItem("boards") || ""));
   }, []);
 
   const handleGoogleLogin = () => {
@@ -122,7 +117,7 @@ const SideNav = ({
         },
       ];
       localStorage.setItem("boards", JSON.stringify(newData));
-      setLocalStorageBoards(newData);
+      setBoards(newData);
     } else {
       // Creating new Board in Firestore
       const uuid = uuidv4();
@@ -154,82 +149,70 @@ const SideNav = ({
         {/* All Boards title */}
         <h3 className="pl-4 uppercase font-bold text-xs mb-4">
           {/* Would like to change the initial "undefined" value of "localStorageBoards?.boards?.length" */}
-          {data?.length !== 0
+          {/* {data?.length !== 0
             ? `All Boards (${data?.length})`
-            : localStorageBoards?.length !== 0
-            ? `All Boards (${localStorageBoards?.length})`
-            : "No Boards!"}
+            : boards?.length !== 0
+            ? `All Boards (${boards?.length})`
+            : "No Boards!"} */}
         </h3>
         {/* Boards subcontainer */}
         <div>
           {/* Specific Board */}
-          {localStorageBoards
-            ? data?.length !== 0
-              ? data?.map((board: BoardSchema) => {
-                  const uid = uuidv4();
+          {boards
+            ? boards?.map(
+                // ** Re-assign board type later
+                (board: any) => {
                   return (
-                    <div className="board" key={uid}>
+                    <div
+                      className={
+                        board?.id === id
+                          ? "board bg-fontTertiary text-fontPrimary rounded-r-full"
+                          : "board"
+                      }
+                      key={board?.id}
+                      onClick={() => {
+                        setId(board?.id);
+                      }}
+                    >
                       <TbLayoutBoardSplit />
-                      {/* <h4>{board?.title}</h4> */}
                       <input
                         className="bg-transparent cursor-pointer outline-none"
                         type="text"
                         value={board?.title}
                         // ** Having trouble refactoring the logic in a separate func
-                        onChange={(e) => {
-                          updateBoardName(board.id, e.target.value);
-                          // setLocalStorageBoards(newBoardList);
-                          // setId(board?.id);
-                        }}
+                        onChange={
+                          user
+                            ? // If user is authenticated, update Firestore
+                              (e) => {
+                                updateBoardName(board.id, e.target.value);
+                                // setLocalStorageBoards(newBoardList);
+                                // setId(board?.id);
+                              }
+                            : // If user is not authenticated, update localStorage
+                              (e) => {
+                                const newBoardList: {}[] = [];
+                                boards.map((b: BoardSchema) => {
+                                  b.id === board.id
+                                    ? newBoardList.push({
+                                        ...board,
+                                        title: e.target.value,
+                                      })
+                                    : newBoardList.push(b);
+                                });
+                                localStorage.setItem(
+                                  "boards",
+                                  JSON.stringify(newBoardList)
+                                );
+                                setBoards(newBoardList);
+                                setId(board?.id);
+                              }
+                        }
                       />
                     </div>
                   );
-                })
-              : localStorageBoards?.map(
-                  // ** Re-assign board type later
-                  (board: any) => {
-                    return (
-                      // <div className="board" key={board?.id}>
-                      <div
-                        className={
-                          board?.id === id
-                            ? "board bg-fontTertiary text-fontPrimary rounded-r-full"
-                            : "board"
-                        }
-                        key={board?.id}
-                        onClick={() => {
-                          setId(board?.id);
-                        }}
-                      >
-                        <TbLayoutBoardSplit />
-                        <input
-                          className="bg-transparent cursor-pointer outline-none"
-                          type="text"
-                          value={board?.title}
-                          // ** Having trouble refactoring the logic in a separate func
-                          onChange={(e) => {
-                            const newBoardList: {}[] = [];
-                            localStorageBoards.map((b: BoardSchema) => {
-                              b.id === board.id
-                                ? newBoardList.push({
-                                    ...board,
-                                    title: e.target.value,
-                                  })
-                                : newBoardList.push(b);
-                            });
-                            localStorage.setItem(
-                              "boards",
-                              JSON.stringify(newBoardList)
-                            );
-                            setLocalStorageBoards(newBoardList);
-                            setId(board?.id);
-                          }}
-                        />
-                      </div>
-                    );
-                  }
-                )
-            : "No LS or FS data found :("}
+                }
+              )
+            : "There is nothing bro :(!"}
         </div>
         {/* Create new Board container */}
         <div className="pl-4 flex justify-start items-center gap-3 py-1 text-fontTertiary cursor-pointer hover:bg-fontPrimary hover:text-fontTertiary hover:rounded-r-full">

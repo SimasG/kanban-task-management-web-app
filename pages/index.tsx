@@ -22,10 +22,12 @@ const Home: NextPage = () => {
   // Pre-fetching data
   const user = useContext(UserContext);
   const firestoreData = useFetchFirestoreData(user?.uid);
-  useEffect(() => {
-    setLocalStorageBoards(JSON.parse(localStorage.getItem("boards") || ""));
-  }, []);
-  const [localStorageBoards, setLocalStorageBoards] = useState<
+  // Why am I calling it "localStorage" to begin with?
+  // const [localStorageBoards, setLocalStorageBoards] = useState<
+  //   // ** Change "any" later
+  //   LocalStorageBoardSchema | null | any
+  // >(null);
+  const [boards, setBoards] = useState<
     // ** Change "any" later
     LocalStorageBoardSchema | null | any
   >(null);
@@ -37,22 +39,34 @@ const Home: NextPage = () => {
   // ** Putting "any" for now
   const [activeBoard, setActiveBoard] = useState<any | null>(null);
 
-  let data: any;
-  user ? (data = firestoreData) : (data = localStorageBoards);
+  useEffect(() => {
+    if (!user) {
+      // console.log("Boards from localStorage:");
+      // console.log(JSON.parse(localStorage.getItem("boards") || ""));
+      setBoards(JSON.parse(localStorage.getItem("boards") || ""));
+    } else {
+      // console.log("Boards from Firestore:");
+      // console.log(firestoreData);
+      setBoards(firestoreData);
+    }
+  }, [user]);
+
+  // let data: any;
+  // user ? (data = firestoreData) : (data = localStorageBoards);
 
   // ** useEffects
   // Setting default active Board from localStorage
   useEffect(() => {
     if (user) return;
-    if (!localStorageBoards || localStorageBoards?.length === 0) return;
+    if (!boards || boards?.length === 0) return;
     if (id) return;
-    setId(localStorageBoards?.[0].id);
-  }, [user, localStorageBoards]);
+    setId(boards?.[0].id);
+  }, [user, boards]);
 
   // Setting a current active Board
   useEffect(() => {
     if (id) {
-      const currentBoard = data?.filter(
+      const currentBoard = boards?.filter(
         (board: BoardSchema) => board.id === id
       );
       setActiveBoard(currentBoard);
@@ -76,7 +90,7 @@ const Home: NextPage = () => {
       const lsData = JSON.parse(localStorage.getItem("boards") || "");
       const newData = lsData.filter((board: BoardSchema) => board.id !== id);
       localStorage.setItem("boards", JSON.stringify(newData));
-      setLocalStorageBoards(newData);
+      setBoards(newData);
       setId(newData?.[0].id);
     } else {
       // Deleting Board from Firestore
@@ -93,8 +107,8 @@ const Home: NextPage = () => {
     >
       <SideNav
         // ** Wonder if I would decrease the number of props here?
-        localStorageBoards={localStorageBoards}
-        setLocalStorageBoards={setLocalStorageBoards}
+        boards={boards}
+        setBoards={setBoards}
         id={id}
         setId={setId}
       />
