@@ -116,28 +116,35 @@ const SideNav = ({
   //   localStorage.setItem("boards", JSON.stringify(exampleBoards));
   // }
 
-  const handleCreateNewBoardFirestore = () => {
-    // const uuid = uuidv4();
-    // const ref = doc(db, "users", `${user?.uid}`, "boards", uuid);
-    // setDoc(ref, {
-    //   title: "New Board",
-    // });
-    console.log("Creating new board in Firestore");
-  };
+  // const handleCreateNewBoardFirestore = () => {
+  // const uuid = uuidv4();
+  // const ref = doc(db, "users", `${user?.uid}`, "boards", uuid);
+  // setDoc(ref, {
+  //   title: "New Board",
+  // });
+  //   console.log("Creating new board in Firestore");
+  // };
 
-  const handleCreateNewBoardLS = () => {
-    const oldData = JSON.parse(localStorage.getItem("boards") || "").boards;
-    const newData = {
-      boards: [
+  const handleCreateNewBoard = () => {
+    if (!user) {
+      const oldData = JSON.parse(localStorage.getItem("boards") || "");
+      const newData = [
         ...oldData,
         {
           id: uuidv4(),
           title: "New Board",
         },
-      ],
-    };
-    localStorage.setItem("boards", JSON.stringify(newData));
-    setLocalStorageBoards(newData);
+      ];
+      localStorage.setItem("boards", JSON.stringify(newData));
+      setLocalStorageBoards(newData);
+    } else {
+      // const uuid = uuidv4();
+      // const ref = doc(db, "users", `${user?.uid}`, "boards", uuid);
+      // setDoc(ref, {
+      //   title: "New Board",
+      // });
+      //   console.log("Creating new board in Firestore");
+    }
   };
 
   return (
@@ -195,24 +202,23 @@ const SideNav = ({
                           className="bg-transparent cursor-pointer outline-none"
                           type="text"
                           value={board?.title}
-                          // Having trouble refactoring the logic in a separate func
+                          // ** Having trouble refactoring the logic in a separate func
                           onChange={(e) => {
                             // ** Putting "any" type for now
-                            const newBoardList: any = {
-                              boards: [],
-                            };
-                            localStorageBoards.boards.map((b: BoardSchema) => {
+                            const newBoardList: {}[] = [];
+                            localStorageBoards.map((b: BoardSchema) => {
                               b.id === board.id
-                                ? newBoardList.boards.push({
+                                ? newBoardList.push({
                                     ...board,
                                     title: e.target.value,
                                   })
-                                : newBoardList.boards.push(b);
+                                : newBoardList.push(b);
                             });
                             localStorage.setItem(
                               "boards",
                               JSON.stringify(newBoardList)
                             );
+                            setId(board.id);
                             setLocalStorageBoards(newBoardList);
                           }}
                         />
@@ -225,13 +231,7 @@ const SideNav = ({
         {/* Create new Board container */}
         <div className="pl-4 flex justify-start items-center gap-3 py-1 text-fontTertiary cursor-pointer hover:bg-fontPrimary hover:text-fontTertiary hover:rounded-r-full">
           <TbLayoutBoardSplit />
-          <button
-            onClick={
-              user ? handleCreateNewBoardFirestore : handleCreateNewBoardLS
-            }
-          >
-            + Create New Board
-          </button>
+          <button onClick={handleCreateNewBoard}>+ Create New Board</button>
         </div>
       </section>
       {/* Log in/out btn + theme toggle + hide sidebar section */}

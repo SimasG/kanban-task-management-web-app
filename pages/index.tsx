@@ -45,6 +45,7 @@ const Home: NextPage = () => {
   useEffect(() => {
     if (user) return;
     if (!localStorageBoards || localStorageBoards?.length === 0) return;
+    if (id) return;
     setId(localStorageBoards?.[0].id);
   }, [user, localStorageBoards]);
 
