@@ -4,10 +4,11 @@ import {
   DocumentData,
   serverTimestamp,
   setDoc,
+  Timestamp,
   updateDoc,
 } from "firebase/firestore";
 import Image from "next/image";
-import React, { useContext, useEffect } from "react";
+import React, { useContext } from "react";
 import toast from "react-hot-toast";
 import { FcGoogle } from "react-icons/fc";
 import { TbLayoutBoard, TbLayoutBoardSplit } from "react-icons/tb";
@@ -56,11 +57,6 @@ const SideNav = ({ boards, setBoards, id, setId }: SideNavProps) => {
   // // ** Putting any as the time for now
   // const data: any = useFetchFirestoreData(user?.uid);
 
-  useEffect(() => {
-    // ** Use state to populate the UI and keep the UI in sync with local storage changes
-    setBoards(JSON.parse(localStorage.getItem("boards") || ""));
-  }, []);
-
   const handleGoogleLogin = () => {
     const provider = new GoogleAuthProvider();
     signInWithPopup(auth, provider)
@@ -74,14 +70,23 @@ const SideNav = ({ boards, setBoards, id, setId }: SideNavProps) => {
         });
 
         // ! Storing localStorage data into Firestore ->  having issues
-        const lsData = JSON.parse(localStorage.getItem("boards") || "");
-        // console.log("lsData:", lsData);
-        lsData?.forEach(async (board: BoardSchema) => {
-          // console.log("single Board:", board);
-          const ref = doc(db, "users", `${user.uid}`, "boards", `${board.id}`);
-          console.log(ref, board);
-          await setDoc(ref, board);
-        });
+        //
+        if (localStorage.getItem("boards") || "" !== "") {
+          const lsData = JSON.parse(localStorage.getItem("boards") || "");
+          // console.log("lsData:", lsData);
+          lsData?.forEach(async (board: BoardSchema) => {
+            // console.log("single Board:", board);
+            const ref = doc(
+              db,
+              "users",
+              `${user.uid}`,
+              "boards",
+              `${board.id}`
+            );
+            // console.log(ref, board);
+            await setDoc(ref, board);
+          });
+        }
 
         toast.success(`Welcome ${user.displayName}!`);
       })
@@ -89,29 +94,12 @@ const SideNav = ({ boards, setBoards, id, setId }: SideNavProps) => {
   };
 
   const signOutUser = () => {
-    // Storing Firestore data into localStorage
-    localStorage.setItem("boards", JSON.stringify(boards));
     signOut(auth).then(() => toast.success("Logged out!"));
   };
 
   // console.log("boards:", boards);
 
-  const exampleBoards = [
-    {
-      id: uuidv4(),
-      title: "Marketing Campaign",
-    },
-    {
-      id: uuidv4(),
-      title: "Sales Campaign",
-    },
-    {
-      id: uuidv4(),
-      title: "Customer Success",
-    },
-  ];
-
-  const handleCreateNewBoard = () => {
+  const handleCreateNewBoard = async () => {
     // Creating new Board in localStorage
     if (!user) {
       const oldData = JSON.parse(localStorage.getItem("boards") || "");
@@ -128,10 +116,12 @@ const SideNav = ({ boards, setBoards, id, setId }: SideNavProps) => {
       // Creating new Board in Firestore
       const uuid = uuidv4();
       const ref = doc(db, "users", `${user?.uid}`, "boards", uuid);
-      setDoc(ref, {
+      await setDoc(ref, {
         title: "New Board",
         id: uuid,
+        createdAt: Timestamp.fromDate(new Date()),
       });
+      // setId -> according to timestamp (the latest dateCreated)
     }
   };
 
@@ -158,11 +148,6 @@ const SideNav = ({ boards, setBoards, id, setId }: SideNavProps) => {
           {boards?.length !== 0
             ? `All Boards (${boards?.length})`
             : "No Boards!"}
-          {/* {data?.length !== 0
-            ? `All Boards (${data?.length})`
-            : boards?.length !== 0
-            ? `All Boards (${boards?.length})`
-            : "No Boards!"} */}
         </h3>
         {/* Boards subcontainer */}
         <div>

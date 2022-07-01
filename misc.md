@@ -238,3 +238,28 @@ const currentBoard = boards?.filter(
 setActiveBoard(currentBoard);
 }
 }, [id, boards]);
+
+useEffect(() => {
+// If localStorage is empty, do not try to set the main state from it
+if (localStorage.getItem("boards") || "" !== "") {
+console.log("LS isn't empty yayy");
+setBoards(JSON.parse(localStorage.getItem("boards") || ""));
+} else {
+console.log("LS is empty bitches");
+}
+}, []);
+
+const exampleBoards = [
+{
+id: uuidv4(),
+title: "Marketing Campaign",
+},
+{
+id: uuidv4(),
+title: "Sales Campaign",
+},
+{
+id: uuidv4(),
+title: "Customer Success",
+},
+];

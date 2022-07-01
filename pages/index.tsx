@@ -38,23 +38,44 @@ const Home: NextPage = () => {
   // Setting main state either from localStorage or Firestore
   useEffect(() => {
     if (!user) {
-      setBoards(JSON.parse(localStorage.getItem("boards") || ""));
-      setId(JSON.parse(localStorage.getItem("boards") || "")?.[0]?.id);
+      // If localStorage is empty, do not try to set the main state from it
+      if (localStorage.getItem("boards") || "" !== "") {
+        setBoards(JSON.parse(localStorage.getItem("boards") || ""));
+        setId(JSON.parse(localStorage.getItem("boards") || "")?.[0]?.id);
+        console.log("LS isn't empty");
+      } else {
+        console.log("LS is empty");
+      }
       return;
-    }
-    // Ensuring that I only set the main state from Firestore once the data has been fetched (async protection)
-    if (!firestoreData || firestoreData.length === 0) return;
-    setBoards(firestoreData);
-
-    if (activeBoard) {
-      const index = boards?.indexOf(activeBoard?.[0]);
-      setId(firestoreData?.[index]?.id);
     } else {
-      setId(firestoreData?.[0]?.id);
+      // Ensuring that I only set the main state from Firestore once the data has been fetched (async protection)
+
+      // ** How do I make sure that I set the main state from FS when I'm authed even if it's an empty array?
+      if (!firestoreData) return;
+      setBoards(firestoreData);
+
+      if (activeBoard) {
+        const index = boards?.indexOf(activeBoard?.[0]);
+        setId(firestoreData?.[index]?.id);
+        console.log("activeBoard ran");
+      } else {
+        console.log("!activeBoard ran");
+        setId(firestoreData?.[0]?.id);
+      }
+
+      if (firestoreData.length !== 0) {
+        console.log("firestoreData.length !== 0 ran");
+        setBoards(firestoreData);
+      }
     }
   }, [firestoreData, user]);
 
   const activeBoard = boards?.filter((board: BoardSchema) => board.id === id);
+
+  console.log("firestoreData:", firestoreData);
+  console.log("activeBoard:", activeBoard);
+  console.log("id:", id);
+  console.log("boards:", boards);
 
   // Buttons
   const handleAddNewTaskBtn = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -74,11 +95,11 @@ const Home: NextPage = () => {
       const newData = lsData.filter((board: BoardSchema) => board.id !== id);
       localStorage.setItem("boards", JSON.stringify(newData));
       setBoards(newData);
-      setId(newData?.[0].id);
+      setId(newData?.[0]?.id);
     } else {
       // Deleting Board from Firestore
       const docRef = doc(db, "users", `${user?.uid}`, "boards", `${id}`);
-      setId(boards?.[0].id);
+      setId(boards?.[0]?.id);
       await deleteDoc(docRef);
     }
   };
