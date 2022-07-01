@@ -218,3 +218,23 @@ setId(boards?.[0].id);
 }, [boards]);
 
 console.log(boards?.indexOf(activeBoard?.[0]));
+
+    if (firestoreData && firestoreData.length !== 0 && !activeBoard) {
+      setId(firestoreData?.[0]?.id);
+
+    }
+    if (firestoreData && activeBoard) {
+      const index = boards?.indexOf(activeBoard?.[0]);
+      setId(firestoreData?.[index]?.id);
+    }
+
+// Setting a current active Board
+// I don't actually need the state
+useEffect(() => {
+if (id) {
+const currentBoard = boards?.filter(
+(board: BoardSchema) => board.id === id
+);
+setActiveBoard(currentBoard);
+}
+}, [id, boards]);

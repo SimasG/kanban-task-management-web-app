@@ -46,7 +46,7 @@ type LocalStorageBoardSchema = {
 
 type SideNavProps = {
   boards: any;
-  setBoards: React.Dispatch<any>;
+  setBoards: React.Dispatch<React.SetStateAction<any>>;
   id: string | null | undefined;
   setId: React.Dispatch<React.SetStateAction<string | null | undefined>>;
 };
@@ -71,14 +71,18 @@ const SideNav = ({ boards, setBoards, id, setId }: SideNavProps) => {
           id: user.uid,
           email: user.email,
           timeStamp: serverTimestamp(),
-        }).then(async () => {
-          // Storing localStorage data into Firestore
-          const lsData = JSON.parse(localStorage.getItem("boards") || "");
-          lsData.forEach(async (board: BoardSchema) => {
-            const ref = doc(db, "users", user.uid, "boards", board.id);
-            await setDoc(ref, board);
-          });
         });
+
+        // ! Storing localStorage data into Firestore ->  having issues
+        const lsData = JSON.parse(localStorage.getItem("boards") || "");
+        // console.log("lsData:", lsData);
+        lsData?.forEach(async (board: BoardSchema) => {
+          // console.log("single Board:", board);
+          const ref = doc(db, "users", `${user.uid}`, "boards", `${board.id}`);
+          console.log(ref, board);
+          await setDoc(ref, board);
+        });
+
         toast.success(`Welcome ${user.displayName}!`);
       })
       .catch((err) => console.log(err));
@@ -86,9 +90,11 @@ const SideNav = ({ boards, setBoards, id, setId }: SideNavProps) => {
 
   const signOutUser = () => {
     // Storing Firestore data into localStorage
-    // console.log(user);
-    // signOut(auth).then(() => toast.success("Logged out!"));
+    localStorage.setItem("boards", JSON.stringify(boards));
+    signOut(auth).then(() => toast.success("Logged out!"));
   };
+
+  // console.log("boards:", boards);
 
   const exampleBoards = [
     {
@@ -126,7 +132,6 @@ const SideNav = ({ boards, setBoards, id, setId }: SideNavProps) => {
         title: "New Board",
         id: uuid,
       });
-      setId(uuid);
     }
   };
 
@@ -163,26 +168,26 @@ const SideNav = ({ boards, setBoards, id, setId }: SideNavProps) => {
         <div>
           {/* Specific Board */}
           {boards
-            ? boards?.map(
+            ? boards.map(
                 // ** Re-assign board type later
                 (board: any) => {
                   return (
                     <div
                       className={
-                        board?.id === id
+                        board.id === id
                           ? "board bg-fontTertiary text-fontPrimary rounded-r-full"
                           : "board"
                       }
-                      key={board?.id}
+                      key={board.id}
                       onClick={() => {
-                        setId(board?.id);
+                        setId(board.id);
                       }}
                     >
                       <TbLayoutBoardSplit />
                       <input
                         className="bg-transparent cursor-pointer outline-none"
                         type="text"
-                        value={board?.title}
+                        value={board.title}
                         // ** Having trouble refactoring the logic in a separate func
                         onChange={
                           user
@@ -208,7 +213,7 @@ const SideNav = ({ boards, setBoards, id, setId }: SideNavProps) => {
                                   JSON.stringify(newBoardList)
                                 );
                                 setBoards(newBoardList);
-                                setId(board?.id);
+                                setId(board.id);
                               }
                         }
                       />

@@ -8,12 +8,12 @@ import { UserContext } from "../lib/context";
 import { db } from "../lib/firebase";
 import useFetchFirestoreData from "../lib/hooks/useFetchFsData";
 
-type LocalStorageBoardSchema = {
-  boards: {
-    title: string;
-    id: string | null | undefined;
-  }[];
-};
+// type LocalStorageBoardSchema = {
+//   boards: {
+//     title: string;
+//     id: string | null | undefined;
+//   }[];
+// };
 
 type BoardSchema = {
   title: string;
@@ -26,44 +26,35 @@ const Home: NextPage = () => {
   const firestoreData = useFetchFirestoreData(user?.uid);
 
   // States
+  // ** Main State
   const [boards, setBoards] = useState<
-    // ** Change "any" later
-    LocalStorageBoardSchema | null | any
+    // ** Change "any" later -> change it once the data schema is more clear
+    BoardSchema[] | null | any
   >(null);
   const [showAddTaskModal, setShowAddTaskModal] = useState(false);
   const [showEditTaskModal, setShowEditTaskModal] = useState(false);
   const [id, setId] = useState<string | null | undefined>(null);
-  // ** Putting "any" for now
-  const [activeBoard, setActiveBoard] = useState<any | null>(null);
 
   // Setting main state either from localStorage or Firestore
   useEffect(() => {
     if (!user) {
       setBoards(JSON.parse(localStorage.getItem("boards") || ""));
+      setId(JSON.parse(localStorage.getItem("boards") || "")?.[0]?.id);
+      return;
     }
     // Ensuring that I only set the main state from Firestore once the data has been fetched (async protection)
-    if (!firestoreData) return;
-    if (firestoreData) {
-      setBoards(firestoreData);
-    }
-    if (firestoreData && !activeBoard) {
-      setId(firestoreData?.[0].id);
-    }
-    if (firestoreData && activeBoard) {
-      const index = boards?.indexOf(activeBoard?.[0]);
-      setId(firestoreData?.[index].id);
-    }
-  }, [firestoreData]);
+    if (!firestoreData || firestoreData.length === 0) return;
+    setBoards(firestoreData);
 
-  // Setting a current active Board
-  useEffect(() => {
-    if (id) {
-      const currentBoard = boards?.filter(
-        (board: BoardSchema) => board.id === id
-      );
-      setActiveBoard(currentBoard);
+    if (activeBoard) {
+      const index = boards?.indexOf(activeBoard?.[0]);
+      setId(firestoreData?.[index]?.id);
+    } else {
+      setId(firestoreData?.[0]?.id);
     }
-  }, [id, boards]);
+  }, [firestoreData, user]);
+
+  const activeBoard = boards?.filter((board: BoardSchema) => board.id === id);
 
   // Buttons
   const handleAddNewTaskBtn = (e: React.MouseEvent<HTMLButtonElement>) => {
