@@ -319,3 +319,14 @@ return data;
 };
 
 export default useFetchDiffFsData;
+
+        {
+          // ** Change logic
+          // const index = boards?.indexOf(activeBoard?.[0]);
+          // setId(firestoreData?.[index]?.id);
+          console.log("activeBoard ran");
+          setId(firestoreData?.[0]?.id);
+        } else {
+          console.log("!activeBoard ran");
+          setId(firestoreData?.[0]?.id);
+        }

@@ -12,12 +12,15 @@ import useFetchFirestoreData from "../lib/hooks/useFetchFsData";
 //   boards: {
 //     title: string;
 //     id: string | null | undefined;
+// createdAt: any
 //   }[];
 // };
 
 type BoardSchema = {
   title: string;
   id: string | null | undefined;
+  // What type is a Firebase timestamp?
+  createdAt: any;
 };
 
 const Home: NextPage = () => {
@@ -42,27 +45,28 @@ const Home: NextPage = () => {
       if (localStorage.getItem("boards") || "" !== "") {
         setBoards(JSON.parse(localStorage.getItem("boards") || ""));
         setId(JSON.parse(localStorage.getItem("boards") || "")?.[0]?.id);
-        // console.log("LS isn't empty");
+        console.log("LS isn't empty");
       } else {
-        // console.log("LS is empty");
+        console.log("LS is empty");
       }
       return;
     } else {
       // Ensuring that I only set the main state from Firestore once the data has been fetched (async protection)
-
       // ** How do I make sure that I set the main state from FS when I'm authed even if it's an empty array?
       if (!firestoreData) return;
       setBoards(firestoreData);
-
       if (firestoreData.length !== 0) {
-        // console.log("firestoreData.length !== 0 ran");
+        console.log("firestoreData.length !== 0 ran");
         setBoards(firestoreData);
         if (activeBoard?.length !== 0) {
-          const index = boards?.indexOf(activeBoard?.[0]);
-          setId(firestoreData?.[index]?.id);
-          // console.log("activeBoard ran");
+          console.log("activeBoard?.length !== 0 ran");
+          if (id !== firestoreData?.[0]?.id) {
+            const index = boards?.indexOf(activeBoard?.[0]);
+            setId(firestoreData?.[index]?.id);
+          }
         } else {
-          // console.log("!activeBoard ran");
+          // ! Unable to run this bit after refresh -> active Board is not auto set
+          console.log("activeBoard?.length === 0 ran");
           setId(firestoreData?.[0]?.id);
         }
       }
@@ -71,6 +75,12 @@ const Home: NextPage = () => {
 
   const activeBoard = boards?.filter((board: BoardSchema) => board.id === id);
 
+  // console.log(
+  //   "activeBoard?.length:",
+  //   activeBoard?.length,
+  //   "activeBoard:",
+  //   activeBoard
+  // );
   // console.log("firestoreData:", firestoreData);
   // console.log("activeBoard:", activeBoard);
   // console.log("id:", id);
@@ -98,7 +108,9 @@ const Home: NextPage = () => {
     } else {
       // Deleting Board from Firestore
       const docRef = doc(db, "users", `${user?.uid}`, "boards", `${id}`);
-      setId(boards?.[0]?.id);
+      // If the first Board in the array is deleted, setId to the second Board (which will become the
+      // first once the first one is removed from FS). Else, remove the first Board in the array.
+      boards?.[0]?.id === id ? setId(boards?.[1]?.id) : setId(boards?.[0]?.id);
       await deleteDoc(docRef);
     }
   };

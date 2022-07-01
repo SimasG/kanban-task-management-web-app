@@ -36,12 +36,15 @@ import useFetchFirestoreData from "../lib/hooks/useFetchFsData";
 type BoardSchema = {
   title: string;
   id: string;
+  // Change "createdAt" type later
+  createdAt: any;
 };
 
 type LocalStorageBoardSchema = {
   boards: {
     title: string;
     id: string;
+    createdAt: any;
   }[];
 };
 
@@ -87,7 +90,8 @@ const SideNav = ({ boards, setBoards, id, setId }: SideNavProps) => {
             await setDoc(ref, board);
           });
         }
-
+        // Clearing localStorage as soon as user is authed. LS is designed to be a temporary DB only.
+        localStorage.clear();
         toast.success(`Welcome ${user.displayName}!`);
       })
       .catch((err) => console.log(err));
@@ -103,16 +107,33 @@ const SideNav = ({ boards, setBoards, id, setId }: SideNavProps) => {
   const handleCreateNewBoard = async () => {
     // Creating new Board in localStorage
     if (!user) {
-      const oldData = JSON.parse(localStorage.getItem("boards") || "");
-      const newData = [
-        ...oldData,
-        {
-          id: uuidv4(),
-          title: "New Board",
-        },
-      ];
-      localStorage.setItem("boards", JSON.stringify(newData));
-      setBoards(newData);
+      // If LS isn't empty
+      if (localStorage.getItem("boards") || "" !== "") {
+        const oldData = JSON.parse(localStorage.getItem("boards") || "");
+        const newData = [
+          ...oldData,
+          {
+            id: uuidv4(),
+            title: "New Board",
+            createdAt: Date.now(),
+          },
+        ];
+        localStorage.setItem("boards", JSON.stringify(newData));
+        setBoards(newData);
+      }
+      // If LS is empty
+      else {
+        console.log("creating new board: LS is empty");
+        const newData = [
+          {
+            id: uuidv4(),
+            title: "New Board",
+            createdAt: Date.now(),
+          },
+        ];
+        localStorage.setItem("boards", JSON.stringify(newData));
+        setBoards(newData);
+      }
     } else {
       // Creating new Board in Firestore
       const uuid = uuidv4();
@@ -122,7 +143,7 @@ const SideNav = ({ boards, setBoards, id, setId }: SideNavProps) => {
         id: uuid,
         createdAt: Timestamp.fromDate(new Date()),
       });
-      // setId -> according to timestamp (the latest dateCreated)
+      setId(uuid);
     }
   };
 
