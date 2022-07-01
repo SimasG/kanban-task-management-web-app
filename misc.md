@@ -263,3 +263,59 @@ id: uuidv4(),
 title: "Customer Success",
 },
 ];
+
+// \*SSR
+export async function getStaticProps(context: any) {
+const user = useContext(UserContext);
+if (!user) return;
+const q = query(
+collection(db, "users", `${user?.uid}`, "boards"),
+orderBy("createdAt", "desc")
+);
+
+const data = (await getDocs(q)).docs.map(boardToJSON);
+
+return {
+props: { data },
+};
+}
+
+import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
+import { useEffect, useState } from "react";
+import { db } from "../firebase";
+
+const useFetchDiffFsData = async (uid: string | null | undefined) => {
+const [data, setData] = useState<any>();
+
+useEffect(() => {
+if (!uid) return;
+const q = query(
+collection(db, "users", `${uid}`, "boards"),
+orderBy("createdAt", "desc")
+);
+
+    const unsub = onSnapshot(q, (querySnapshot) => {
+      const array: any = [];
+      querySnapshot.forEach((doc) => {
+        array.push(doc.data());
+      });
+      setData(array);
+    });
+
+    return () => unsub();
+
+}, [uid]);
+
+return data;
+
+// const querySnapshot = await getDocs(q);
+// let data: any = [];
+// querySnapshot.forEach((doc) => {
+// // console.log(doc.data);
+// data.push(doc.data());
+// });
+
+// return data;
+};
+
+export default useFetchDiffFsData;

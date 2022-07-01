@@ -42,9 +42,9 @@ const Home: NextPage = () => {
       if (localStorage.getItem("boards") || "" !== "") {
         setBoards(JSON.parse(localStorage.getItem("boards") || ""));
         setId(JSON.parse(localStorage.getItem("boards") || "")?.[0]?.id);
-        console.log("LS isn't empty");
+        // console.log("LS isn't empty");
       } else {
-        console.log("LS is empty");
+        // console.log("LS is empty");
       }
       return;
     } else {
@@ -54,28 +54,27 @@ const Home: NextPage = () => {
       if (!firestoreData) return;
       setBoards(firestoreData);
 
-      if (activeBoard) {
-        const index = boards?.indexOf(activeBoard?.[0]);
-        setId(firestoreData?.[index]?.id);
-        console.log("activeBoard ran");
-      } else {
-        console.log("!activeBoard ran");
-        setId(firestoreData?.[0]?.id);
-      }
-
       if (firestoreData.length !== 0) {
-        console.log("firestoreData.length !== 0 ran");
+        // console.log("firestoreData.length !== 0 ran");
         setBoards(firestoreData);
+        if (activeBoard?.length !== 0) {
+          const index = boards?.indexOf(activeBoard?.[0]);
+          setId(firestoreData?.[index]?.id);
+          // console.log("activeBoard ran");
+        } else {
+          // console.log("!activeBoard ran");
+          setId(firestoreData?.[0]?.id);
+        }
       }
     }
   }, [firestoreData, user]);
 
   const activeBoard = boards?.filter((board: BoardSchema) => board.id === id);
 
-  console.log("firestoreData:", firestoreData);
-  console.log("activeBoard:", activeBoard);
-  console.log("id:", id);
-  console.log("boards:", boards);
+  // console.log("firestoreData:", firestoreData);
+  // console.log("activeBoard:", activeBoard);
+  // console.log("id:", id);
+  // console.log("boards:", boards);
 
   // Buttons
   const handleAddNewTaskBtn = (e: React.MouseEvent<HTMLButtonElement>) => {

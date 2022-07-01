@@ -94,6 +94,7 @@ const SideNav = ({ boards, setBoards, id, setId }: SideNavProps) => {
   };
 
   const signOutUser = () => {
+    setBoards(null);
     signOut(auth).then(() => toast.success("Logged out!"));
   };
 
