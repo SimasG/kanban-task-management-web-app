@@ -43,41 +43,28 @@ const Home: NextPage = () => {
     if (!user) {
       // If localStorage is empty, do not try to set the main state from it
       if (localStorage.getItem("boards") || "" !== "") {
+        // console.log("boards:", boards);
+        // console.log("activeBoard:", activeBoard);
+        // console.log(
+        //   'localStorage.getItem("boards") || ""',
+        //   JSON.parse(localStorage.getItem("boards") || "")
+        // );
+
         setBoards(JSON.parse(localStorage.getItem("boards") || ""));
         setId(JSON.parse(localStorage.getItem("boards") || "")?.[0]?.id);
-        console.log("LS isn't empty");
-      } else {
-        console.log("LS is empty");
       }
       return;
     } else {
       // Ensuring that I only set the main state from Firestore once the data has been fetched (async protection)
       if (!firestoreData) return;
       setBoards(firestoreData);
-      // If firestoreData doesn't have Board(s)
       if (activeBoard === undefined && firestoreData?.length !== 0) {
-        console.log(
-          "activeBoard === undefined ran (active Board doesn't exist)",
-          activeBoard,
-          firestoreData
-        );
         setId(firestoreData?.[0]?.id);
       }
     }
   }, [firestoreData, user]);
 
   const activeBoard = boards?.filter((board: BoardSchema) => board.id === id);
-
-  // console.log(
-  //   "activeBoard?.length:",
-  //   activeBoard?.length,
-  //   "activeBoard:",
-  //   activeBoard
-  // );
-  // console.log("firestoreData:", firestoreData);
-  // console.log("activeBoard:", activeBoard);
-  // console.log("id:", id);
-  // console.log("boards:", boards);
 
   // Buttons
   const handleAddNewTaskBtn = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -96,7 +83,7 @@ const Home: NextPage = () => {
       const lsData = JSON.parse(localStorage.getItem("boards") || "");
       const newData = lsData.filter((board: BoardSchema) => board.id !== id);
       localStorage.setItem("boards", JSON.stringify(newData));
-      setBoards(newData);
+      setBoards(newData.reverse());
       setId(newData?.[0]?.id);
     } else {
       // Deleting Board from Firestore
@@ -123,13 +110,7 @@ const Home: NextPage = () => {
       }}
       className="flex justify-center text-white h-screen overflow-x-hidden"
     >
-      <SideNav
-        // ** Wonder if I would decrease the number of props here?
-        boards={boards}
-        setBoards={setBoards}
-        id={id}
-        setId={setId}
-      />
+      <SideNav boards={boards} setBoards={setBoards} id={id} setId={setId} />
       {/* Main */}
       <main className="w-4/5">
         {/* Top Settings */}

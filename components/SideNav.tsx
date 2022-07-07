@@ -76,9 +76,7 @@ const SideNav = ({ boards, setBoards, id, setId }: SideNavProps) => {
         //
         if (localStorage.getItem("boards") || "" !== "") {
           const lsData = JSON.parse(localStorage.getItem("boards") || "");
-          // console.log("lsData:", lsData);
           lsData?.forEach(async (board: BoardSchema) => {
-            // console.log("single Board:", board);
             const ref = doc(
               db,
               "users",
@@ -102,13 +100,12 @@ const SideNav = ({ boards, setBoards, id, setId }: SideNavProps) => {
     signOut(auth).then(() => toast.success("Logged out!"));
   };
 
-  // console.log("boards:", boards);
-
   const handleCreateNewBoard = async () => {
     // Creating new Board in localStorage
     if (!user) {
       // If LS isn't empty
-      if (localStorage.getItem("boards") || "" !== "") {
+      if (localStorage.getItem("boards") !== "[]") {
+        console.log("LS is not '[]'");
         const oldData = JSON.parse(localStorage.getItem("boards") || "");
         const newData = [
           ...oldData,
@@ -119,11 +116,12 @@ const SideNav = ({ boards, setBoards, id, setId }: SideNavProps) => {
           },
         ];
         localStorage.setItem("boards", JSON.stringify(newData));
-        setBoards(newData);
+        setBoards(newData?.reverse());
+        setId(newData?.[0]?.id);
       }
       // If LS is empty
       else {
-        console.log("creating new board: LS is empty");
+        console.log("LS is '[]'");
         const newData = [
           {
             id: uuidv4(),
@@ -133,6 +131,7 @@ const SideNav = ({ boards, setBoards, id, setId }: SideNavProps) => {
         ];
         localStorage.setItem("boards", JSON.stringify(newData));
         setBoards(newData);
+        setId(newData?.[0]?.id);
       }
     } else {
       // Creating new Board in Firestore
