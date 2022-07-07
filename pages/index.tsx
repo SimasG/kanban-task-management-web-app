@@ -52,23 +52,16 @@ const Home: NextPage = () => {
       return;
     } else {
       // Ensuring that I only set the main state from Firestore once the data has been fetched (async protection)
-      // ** How do I make sure that I set the main state from FS when I'm authed even if it's an empty array?
       if (!firestoreData) return;
       setBoards(firestoreData);
-      if (firestoreData.length !== 0) {
-        console.log("firestoreData.length !== 0 ran");
-        setBoards(firestoreData);
-        if (activeBoard?.length !== 0) {
-          console.log("activeBoard?.length !== 0 ran");
-          if (id !== firestoreData?.[0]?.id) {
-            const index = boards?.indexOf(activeBoard?.[0]);
-            setId(firestoreData?.[index]?.id);
-          }
-        } else {
-          // ! Unable to run this bit after refresh -> active Board is not auto set
-          console.log("activeBoard?.length === 0 ran");
-          setId(firestoreData?.[0]?.id);
-        }
+      // If firestoreData doesn't have Board(s)
+      if (activeBoard === undefined && firestoreData?.length !== 0) {
+        console.log(
+          "activeBoard === undefined ran (active Board doesn't exist)",
+          activeBoard,
+          firestoreData
+        );
+        setId(firestoreData?.[0]?.id);
       }
     }
   }, [firestoreData, user]);

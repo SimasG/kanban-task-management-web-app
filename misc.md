@@ -330,3 +330,29 @@ export default useFetchDiffFsData;
           console.log("!activeBoard ran");
           setId(firestoreData?.[0]?.id);
         }
+
+          // Maintaining the same active Board when its title is being updated
+          // if (id !== firestoreData?.[0]?.id) {
+          //   const index = boards?.indexOf(activeBoard?.[0]);
+          //   setId(firestoreData?.[index]?.id);
+          // }
+
+      if (firestoreData.length !== 0) {
+        console.log("firestoreData.length !== 0 ran");
+        // * Don't think that setting the Boards here is required
+        // setBoards(firestoreData);
+        // If the active Board exists
+        if (activeBoard !== undefined) {
+          console.log(
+            "activeBoard?.length !== undefined ran (active Board exists)",
+            activeBoard
+          );
+        } else if (activeBoard === undefined) {
+          console.log(
+            "activeBoard === undefined ran (active Board doesn't exist)",
+            activeBoard,
+            firestoreData
+          );
+          setId(firestoreData?.[0]?.id);
+        }
+      }
