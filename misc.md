@@ -360,3 +360,16 @@ export default useFetchDiffFsData;
         // const newArray: any = [];
         // newData?.map((board) => newArray.push(board?.createdAt));
         // console.log(newArray.sort());
+
+
+      // const loadFSData = async () => {
+      //   const querySnapshot = await getDocs(
+      //     collection(db, "users", `${user?.uid}`, "boards")
+      //   );
+      //   const newArray: {}[] = [];
+      //   querySnapshot.forEach((doc) => {
+      //     newArray.push(doc?.data());
+      //   });
+      //   setBoards(newArray);
+      // };
+      // loadFSData();

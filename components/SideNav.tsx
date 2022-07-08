@@ -72,9 +72,12 @@ const SideNav = ({ boards, setBoards, id, setId }: SideNavProps) => {
           timeStamp: serverTimestamp(),
         });
 
-        // ! Storing localStorage data into Firestore ->  having issues
         //
-        if (localStorage.getItem("boards") || "" !== "") {
+        // if (localStorage.getItem("boards") || "" !== "") {
+        if (
+          localStorage.getItem("boards") !== "[]" ||
+          localStorage.getItem("boards") !== null
+        ) {
           const lsData = JSON.parse(localStorage.getItem("boards") || "");
           lsData?.forEach(async (board: BoardSchema) => {
             const ref = doc(
@@ -84,7 +87,6 @@ const SideNav = ({ boards, setBoards, id, setId }: SideNavProps) => {
               "boards",
               `${board.id}`
             );
-            // console.log(ref, board);
             await setDoc(ref, board);
           });
         }
@@ -103,9 +105,16 @@ const SideNav = ({ boards, setBoards, id, setId }: SideNavProps) => {
   const handleCreateNewBoard = async () => {
     // Creating new Board in localStorage
     if (!user) {
-      // If LS isn't empty
-      if (localStorage.getItem("boards") !== "[]") {
-        console.log("LS is not '[]'");
+      // If LS isn't empty (empty array OR empty string OR null)
+      if (
+        localStorage.getItem("boards") !== "[]" &&
+        localStorage.getItem("boards") !== null
+      ) {
+        // console.log(localStorage.getItem("boards"));
+        // console.log("LS is null?", localStorage.getItem("boards") === null);
+        // console.log("LS is ''?", localStorage.getItem("boards") === "");
+        // console.log("LS is []?", localStorage.getItem("boards") === "[]");
+        // console.log("LS is not empty");
         const oldData = JSON.parse(localStorage.getItem("boards") || "");
         const newData = [
           ...oldData,
@@ -116,12 +125,24 @@ const SideNav = ({ boards, setBoards, id, setId }: SideNavProps) => {
           },
         ];
         localStorage.setItem("boards", JSON.stringify(newData));
-        setBoards(newData?.reverse());
+        if (
+          JSON.parse(localStorage.getItem("boards") || "")?.[0]?.createdAt <
+          JSON.parse(localStorage.getItem("boards") || "")?.[1]?.createdAt
+        ) {
+          setBoards(newData);
+        } else {
+          setBoards(newData);
+        }
+
         setId(newData?.[0]?.id);
       }
       // If LS is empty
       else {
-        console.log("LS is '[]'");
+        // console.log(localStorage.getItem("boards"));
+        // console.log("LS is null?", localStorage.getItem("boards") === null);
+        // console.log("LS is ''?", localStorage.getItem("boards") === "");
+        // console.log("LS is []?", localStorage.getItem("boards") === "[]");
+        // console.log("LS is empty");
         const newData = [
           {
             id: uuidv4(),

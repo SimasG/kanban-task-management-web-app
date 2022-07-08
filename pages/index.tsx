@@ -1,4 +1,10 @@
-import { deleteDoc, doc, updateDoc } from "firebase/firestore";
+import {
+  collection,
+  deleteDoc,
+  doc,
+  getDocs,
+  updateDoc,
+} from "firebase/firestore";
 import type { NextPage } from "next";
 import React, { useContext, useEffect, useState } from "react";
 import AddNewTaskModal from "../components/AddNewTaskModal";
@@ -43,13 +49,6 @@ const Home: NextPage = () => {
     if (!user) {
       // If localStorage is empty, do not try to set the main state from it
       if (localStorage.getItem("boards") || "" !== "") {
-        // console.log("boards:", boards);
-        // console.log("activeBoard:", activeBoard);
-        // console.log(
-        //   'localStorage.getItem("boards") || ""',
-        //   JSON.parse(localStorage.getItem("boards") || "")
-        // );
-
         setBoards(JSON.parse(localStorage.getItem("boards") || ""));
         setId(JSON.parse(localStorage.getItem("boards") || "")?.[0]?.id);
       }
@@ -83,7 +82,7 @@ const Home: NextPage = () => {
       const lsData = JSON.parse(localStorage.getItem("boards") || "");
       const newData = lsData.filter((board: BoardSchema) => board.id !== id);
       localStorage.setItem("boards", JSON.stringify(newData));
-      setBoards(newData.reverse());
+      setBoards(newData);
       setId(newData?.[0]?.id);
     } else {
       // Deleting Board from Firestore
