@@ -2,8 +2,10 @@ import { ErrorMessage, Field } from "formik";
 
 const Select = ({ label, name, options, ...rest }: any) => {
   return (
-    <div className="payment-terms-container">
-      <label htmlFor={name}>{label}</label>
+    <div className="flex flex-col justify-between gap-2">
+      <label className="font-bold text-sm" htmlFor={name}>
+        {label}
+      </label>
       <Field as="select" id={name} name={name} {...rest}>
         {options.map((option: any) => {
           return (

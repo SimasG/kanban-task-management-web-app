@@ -18,6 +18,7 @@ const AddNewTaskModal = () => {
 
   const validationSchema = Yup.object({
     title: Yup.string().required("Title is Required!"),
+    description: Yup.string().required("Description is Required!"),
     subtasks: Yup.array().of(
       Yup.object({
         title: Yup.string().required("Subtask Title is Required!"),
@@ -48,14 +49,13 @@ const AddNewTaskModal = () => {
               placeholder="e.g. Design new homepage"
             />
             {/* Description */}
-            <div className="flex flex-col justify-between gap-2">
-              <span className="font-bold text-sm">Description</span>
-              <textarea
-                className="textarea"
-                placeholder="e.g. The homepage of UReason should be redesigned to fit in with the modern web standards. 
-            The homepage of UReason should be redesigned to fit in with the modern web standards."
-              />
-            </div>
+            <FormikControl
+              control="textarea"
+              label="Description"
+              name="description"
+              placeholder="e.g. The homepage of UReason should be redesigned to fit in with the modern web standards. 
+              The homepage of UReason should be redesigned to fit in with the modern web standards."
+            />
             {/* Subtask Container */}
             <div className="flex flex-col justify-between gap-3">
               <span className="font-bold text-sm">Subtasks</span>
@@ -86,47 +86,26 @@ const AddNewTaskModal = () => {
                   </button>
                 </div>
               </div>
-              <div className="flex flex-col justify-between gap-2">
-                <div className="flex justify-center items-center gap-2">
-                  <input
-                    className="input w-full"
-                    type="text"
-                    placeholder="e.g. Create new Homepage wireframe"
-                  />
-                  {/* Delete Subtask Btn */}
-                  <button type="button">
-                    <svg
-                      className="w-8 h-8 p-1 text-fontSecondary hover:bg-fontSecondary hover:bg-opacity-25 hover:rounded"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="3"
-                        d="M6 18L18 6M6 6l12 12"
-                      ></path>
-                    </svg>
-                  </button>
-                </div>
-              </div>
               {/* Add Subtask Btn */}
               <button type="button" className="whiteBtn text-sm">
                 + Add New Subtask
               </button>
             </div>
             {/* Status */}
-            <div className="flex flex-col justify-between gap-2">
+            <FormikControl
+              control="select"
+              label="Status"
+              name="status"
+              placeholder="todo"
+            />
+            {/* <div className="flex flex-col justify-between gap-2">
               <span className="font-bold text-sm">Status</span>
-              {/* **Change to select input later */}
               <input
                 className="input"
                 type="select"
                 placeholder="e.g. This will be a select input"
               />
-            </div>
+            </div> */}
             {/* Create Task Btn */}
             <button type="submit" className="purpleBtn">
               Create Task

@@ -6,7 +6,13 @@ const Input = ({ label, name, ...rest }: any) => {
       <label htmlFor={name} className="font-bold text-sm">
         {label}
       </label>
-      <Field id={name} name={name} {...rest} className="input" />
+      <Field
+        as="textarea"
+        id={name}
+        name={name}
+        {...rest}
+        className="textarea"
+      />
       <ErrorMessage
         name={name}
         component="p"
