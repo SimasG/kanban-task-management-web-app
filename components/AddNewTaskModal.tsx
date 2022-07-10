@@ -4,17 +4,28 @@ import FormikControl from "./form/FormikControl";
 
 const AddNewTaskModal = () => {
   type initialValuesProps = {
-    title?: string;
+    title: string;
     description?: string;
+    status: string;
     subtasks?: {}[];
   };
 
   const initialValues: initialValuesProps = {
     title: "",
     description: "",
-    // status: radio btn
+    status: "",
     subtasks: [{ title: "" }],
   };
+
+  const dropdownOptions = [
+    // "value: ''" will automatically make this option invalid and throw an error
+    { key: "Select an option", value: "" },
+    { key: "TODO", value: "todo" },
+    { key: "DOING", value: "doing" },
+    { key: "DONE", value: "done" },
+  ];
+
+  // dropdownOptions.map((option) => console.log(option));
 
   const validationSchema = Yup.object({
     title: Yup.string().required("Title is Required!"),
@@ -24,9 +35,10 @@ const AddNewTaskModal = () => {
         title: Yup.string().required("Subtask Title is Required!"),
       })
     ),
+    status: Yup.string().required("Status is Required!"),
   });
 
-  const onSubmit = (values: any) => console.log("bittttttch");
+  const onSubmit = (values: any) => console.log("Submitted bittttttch");
 
   return (
     <Formik
@@ -97,6 +109,7 @@ const AddNewTaskModal = () => {
               label="Status"
               name="status"
               placeholder="todo"
+              options={dropdownOptions}
             />
             {/* <div className="flex flex-col justify-between gap-2">
               <span className="font-bold text-sm">Status</span>

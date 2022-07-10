@@ -6,7 +6,7 @@ const Select = ({ label, name, options, ...rest }: any) => {
       <label className="font-bold text-sm" htmlFor={name}>
         {label}
       </label>
-      <Field as="select" id={name} name={name} {...rest}>
+      <Field as="select" id={name} name={name} {...rest} className="input">
         {options.map((option: any) => {
           return (
             <option key={option.value} value={option.value}>
