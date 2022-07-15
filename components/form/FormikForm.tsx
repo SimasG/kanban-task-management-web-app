@@ -7,8 +7,18 @@ import {
 } from "formik";
 import FormikControl from "./FormikControl";
 import { v4 as uuidv4 } from "uuid";
+import { doc, setDoc, Timestamp } from "firebase/firestore";
+import { db } from "../../lib/firebase";
+import { useContext } from "react";
+import { UserContext } from "../../lib/context";
 
-const FormikForm = () => {
+type IndexProps = {
+  id: string | null | undefined;
+};
+
+const FormikForm = ({ id }: IndexProps) => {
+  const user = useContext(UserContext);
+
   const dropdownOptions = [
     // "value: ''" will automatically make this option invalid and throw an error
     { key: "Select an option", value: "" },
@@ -18,6 +28,24 @@ const FormikForm = () => {
   ];
   const formik = useFormikContext();
   const { values, setSubmitting, resetForm } = formik;
+
+  const handleSubmit = async () => {
+    console.log("new way to submit the form!");
+    setSubmitting(true);
+    const taskDocRef = doc(
+      db,
+      `${user?.uid}`,
+      "boards",
+      `${id}`,
+      "tasks",
+      uuidv4()
+    );
+
+    await setDoc(taskDocRef, {
+      values,
+      updatedAt: Timestamp.fromDate(new Date()),
+    });
+  };
 
   return (
     <>
@@ -62,8 +90,6 @@ const FormikForm = () => {
                             id={`subtasks[${index}].title`}
                             placeholder="e.g. Prepare Marketing Campaign Overview"
                             type="text"
-                            // onChange={(e) => handleChange(e)}
-                            // value={subtasks[index].title}
                           />
                           {/* Delete Subtask Btn */}
                           <button type="button" onClick={() => remove(index)}>
@@ -116,7 +142,11 @@ const FormikForm = () => {
               options={dropdownOptions}
             />
             {/* Create Task Btn */}
-            <button type="submit" className="purpleBtn">
+            <button
+              type="submit"
+              className="purpleBtn"
+              onClick={() => handleSubmit()}
+            >
               Create Task
             </button>
           </Form>

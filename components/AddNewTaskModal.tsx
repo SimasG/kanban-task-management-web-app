@@ -2,8 +2,18 @@ import { Formik } from "formik";
 import * as Yup from "yup";
 import { v4 as uuidv4 } from "uuid";
 import FormikForm from "./form/FormikForm";
+import { doc } from "firebase/firestore";
+import { db } from "../lib/firebase";
+import { useContext } from "react";
+import { UserContext } from "../lib/context";
 
-const AddNewTaskModal = () => {
+type IndexProps = {
+  id: string | null | undefined;
+};
+
+const AddNewTaskModal = ({ id }: IndexProps) => {
+  const user = useContext(UserContext);
+
   type initialValuesProps = {
     title: string;
     description?: string;
@@ -34,16 +44,19 @@ const AddNewTaskModal = () => {
     status: Yup.string().required("Status is Required!"),
   });
 
-  const onSubmit = (values: any) => console.log("Form submitted!", values);
+  // const onSubmit = async (values: any) => {
+  //   console.log("Form submitted!", values);
+  //   const ref = doc(db, `${user?.uid}`, "boards", `${id}`, "tasks", uuidv4());
+  // };
 
   return (
     <Formik
       initialValues={initialValues}
       validationSchema={validationSchema}
-      onSubmit={onSubmit}
+      // onSubmit={onSubmit}
     >
       {(formik) => {
-        return <FormikForm />;
+        return <FormikForm id={id} />;
       }}
     </Formik>
   );

@@ -191,6 +191,7 @@ const Home: NextPage = () => {
             </div>
             {/* Task Container */}
             <div className="flex flex-col justify-start items-center gap-4">
+              {/* HEREEEEEEEEEEEEEEE */}
               {/* Single Task Container */}
               <div
                 onClick={(e) => {
@@ -296,7 +297,7 @@ const Home: NextPage = () => {
           </div>
         </section>
       </main>
-      {showAddTaskModal && <AddNewTaskModal />}
+      {showAddTaskModal && <AddNewTaskModal id={id} />}
       {showEditTaskModal && <EditTaskModal />}
     </div>
   );
