@@ -17,11 +17,7 @@ const AddNewTaskModal = () => {
     subtasks: [
       {
         uid: uuidv4(),
-        title: "zdare",
-      },
-      {
-        uid: uuidv4(),
-        title: "heyo",
+        title: "",
       },
     ],
     status: "",

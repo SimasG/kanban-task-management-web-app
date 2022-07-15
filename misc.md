@@ -391,3 +391,38 @@ export default useFetchDiffFsData;
                 placeholder="e.g. This will be a select input"
               />
             </div> */}
+
+            <div className="flex flex-col justify-between gap-3">
+              <span className="font-bold text-sm">Subtasks</span>
+              {/* Individual Subtasks */}
+              <div className="flex flex-col justify-between gap-2">
+                <div className="flex justify-center items-center gap-2">
+                  <input
+                    className="input w-full"
+                    type="text"
+                    placeholder="e.g. Create new Homepage wireframe"
+                  />
+                  {/* Delete Subtask Btn */}
+                  <button>
+                    <svg
+                      className="w-8 h-8 p-1 text-fontSecondary hover:bg-fontSecondary hover:bg-opacity-25 hover:rounded"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="3"
+                        d="M6 18L18 6M6 6l12 12"
+                      ></path>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              {/* Add Subtask Btn */}
+              <button type="button" className="whiteBtn text-sm">
+                + Add New Subtask
+              </button>
+            </div>

@@ -5,8 +5,8 @@ import {
   Form,
   useFormikContext,
 } from "formik";
-import { useEffect } from "react";
 import FormikControl from "./FormikControl";
+import { v4 as uuidv4 } from "uuid";
 
 const FormikForm = () => {
   const dropdownOptions = [
@@ -48,90 +48,65 @@ const FormikForm = () => {
             <FieldArray name="subtasks">
               {(fieldArrayProps) => {
                 const { push, remove, form } = fieldArrayProps;
-                const { values, handleChange } = form;
+                const { values, handleChange, errors } = form;
                 const { subtasks } = values;
                 return (
                   <div className="flex flex-col justify-between gap-3">
                     <label htmlFor="subtasks">Subtasks</label>
                     {subtasks.map((subtask: any, index: number) => (
-                      <div
-                        key={subtask.uid}
-                        className="flex justify-between gap-3"
-                      >
-                        <Field
-                          className="input w-full"
-                          id={`subtask[${index}]`}
-                          name={`subtask[${index}]`}
-                          type="text"
-                          onChange={(e: string) => handleChange(e)}
-                          value={subtask.title}
-                        />
+                      <div key={subtask.uid} className="flex flex-col gap-2">
+                        <div className="flex justify-between items-center">
+                          <Field
+                            className="input w-full"
+                            name={`subtasks[${index}].title`}
+                            id={`subtasks[${index}].title`}
+                            placeholder="e.g. Prepare Marketing Campaign Overview"
+                            type="text"
+                            // onChange={(e) => handleChange(e)}
+                            // value={subtasks[index].title}
+                          />
+                          {/* Delete Subtask Btn */}
+                          <button type="button" onClick={() => remove(index)}>
+                            <svg
+                              className="w-8 h-8 p-1 text-fontSecondary hover:bg-fontSecondary hover:bg-opacity-25 hover:rounded"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="3"
+                                d="M6 18L18 6M6 6l12 12"
+                              ></path>
+                            </svg>
+                          </button>
+                        </div>
                         <ErrorMessage
-                          name={`subtasks[${index}]`}
+                          name={`subtasks[${index}].title`}
                           component="p"
                           className="text-red-400"
                         />
-                        {/* Delete Subtask Btn */}
-                        <button type="button" onClick={() => remove(index)}>
-                          <svg
-                            className="w-8 h-8 p-1 text-fontSecondary hover:bg-fontSecondary hover:bg-opacity-25 hover:rounded"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="3"
-                              d="M6 18L18 6M6 6l12 12"
-                            ></path>
-                          </svg>
-                        </button>
                       </div>
                     ))}
                     {/* Add Subtask Btn */}
-                    <button type="button" className="whiteBtn text-sm">
+                    <button
+                      type="button"
+                      className="whiteBtn text-sm"
+                      onClick={() =>
+                        push({
+                          uid: uuidv4(),
+                          title: "",
+                        })
+                      }
+                    >
                       + Add New Subtask
                     </button>
                   </div>
                 );
               }}
             </FieldArray>
-            <div className="flex flex-col justify-between gap-3">
-              <span className="font-bold text-sm">Subtasks</span>
-              {/* Individual Subtasks */}
-              <div className="flex flex-col justify-between gap-2">
-                <div className="flex justify-center items-center gap-2">
-                  <input
-                    className="input w-full"
-                    type="text"
-                    placeholder="e.g. Create new Homepage wireframe"
-                  />
-                  {/* Delete Subtask Btn */}
-                  <button>
-                    <svg
-                      className="w-8 h-8 p-1 text-fontSecondary hover:bg-fontSecondary hover:bg-opacity-25 hover:rounded"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="3"
-                        d="M6 18L18 6M6 6l12 12"
-                      ></path>
-                    </svg>
-                  </button>
-                </div>
-              </div>
-              {/* Add Subtask Btn */}
-              <button type="button" className="whiteBtn text-sm">
-                + Add New Subtask
-              </button>
-            </div>
             {/* Status */}
             <FormikControl
               control="select"
