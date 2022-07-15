@@ -7,11 +7,7 @@ const Input = ({ label, name, ...rest }: any) => {
         {label}
       </label>
       <Field id={name} name={name} {...rest} className="input" />
-      <ErrorMessage
-        name={name}
-        component="p"
-        className="error-msg text-red-400"
-      />
+      <ErrorMessage name={name} component="p" className="text-red-400" />
     </div>
   );
 };

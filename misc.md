@@ -382,3 +382,12 @@ export default useFetchDiffFsData;
             The homepage of UReason should be redesigned to fit in with the modern web standards."
               />
             </div> */}s
+
+            {/* <div className="flex flex-col justify-between gap-2">
+              <span className="font-bold text-sm">Status</span>
+              <input
+                className="input"
+                type="select"
+                placeholder="e.g. This will be a select input"
+              />
+            </div> */}

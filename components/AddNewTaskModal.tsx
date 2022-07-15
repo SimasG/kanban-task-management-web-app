@@ -13,8 +13,8 @@ const AddNewTaskModal = () => {
   const initialValues: initialValuesProps = {
     title: "",
     description: "",
-    status: "",
     subtasks: [{ title: "" }],
+    status: "",
   };
 
   const dropdownOptions = [
@@ -24,8 +24,6 @@ const AddNewTaskModal = () => {
     { key: "DOING", value: "doing" },
     { key: "DONE", value: "done" },
   ];
-
-  // dropdownOptions.map((option) => console.log(option));
 
   const validationSchema = Yup.object({
     title: Yup.string().required("Title is Required!"),
@@ -111,14 +109,6 @@ const AddNewTaskModal = () => {
               placeholder="todo"
               options={dropdownOptions}
             />
-            {/* <div className="flex flex-col justify-between gap-2">
-              <span className="font-bold text-sm">Status</span>
-              <input
-                className="input"
-                type="select"
-                placeholder="e.g. This will be a select input"
-              />
-            </div> */}
             {/* Create Task Btn */}
             <button type="submit" className="purpleBtn">
               Create Task

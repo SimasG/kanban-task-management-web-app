@@ -15,7 +15,7 @@ const Select = ({ label, name, options, ...rest }: any) => {
           );
         })}
       </Field>
-      <ErrorMessage name={name} component="p" className="error-msg" />
+      <ErrorMessage name={name} component="p" className="text-red-400" />
     </div>
   );
 };
