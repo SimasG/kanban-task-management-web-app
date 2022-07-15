@@ -11,12 +11,14 @@ import { doc, setDoc, Timestamp } from "firebase/firestore";
 import { db } from "../../lib/firebase";
 import { useContext } from "react";
 import { UserContext } from "../../lib/context";
+import toast from "react-hot-toast";
 
 type IndexProps = {
   id: string | null | undefined;
+  setShowAddTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const FormikForm = ({ id }: IndexProps) => {
+const FormikForm = ({ id, setShowAddTaskModal }: IndexProps) => {
   const user = useContext(UserContext);
 
   const dropdownOptions = [
@@ -28,12 +30,14 @@ const FormikForm = ({ id }: IndexProps) => {
   ];
   const formik = useFormikContext();
   const { values, setSubmitting, resetForm } = formik;
+  console.log(values);
 
   const handleSubmit = async () => {
     console.log("new way to submit the form!");
     setSubmitting(true);
     const taskDocRef = doc(
       db,
+      "users",
       `${user?.uid}`,
       "boards",
       `${id}`,
@@ -42,9 +46,15 @@ const FormikForm = ({ id }: IndexProps) => {
     );
 
     await setDoc(taskDocRef, {
-      values,
+      // Using type guard to ensure that we're always spreading an object
+      ...(typeof values === "object" ? values : {}),
+      id: id,
       updatedAt: Timestamp.fromDate(new Date()),
     });
+    toast.success("New Task Created");
+    setSubmitting(false);
+    resetForm();
+    setShowAddTaskModal(false);
   };
 
   return (

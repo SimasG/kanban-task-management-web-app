@@ -297,7 +297,9 @@ const Home: NextPage = () => {
           </div>
         </section>
       </main>
-      {showAddTaskModal && <AddNewTaskModal id={id} />}
+      {showAddTaskModal && (
+        <AddNewTaskModal id={id} setShowAddTaskModal={setShowAddTaskModal} />
+      )}
       {showEditTaskModal && <EditTaskModal />}
     </div>
   );

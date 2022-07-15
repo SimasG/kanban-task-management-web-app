@@ -9,9 +9,10 @@ import { UserContext } from "../lib/context";
 
 type IndexProps = {
   id: string | null | undefined;
+  setShowAddTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const AddNewTaskModal = ({ id }: IndexProps) => {
+const AddNewTaskModal = ({ id, setShowAddTaskModal }: IndexProps) => {
   const user = useContext(UserContext);
 
   type initialValuesProps = {
@@ -56,7 +57,7 @@ const AddNewTaskModal = ({ id }: IndexProps) => {
       // onSubmit={onSubmit}
     >
       {(formik) => {
-        return <FormikForm id={id} />;
+        return <FormikForm id={id} setShowAddTaskModal={setShowAddTaskModal} />;
       }}
     </Formik>
   );
