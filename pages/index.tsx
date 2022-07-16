@@ -67,7 +67,10 @@ const Home: NextPage = () => {
   console.log("boards:", boards);
 
   const tasks = useFetchFsTasks(user?.uid, id);
-  console.log("FsTasks:", tasks);
+
+  // tasks?.map((task: any) => {
+  //   console.log(task?.title);
+  // });
 
   const activeBoard = boards?.filter((board: BoardSchema) => board.id === id);
 
@@ -198,32 +201,19 @@ const Home: NextPage = () => {
             {/* Task Container */}
             <div className="flex flex-col justify-start items-center gap-4">
               {/* HEREEEEEEEEEEEEEEE */}
-
-              {/* Single Task Container */}
-              <div
-                onClick={(e) => {
-                  handleEditTask(e);
-                }}
-                className="task"
-              >
-                <h2 className="task-title">Example todo for xyz</h2>
-                <span className="task-body">0 of 3 subtasks</span>
-              </div>
-              {/* Single Task Container */}
-              <div className="task">
-                <h2 className="task-title">Example todo for zyx</h2>
-                <span className="task-body">0 of 7 subtasks</span>
-              </div>
-              {/* Single Task Container */}
-              <div className="task">
-                <h2 className="task-title">Example todo for abc</h2>
-                <span className="task-body">1 of 3 subtasks</span>
-              </div>
-              {/* Single Task Container */}
-              <div className="task">
-                <h2 className="task-title">Example todo for cba</h2>
-                <span className="task-body">2 of 5 subtasks</span>
-              </div>
+              {tasks?.map((task: any) => {
+                return (
+                  <div
+                    onClick={(e) => {
+                      handleEditTask(e);
+                    }}
+                    className="task"
+                  >
+                    <h2 className="task-title">{task?.title}</h2>
+                    <span className="task-body">0 of 3 subtasks</span>
+                  </div>
+                );
+              })}
             </div>
           </div>
           {/* Second Column */}
