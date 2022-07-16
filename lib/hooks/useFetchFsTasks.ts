@@ -2,12 +2,19 @@ import { collection, orderBy, query } from "firebase/firestore";
 import { useCollectionData } from "react-firebase-hooks/firestore";
 import { db } from "../firebase";
 
-// WHen is uid null?
-const useFetchFirestoreData = (uid: string | null | undefined) => {
-  const q = query(
-    collection(db, "users", `${uid}`, "boards"),
-    orderBy("createdAt", "desc")
+const useFetchFsTasks = (
+  userId: string | null | undefined,
+  boardId: string | null | undefined
+) => {
+  const tasksCollectionRef = collection(
+    db,
+    "users",
+    `${userId}`,
+    "boards",
+    `${boardId}`,
+    "tasks"
   );
+  const q = query(tasksCollectionRef);
 
   // const data = useCollectionData(collection(db, "users", `${uid}`, "boards"));
   const data = useCollectionData(q);
@@ -17,4 +24,4 @@ const useFetchFirestoreData = (uid: string | null | undefined) => {
   return data[0];
 };
 
-export default useFetchFirestoreData;
+export default useFetchFsTasks;

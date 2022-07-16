@@ -51,11 +51,7 @@ const AddNewTaskModal = ({ id, setShowAddTaskModal }: IndexProps) => {
   // };
 
   return (
-    <Formik
-      initialValues={initialValues}
-      validationSchema={validationSchema}
-      // onSubmit={onSubmit}
-    >
+    <Formik initialValues={initialValues} validationSchema={validationSchema}>
       {(formik) => {
         return <FormikForm id={id} setShowAddTaskModal={setShowAddTaskModal} />;
       }}

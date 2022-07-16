@@ -15,7 +15,7 @@ import { TbLayoutBoard, TbLayoutBoardSplit } from "react-icons/tb";
 import { UserContext } from "../lib/context";
 import { auth, db } from "../lib/firebase";
 import { v4 as uuidv4 } from "uuid";
-import useFetchFirestoreData from "../lib/hooks/useFetchFsData";
+import useFetchFsBoards from "../lib/hooks/useFetchFsBoards";
 
 // type LocalStorageDataProps = {
 //   users: UserProps;
@@ -58,7 +58,7 @@ type SideNavProps = {
 const SideNav = ({ boards, setBoards, id, setId }: SideNavProps) => {
   const user = useContext(UserContext);
   // // ** Putting any as the time for now
-  // const data: any = useFetchFirestoreData(user?.uid);
+  // const data: any = useFetchFsBoards(user?.uid);
 
   const handleGoogleLogin = () => {
     const provider = new GoogleAuthProvider();

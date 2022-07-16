@@ -30,10 +30,8 @@ const FormikForm = ({ id, setShowAddTaskModal }: IndexProps) => {
   ];
   const formik = useFormikContext();
   const { values, setSubmitting, resetForm } = formik;
-  console.log(values);
 
   const handleSubmit = async () => {
-    console.log("new way to submit the form!");
     setSubmitting(true);
     const taskDocRef = doc(
       db,

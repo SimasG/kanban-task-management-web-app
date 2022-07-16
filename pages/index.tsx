@@ -12,7 +12,8 @@ import EditTaskModal from "../components/EditTaskModal";
 import SideNav from "../components/SideNav";
 import { UserContext } from "../lib/context";
 import { db } from "../lib/firebase";
-import useFetchFirestoreData from "../lib/hooks/useFetchFsData";
+import useFetchFsBoards from "../lib/hooks/useFetchFsBoards";
+import useFetchFsTasks from "../lib/hooks/useFetchFsTasks";
 
 // type LocalStorageBoardSchema = {
 //   boards: {
@@ -32,7 +33,7 @@ type BoardSchema = {
 const Home: NextPage = () => {
   // Pre-fetching data
   const user = useContext(UserContext);
-  const firestoreData = useFetchFirestoreData(user?.uid);
+  const firestoreData = useFetchFsBoards(user?.uid);
 
   // States
   // ** Main State
@@ -62,6 +63,11 @@ const Home: NextPage = () => {
       }
     }
   }, [firestoreData, user]);
+
+  console.log("boards:", boards);
+
+  const tasks = useFetchFsTasks(user?.uid, id);
+  console.log("FsTasks:", tasks);
 
   const activeBoard = boards?.filter((board: BoardSchema) => board.id === id);
 
@@ -192,6 +198,7 @@ const Home: NextPage = () => {
             {/* Task Container */}
             <div className="flex flex-col justify-start items-center gap-4">
               {/* HEREEEEEEEEEEEEEEE */}
+
               {/* Single Task Container */}
               <div
                 onClick={(e) => {
