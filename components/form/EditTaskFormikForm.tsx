@@ -14,11 +14,11 @@ import { UserContext } from "../../lib/context";
 import toast from "react-hot-toast";
 
 type IndexProps = {
-  boardId: string | null | undefined;
-  setShowAddTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
+  taskId: string | null | undefined;
+  setShowEditTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const FormikForm = ({ boardId, setShowAddTaskModal }: IndexProps) => {
+const FormikForm = ({ taskId, setShowEditTaskModal }: IndexProps) => {
   const user = useContext(UserContext);
 
   const dropdownOptions = [
@@ -39,7 +39,7 @@ const FormikForm = ({ boardId, setShowAddTaskModal }: IndexProps) => {
       "users",
       `${user?.uid}`,
       "boards",
-      `${boardId}`,
+      `${taskId}`,
       "tasks",
       uid
     );
@@ -53,7 +53,7 @@ const FormikForm = ({ boardId, setShowAddTaskModal }: IndexProps) => {
     toast.success("New Task Created");
     setSubmitting(false);
     resetForm();
-    setShowAddTaskModal(false);
+    setShowEditTaskModal(false);
   };
 
   return (
@@ -65,6 +65,7 @@ const FormikForm = ({ boardId, setShowAddTaskModal }: IndexProps) => {
             onClick={(e) => e.stopPropagation()}
             className="p-6 bg-darkGray rounded-md flex flex-col justify-between gap-8 min-w-[450px]"
           >
+            <h1>OPA OPA OPA</h1>
             <h2 className="text-lg font-bold">Add New Task</h2>
             {/* Title */}
             <FormikControl

@@ -9,6 +9,7 @@ import type { NextPage } from "next";
 import React, { useContext, useEffect, useState } from "react";
 import AddNewTaskModal from "../components/AddNewTaskModal";
 import EditTaskModal from "../components/EditTaskModal";
+import EditTaskModalNew from "../components/EditTaskModalNew";
 import SideNav from "../components/SideNav";
 import { UserContext } from "../lib/context";
 import { db } from "../lib/firebase";
@@ -43,7 +44,7 @@ const Home: NextPage = () => {
   >(null);
   const [showAddTaskModal, setShowAddTaskModal] = useState(false);
   const [showEditTaskModal, setShowEditTaskModal] = useState(false);
-  const [id, setId] = useState<string | null | undefined>(null);
+  const [boardId, setBoardId] = useState<string | null | undefined>(null);
   const [taskId, setTaskId] = useState<string | null | undefined>(null);
 
   // Setting main state either from localStorage or Firestore
@@ -52,7 +53,7 @@ const Home: NextPage = () => {
       // If localStorage is empty, do not try to set the main state from it
       if (localStorage.getItem("boards") || "" !== "") {
         setBoards(JSON.parse(localStorage.getItem("boards") || ""));
-        setId(JSON.parse(localStorage.getItem("boards") || "")?.[0]?.id);
+        setBoardId(JSON.parse(localStorage.getItem("boards") || "")?.[0]?.id);
       }
       return;
     } else {
@@ -60,15 +61,17 @@ const Home: NextPage = () => {
       if (!firestoreData) return;
       setBoards(firestoreData);
       if (activeBoard === undefined && firestoreData?.length !== 0) {
-        setId(firestoreData?.[0]?.id);
+        setBoardId(firestoreData?.[0]?.id);
       }
     }
   }, [firestoreData, user]);
 
   // Fetching all Tasks of selected Board
-  const tasks = useFetchFsTasks(user?.uid, id);
+  const tasks = useFetchFsTasks(user?.uid, boardId);
 
-  const activeBoard = boards?.filter((board: BoardSchema) => board.id === id);
+  const activeBoard = boards?.filter(
+    (board: BoardSchema) => board.id === boardId
+  );
 
   // Buttons
   const handleAddNewTaskBtn = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -88,13 +91,15 @@ const Home: NextPage = () => {
       const newData = lsData.filter((board: BoardSchema) => board.id !== id);
       localStorage.setItem("boards", JSON.stringify(newData));
       setBoards(newData);
-      setId(newData?.[0]?.id);
+      setBoardId(newData?.[0]?.id);
     } else {
       // Deleting Board from Firestore
       const docRef = doc(db, "users", `${user?.uid}`, "boards", `${id}`);
       // If the first Board in the array is deleted, setId to the second Board (which will become the
       // first once the first one is removed from FS). Else, remove the first Board in the array.
-      boards?.[0]?.id === id ? setId(boards?.[1]?.id) : setId(boards?.[0]?.id);
+      boards?.[0]?.id === id
+        ? setBoardId(boards?.[1]?.id)
+        : setBoardId(boards?.[0]?.id);
       await deleteDoc(docRef);
     }
   };
@@ -114,7 +119,12 @@ const Home: NextPage = () => {
       }}
       className="flex justify-center text-white h-screen overflow-x-hidden"
     >
-      <SideNav boards={boards} setBoards={setBoards} id={id} setId={setId} />
+      <SideNav
+        boards={boards}
+        setBoards={setBoards}
+        boardId={boardId}
+        setBoardId={setBoardId}
+      />
       {/* Main */}
       <main className="w-4/5">
         {/* Top Settings */}
@@ -150,7 +160,7 @@ const Home: NextPage = () => {
                       JSON.stringify(newBoardList)
                     );
                     setBoards(newBoardList);
-                    setId(activeBoard?.[0]?.id);
+                    setBoardId(activeBoard?.[0]?.id);
                   }
             }
           />
@@ -165,7 +175,7 @@ const Home: NextPage = () => {
             </button>
             {/* Delete Board Btn */}
             <svg
-              onClick={() => handleDeleteBoard(id)}
+              onClick={() => handleDeleteBoard(boardId)}
               className="w-10 h-10 p-2 text-fontSecondary rounded cursor-pointer hover:bg-darkBlue"
               fill="none"
               stroke="currentColor"
@@ -293,11 +303,14 @@ const Home: NextPage = () => {
         </section>
       </main>
       {showAddTaskModal && (
-        <AddNewTaskModal id={id} setShowAddTaskModal={setShowAddTaskModal} />
+        <AddNewTaskModal
+          boardId={boardId}
+          setShowAddTaskModal={setShowAddTaskModal}
+        />
       )}
       {showEditTaskModal && (
-        <EditTaskModal
-          boardId={id}
+        <EditTaskModalNew
+          boardId={boardId}
           taskId={taskId}
           setShowEditTaskModal={setShowEditTaskModal}
         />

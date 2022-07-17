@@ -35,7 +35,7 @@ import useFetchFsBoards from "../lib/hooks/useFetchFsBoards";
 
 type BoardSchema = {
   title: string;
-  id: string;
+  uid: string;
   // Change "createdAt" type later
   createdAt: any;
 };
@@ -43,7 +43,7 @@ type BoardSchema = {
 type LocalStorageBoardSchema = {
   boards: {
     title: string;
-    id: string;
+    uid: string;
     createdAt: any;
   }[];
 };
@@ -51,14 +51,12 @@ type LocalStorageBoardSchema = {
 type SideNavProps = {
   boards: any;
   setBoards: React.Dispatch<React.SetStateAction<any>>;
-  id: string | null | undefined;
-  setId: React.Dispatch<React.SetStateAction<string | null | undefined>>;
+  boardId: string | null | undefined;
+  setBoardId: React.Dispatch<React.SetStateAction<string | null | undefined>>;
 };
 
-const SideNav = ({ boards, setBoards, id, setId }: SideNavProps) => {
+const SideNav = ({ boards, setBoards, boardId, setBoardId }: SideNavProps) => {
   const user = useContext(UserContext);
-  // // ** Putting any as the time for now
-  // const data: any = useFetchFsBoards(user?.uid);
 
   const handleGoogleLogin = () => {
     const provider = new GoogleAuthProvider();
@@ -67,7 +65,7 @@ const SideNav = ({ boards, setBoards, id, setId }: SideNavProps) => {
         const user = result.user;
         // Creating user doc if it doesn't exist already
         await setDoc(doc(db, "users", user.uid), {
-          id: user.uid,
+          uid: user.uid,
           email: user.email,
           timeStamp: serverTimestamp(),
         });
@@ -85,7 +83,7 @@ const SideNav = ({ boards, setBoards, id, setId }: SideNavProps) => {
               "users",
               `${user.uid}`,
               "boards",
-              `${board.id}`
+              `${board.uid}`
             );
             await setDoc(ref, board);
           });
@@ -110,11 +108,6 @@ const SideNav = ({ boards, setBoards, id, setId }: SideNavProps) => {
         localStorage.getItem("boards") !== "[]" &&
         localStorage.getItem("boards") !== null
       ) {
-        // console.log(localStorage.getItem("boards"));
-        // console.log("LS is null?", localStorage.getItem("boards") === null);
-        // console.log("LS is ''?", localStorage.getItem("boards") === "");
-        // console.log("LS is []?", localStorage.getItem("boards") === "[]");
-        // console.log("LS is not empty");
         const oldData = JSON.parse(localStorage.getItem("boards") || "");
         const newData = [
           ...oldData,
@@ -134,15 +127,10 @@ const SideNav = ({ boards, setBoards, id, setId }: SideNavProps) => {
           setBoards(newData);
         }
 
-        setId(newData?.[0]?.id);
+        setBoardId(newData?.[0]?.id);
       }
       // If LS is empty
       else {
-        // console.log(localStorage.getItem("boards"));
-        // console.log("LS is null?", localStorage.getItem("boards") === null);
-        // console.log("LS is ''?", localStorage.getItem("boards") === "");
-        // console.log("LS is []?", localStorage.getItem("boards") === "[]");
-        // console.log("LS is empty");
         const newData = [
           {
             id: uuidv4(),
@@ -152,7 +140,7 @@ const SideNav = ({ boards, setBoards, id, setId }: SideNavProps) => {
         ];
         localStorage.setItem("boards", JSON.stringify(newData));
         setBoards(newData);
-        setId(newData?.[0]?.id);
+        setBoardId(newData?.[0]?.id);
       }
     } else {
       // Creating new Board in Firestore
@@ -160,16 +148,16 @@ const SideNav = ({ boards, setBoards, id, setId }: SideNavProps) => {
       const ref = doc(db, "users", `${user?.uid}`, "boards", uuid);
       await setDoc(ref, {
         title: "New Board",
-        id: uuid,
+        uid: uuid,
         createdAt: Timestamp.fromDate(new Date()),
       });
-      setId(uuid);
+      setBoardId(uuid);
     }
   };
 
   // U -> Firestore
-  const updateBoardName = async (id: string, newName: string) => {
-    const ref = doc(db, "users", `${user?.uid}`, "boards", id);
+  const updateBoardName = async (uid: string, newName: string) => {
+    const ref = doc(db, "users", `${user?.uid}`, "boards", uid);
     await updateDoc(ref, {
       title: newName,
     });
@@ -201,13 +189,13 @@ const SideNav = ({ boards, setBoards, id, setId }: SideNavProps) => {
                   return (
                     <div
                       className={
-                        board.id === id
+                        board.uid === boardId
                           ? "board bg-fontTertiary text-fontPrimary rounded-r-full"
                           : "board"
                       }
-                      key={board.id}
+                      key={board.uid}
                       onClick={() => {
-                        setId(board.id);
+                        setBoardId(board.uid);
                       }}
                     >
                       <TbLayoutBoardSplit />
@@ -220,15 +208,15 @@ const SideNav = ({ boards, setBoards, id, setId }: SideNavProps) => {
                           user
                             ? // If user is authenticated, update Firestore
                               (e) => {
-                                updateBoardName(board.id, e.target.value);
+                                updateBoardName(board.uid, e.target.value);
                                 // setLocalStorageBoards(newBoardList);
-                                // setId(board?.id);
+                                // setBoardId(board?.id);
                               }
                             : // If user is not authenticated, update localStorage
                               (e) => {
                                 const newBoardList: {}[] = [];
                                 boards.map((b: BoardSchema) => {
-                                  b.id === board.id
+                                  b.uid === board.uid
                                     ? newBoardList.push({
                                         ...board,
                                         title: e.target.value,
@@ -240,7 +228,7 @@ const SideNav = ({ boards, setBoards, id, setId }: SideNavProps) => {
                                   JSON.stringify(newBoardList)
                                 );
                                 setBoards(newBoardList);
-                                setId(board.id);
+                                setBoardId(board.uid);
                               }
                         }
                       />

@@ -1,7 +1,7 @@
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { v4 as uuidv4 } from "uuid";
-import FormikForm from "./form/FormikForm";
+import EditTaskFormikForm from "./form/EditTaskFormikForm";
 import { doc } from "firebase/firestore";
 import { db } from "../lib/firebase";
 import { useContext } from "react";
@@ -9,10 +9,11 @@ import { UserContext } from "../lib/context";
 
 type IndexProps = {
   boardId: string | null | undefined;
-  setShowAddTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
+  taskId: string | null | undefined;
+  setShowEditTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const AddNewTaskModal = ({ boardId, setShowAddTaskModal }: IndexProps) => {
+const EditTaskModalNew = ({ taskId, setShowEditTaskModal }: IndexProps) => {
   const user = useContext(UserContext);
 
   type initialValuesProps = {
@@ -45,18 +46,13 @@ const AddNewTaskModal = ({ boardId, setShowAddTaskModal }: IndexProps) => {
     status: Yup.string().required("Status is Required!"),
   });
 
-  // const onSubmit = async (values: any) => {
-  //   console.log("Form submitted!", values);
-  //   const ref = doc(db, `${user?.uid}`, "boards", `${id}`, "tasks", uuidv4());
-  // };
-
   return (
     <Formik initialValues={initialValues} validationSchema={validationSchema}>
       {(formik) => {
         return (
-          <FormikForm
-            boardId={boardId}
-            setShowAddTaskModal={setShowAddTaskModal}
+          <EditTaskFormikForm
+            taskId={taskId}
+            setShowEditTaskModal={setShowEditTaskModal}
           />
         );
       }}
@@ -64,4 +60,4 @@ const AddNewTaskModal = ({ boardId, setShowAddTaskModal }: IndexProps) => {
   );
 };
 
-export default AddNewTaskModal;
+export default EditTaskModalNew;
