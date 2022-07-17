@@ -31,8 +31,8 @@ type BoardSchema = {
 };
 
 const Home: NextPage = () => {
-  // Pre-fetching data
   const user = useContext(UserContext);
+  // Fetching all Boards
   const firestoreData = useFetchFsBoards(user?.uid);
 
   // States
@@ -44,6 +44,7 @@ const Home: NextPage = () => {
   const [showAddTaskModal, setShowAddTaskModal] = useState(false);
   const [showEditTaskModal, setShowEditTaskModal] = useState(false);
   const [id, setId] = useState<string | null | undefined>(null);
+  const [taskId, setTaskId] = useState<string | null | undefined>(null);
 
   // Setting main state either from localStorage or Firestore
   useEffect(() => {
@@ -64,13 +65,8 @@ const Home: NextPage = () => {
     }
   }, [firestoreData, user]);
 
-  console.log("boards:", boards);
-
+  // Fetching all Tasks of selected Board
   const tasks = useFetchFsTasks(user?.uid, id);
-
-  // tasks?.map((task: any) => {
-  //   console.log(task?.title);
-  // });
 
   const activeBoard = boards?.filter((board: BoardSchema) => board.id === id);
 
@@ -200,14 +196,17 @@ const Home: NextPage = () => {
             </div>
             {/* Task Container */}
             <div className="flex flex-col justify-start items-center gap-4">
-              {/* HEREEEEEEEEEEEEEEE */}
               {tasks?.map((task: any) => {
                 return (
                   <div
                     onClick={(e) => {
-                      handleEditTask(e);
+                      // handleEditTask(e, task?.id);
+                      setTaskId(task?.id);
+                      e.stopPropagation();
+                      setShowEditTaskModal(true);
                     }}
                     className="task"
+                    key={task?.id}
                   >
                     <h2 className="task-title">{task?.title}</h2>
                     <span className="task-body">0 of 3 subtasks</span>
@@ -297,7 +296,7 @@ const Home: NextPage = () => {
       {showAddTaskModal && (
         <AddNewTaskModal id={id} setShowAddTaskModal={setShowAddTaskModal} />
       )}
-      {showEditTaskModal && <EditTaskModal />}
+      {showEditTaskModal && <EditTaskModal boardId={id} taskId={taskId} />}
     </div>
   );
 };

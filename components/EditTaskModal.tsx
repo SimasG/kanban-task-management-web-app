@@ -1,7 +1,23 @@
 import { Checkbox } from "@mantine/core";
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { UserContext } from "../lib/context";
+import useFetchFsTasks from "../lib/hooks/useFetchFsTasks";
 
-const EditTaskModal = () => {
+type IndexProps = {
+  boardId: string | null | undefined;
+  taskId: string | null | undefined;
+};
+
+const EditTaskModal = ({ boardId, taskId }: IndexProps) => {
+  const user = useContext(UserContext);
+
+  // Fetching all Tasks of selected Board
+  const tasks = useFetchFsTasks(user?.uid, boardId);
+  console.log("EditTaskModal Tasks:", tasks);
+  console.log("taskId:", taskId);
+
+  // ** Get id of the Task that's been clicked, find that Task, populate the JSX with it
+
   const [checked, setChecked] = useState(false);
 
   return (

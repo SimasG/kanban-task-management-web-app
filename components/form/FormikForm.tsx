@@ -46,7 +46,7 @@ const FormikForm = ({ id, setShowAddTaskModal }: IndexProps) => {
     await setDoc(taskDocRef, {
       // Using type guard to ensure that we're always spreading an object
       ...(typeof values === "object" ? values : {}),
-      id: id,
+      uid: uuidv4(),
       updatedAt: Timestamp.fromDate(new Date()),
     });
     toast.success("New Task Created");
