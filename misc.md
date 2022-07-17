@@ -452,3 +452,43 @@ export default useFetchDiffFsData;
                 <h2 className="task-title">Example todo for cba</h2>
                 <span className="task-body">2 of 5 subtasks</span>
               </div>
+
+          {/* Subtask Subcontainer */}
+          <div className="subtask">
+            <Checkbox
+              checked={checked}
+              onChange={() => {
+                setChecked(!checked);
+              }}
+              aria-label="subtask checkbox"
+            />
+            <span className="text-fontPrimary">
+              Research competitors in premium market
+            </span>
+          </div>
+          {/* Subtask Subcontainer */}
+          <div className="subtask">
+            <Checkbox
+              checked={checked}
+              onChange={() => {
+                setChecked(!checked);
+              }}
+              aria-label="subtask checkbox"
+            />
+            <span className="text-fontPrimary">
+              Research competitors in premium market
+            </span>
+          </div>
+          {/* Subtask Subcontainer */}
+          <div className="subtask">
+            <Checkbox
+              checked={checked}
+              onChange={() => {
+                setChecked(!checked);
+              }}
+              aria-label="subtask checkbox"
+            />
+            <span className="text-fontPrimary">
+              Research competitors in premium market
+            </span>
+          </div>

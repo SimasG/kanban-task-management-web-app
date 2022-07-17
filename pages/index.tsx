@@ -200,8 +200,7 @@ const Home: NextPage = () => {
                 return (
                   <div
                     onClick={(e) => {
-                      // handleEditTask(e, task?.id);
-                      setTaskId(task?.id);
+                      setTaskId(task?.uid);
                       e.stopPropagation();
                       setShowEditTaskModal(true);
                     }}
@@ -296,7 +295,13 @@ const Home: NextPage = () => {
       {showAddTaskModal && (
         <AddNewTaskModal id={id} setShowAddTaskModal={setShowAddTaskModal} />
       )}
-      {showEditTaskModal && <EditTaskModal boardId={id} taskId={taskId} />}
+      {showEditTaskModal && (
+        <EditTaskModal
+          boardId={id}
+          taskId={taskId}
+          setShowEditTaskModal={setShowEditTaskModal}
+        />
+      )}
     </div>
   );
 };

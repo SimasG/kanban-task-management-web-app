@@ -1,24 +1,49 @@
 import { Checkbox } from "@mantine/core";
+import { deleteDoc, doc } from "firebase/firestore";
 import { useContext, useState } from "react";
+import toast from "react-hot-toast";
 import { UserContext } from "../lib/context";
+import { db } from "../lib/firebase";
 import useFetchFsTasks from "../lib/hooks/useFetchFsTasks";
 
 type IndexProps = {
   boardId: string | null | undefined;
   taskId: string | null | undefined;
+  setShowEditTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const EditTaskModal = ({ boardId, taskId }: IndexProps) => {
+const EditTaskModal = ({
+  boardId,
+  taskId,
+  setShowEditTaskModal,
+}: IndexProps) => {
   const user = useContext(UserContext);
 
   // Fetching all Tasks of selected Board
   const tasks = useFetchFsTasks(user?.uid, boardId);
-  console.log("EditTaskModal Tasks:", tasks);
-  console.log("taskId:", taskId);
 
-  // ** Get id of the Task that's been clicked, find that Task, populate the JSX with it
+  const selectedTask = tasks?.filter((task: any) => task?.uid === taskId)?.[0];
+  // console.log(
+  //   selectedTask?.subtasks.map((subtask: any) => console.log(subtask?.uid))
+  // );
 
   const [checked, setChecked] = useState(false);
+
+  // const deleteTask = async () => {
+  //   const taskRef = doc(
+  //     db,
+  //     "users",
+  //     `${user?.uid}`,
+  //     "boards",
+  //     `${boardId}`,
+  //     "tasks",
+  //     `${taskId}`
+  //   );
+  //   // console.log(taskRef);
+  //   await deleteDoc(taskRef);
+  //   setShowEditTaskModal(false);
+  //   toast.success("Task has been deleted!");
+  // };
 
   return (
     <section className="absolute bg-black bg-opacity-50 inset-0 w-full h-screen flex justify-center items-center">
@@ -28,10 +53,7 @@ const EditTaskModal = ({ boardId, taskId }: IndexProps) => {
       >
         {/* Title */}
         <div className="flex justify-between items-center">
-          <h2 className="text-lg font-bold">
-            Research pricing points of various competitors and trial different
-            business models
-          </h2>
+          <h2 className="text-lg font-bold">{selectedTask?.title}</h2>
           {/* Delete Task Btn */}
           <svg
             className="w-16 h-12 p-2 text-fontSecondary rounded cursor-pointer hover:bg-darkBlue"
@@ -39,6 +61,20 @@ const EditTaskModal = ({ boardId, taskId }: IndexProps) => {
             stroke="currentColor"
             viewBox="0 0 24 24"
             xmlns="http://www.w3.org/2000/svg"
+            onClick={async () => {
+              const taskRef = doc(
+                db,
+                "users",
+                `${user?.uid}`,
+                "boards",
+                `${boardId}`,
+                "tasks",
+                `${taskId}`
+              );
+              await deleteDoc(taskRef);
+              setShowEditTaskModal(false);
+              toast.success("Task has been deleted!");
+            }}
           >
             <path
               strokeLinecap="round"
@@ -50,56 +86,26 @@ const EditTaskModal = ({ boardId, taskId }: IndexProps) => {
         </div>
         {/* Description */}
         <p className="text-fontSecondary text-sm leading-7">
-          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Enim commodi
-          accusantium fugit quo architecto quas ea maiores, natus quis
-          exercitationem est minima dolorem nulla consectetur tenetur
-          dignissimos, ipsam asperiores beatae.
+          {selectedTask?.description}
         </p>
         {/* Subtasks */}
         <div className="flex flex-col justify-between gap-2">
-          <h2 className="font-bold text-sm mb-2">Subasks (2 out of 3)</h2>
-          {/* ** Connect subtasks to state with a form maker */}
-          {/* Subtask Subcontainer */}
-          <div className="subtask">
-            <Checkbox
-              checked={checked}
-              onChange={() => {
-                setChecked(!checked);
-              }}
-              aria-label="subtask checkbox"
-            />
-            <span className="text-fontPrimary">
-              Research competitors in premium market
-            </span>
-          </div>
-          {/* Subtask Subcontainer */}
-          <div className="subtask">
-            <Checkbox
-              checked={checked}
-              onChange={() => {
-                setChecked(!checked);
-              }}
-              aria-label="subtask checkbox"
-            />
-            <span className="text-fontPrimary">
-              Research competitors in premium market
-            </span>
-          </div>
-          {/* Subtask Subcontainer */}
-          <div className="subtask">
-            <Checkbox
-              checked={checked}
-              onChange={() => {
-                setChecked(!checked);
-              }}
-              aria-label="subtask checkbox"
-            />
-            <span className="text-fontPrimary">
-              Research competitors in premium market
-            </span>
-          </div>
+          <h2 className="font-bold text-sm mb-2">Subtasks (2 out of 3)</h2>
+          {selectedTask?.subtasks.map((subtask: any) => {
+            return (
+              <div className="subtask" key={subtask?.uid}>
+                <Checkbox
+                  checked={checked}
+                  onChange={() => {
+                    setChecked(!checked);
+                  }}
+                  aria-label="subtask checkbox"
+                />
+                <span className="text-fontPrimary">{subtask?.title}</span>
+              </div>
+            );
+          })}
         </div>
-
         {/* Status */}
         <div className="flex flex-col justify-between gap-2">
           <span className="font-bold text-sm">Status</span>
@@ -111,7 +117,7 @@ const EditTaskModal = ({ boardId, taskId }: IndexProps) => {
           />
         </div>
         {/* Create Task Btn */}
-        <button className="purpleBtn">Create Task</button>
+        <button className="purpleBtn">Edit Task</button>
       </form>
     </section>
   );

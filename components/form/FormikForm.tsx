@@ -33,6 +33,7 @@ const FormikForm = ({ id, setShowAddTaskModal }: IndexProps) => {
 
   const handleSubmit = async () => {
     setSubmitting(true);
+    const uid = uuidv4();
     const taskDocRef = doc(
       db,
       "users",
@@ -40,13 +41,13 @@ const FormikForm = ({ id, setShowAddTaskModal }: IndexProps) => {
       "boards",
       `${id}`,
       "tasks",
-      uuidv4()
+      uid
     );
 
     await setDoc(taskDocRef, {
       // Using type guard to ensure that we're always spreading an object
       ...(typeof values === "object" ? values : {}),
-      uid: uuidv4(),
+      uid: uid,
       updatedAt: Timestamp.fromDate(new Date()),
     });
     toast.success("New Task Created");
@@ -90,7 +91,7 @@ const FormikForm = ({ id, setShowAddTaskModal }: IndexProps) => {
                   <div className="flex flex-col justify-between gap-3">
                     <label htmlFor="subtasks">Subtasks</label>
                     {subtasks.map((subtask: any, index: number) => (
-                      <div key={subtask.uid} className="flex flex-col gap-2">
+                      <div key={subtask?.uid} className="flex flex-col gap-2">
                         <div className="flex justify-between items-center">
                           <Field
                             className="input w-full"
