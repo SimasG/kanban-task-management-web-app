@@ -31,8 +31,21 @@ body {
   @apply border-fontSecondary border-2 bg-transparent rounded py-2 px-3 opacity-60 outline-0 min-h-[150px];
 }
 
-.checkbox {
-  @apply border-none outline-0 bg-red-400;
+/* Mantine Checkbox Component */
+.mantine-Checkbox-root {
+  @apply border-none cursor-pointer bg-transparent;
+}
+
+.mantine-Checkbox-inner {
+  @apply border-none cursor-pointer bg-transparent;
+}
+
+.mantine-Checkbox-label {
+  @apply border-none cursor-pointer bg-transparent;
+}
+
+.mantine-Checkbox-input {
+  @apply border-none cursor-pointer checked:bg-fontTertiary;
 }
 
 .purpleBtn {

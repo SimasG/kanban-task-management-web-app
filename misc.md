@@ -492,3 +492,15 @@ export default useFetchDiffFsData;
               Research competitors in premium market
             </span>
           </div>
+
+                              {/* <input
+                                type="checkbox"
+                                name={`subtasks[${index}].checked`}
+                                id={`subtasks[${index}].checked`}
+                                aria-label="subtask checkbox"
+                                className="checkbox cursor-pointer"
+                                onChange={(e) => {
+                                  console.log(e);
+                                  handleChange(e);
+                                }}
+                              /> */}

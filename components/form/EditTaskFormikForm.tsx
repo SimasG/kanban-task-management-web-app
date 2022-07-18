@@ -143,33 +143,34 @@ const FormikForm = ({ boardId, taskId, setShowEditTaskModal }: IndexProps) => {
                         <div key={subtask?.uid} className="flex flex-col gap-2">
                           <div className="flex justify-between items-center">
                             <div className="flex justify-between bg-darkBlue rounded py-2 px-3 w-full gap-3">
-                              {/* <Checkbox
-                              checked={checked}
-                              onChange={() => {
-                                setChecked(!checked);
-                              }}
-                              aria-label="subtask checkbox"
-                              id={`subtasks[${index}].checkbox`}
-                              className="cursor-pointer"
-                            /> */}
-                              <input
-                                type="checkbox"
+                              <Checkbox
                                 name={`subtasks[${index}].checked`}
                                 id={`subtasks[${index}].checked`}
-                                aria-label="subtask checkbox"
-                                className="checkbox cursor-pointer"
                                 onChange={(e) => {
-                                  console.log(e);
                                   handleChange(e);
                                 }}
+                                aria-label="subtask checkbox"
+                                className="cursor-pointer"
+                                radius="xs"
                               />
-                              <Field
-                                className="text-fontPrimary bg-darkBlue border-none outline-0 w-full"
-                                name={`subtasks[${index}].title`}
-                                id={`subtasks[${index}].title`}
-                                type="text"
-                                placeholder="e.g. Prepare Marketing Campaign Overview"
-                              />
+                              {/* Thought it's supposed to be the other way around? */}
+                              {subtask?.checked ? (
+                                <Field
+                                  className="text-fontPrimary bg-darkBlue border-none outline-0 w-full line-through opacity-60"
+                                  name={`subtasks[${index}].title`}
+                                  id={`subtasks[${index}].title`}
+                                  type="text"
+                                  placeholder="e.g. Prepare Marketing Campaign Overview"
+                                />
+                              ) : (
+                                <Field
+                                  className="text-fontPrimary bg-darkBlue border-none outline-0 w-full"
+                                  name={`subtasks[${index}].title`}
+                                  id={`subtasks[${index}].title`}
+                                  type="text"
+                                  placeholder="e.g. Prepare Marketing Campaign Overview"
+                                />
+                              )}
                             </div>
                             {/* Delete Subtask Btn */}
                             <button type="button" onClick={() => remove(index)}>
