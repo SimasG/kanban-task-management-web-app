@@ -9,10 +9,10 @@ import FormikControl from "./FormikControl";
 import { v4 as uuidv4 } from "uuid";
 import { doc, setDoc, Timestamp } from "firebase/firestore";
 import { db } from "../../lib/firebase";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { UserContext } from "../../lib/context";
 import toast from "react-hot-toast";
-import useFetchFsTasks from "../../lib/hooks/useFetchFsTasks";
+import { Checkbox } from "@mantine/core";
 
 type IndexProps = {
   boardId: string | null | undefined;
@@ -23,9 +23,7 @@ type IndexProps = {
 const FormikForm = ({ boardId, taskId, setShowEditTaskModal }: IndexProps) => {
   const user = useContext(UserContext);
 
-  // Fetching all Tasks of selected Board
-  const tasks = useFetchFsTasks(user?.uid, boardId);
-  const selectedTask = tasks?.filter((task: any) => task?.uid === taskId)?.[0];
+  const [checked, setChecked] = useState(false);
 
   const dropdownOptions = [
     // "value: ''" will automatically make this option invalid and throw an error
@@ -35,9 +33,7 @@ const FormikForm = ({ boardId, taskId, setShowEditTaskModal }: IndexProps) => {
     { key: "DONE", value: "done" },
   ];
   const formik = useFormikContext();
-  const { values, setSubmitting, resetForm } = formik;
-
-  console.log("EditTaskFormikForm values:", values);
+  const { values, setSubmitting, resetForm }: any = formik;
 
   const handleSubmit = async () => {
     setSubmitting(true);
@@ -66,30 +62,39 @@ const FormikForm = ({ boardId, taskId, setShowEditTaskModal }: IndexProps) => {
 
   return (
     <>
-      {/* Still confused why I have to render the component once the values are declared */}
       {values && (
         <section className="absolute bg-black bg-opacity-50 inset-0 w-full h-screen flex justify-center items-center">
           <Form
             onClick={(e) => e.stopPropagation()}
             className="p-6 bg-darkGray rounded-md flex flex-col justify-between gap-8 min-w-[450px]"
           >
-            <h1>OPA OPA OPA</h1>
-            <h2 className="text-lg font-bold">Add New Task</h2>
             {/* Title */}
-            <FormikControl
-              control="input"
-              label="Title"
-              name="title"
-              placeholder="e.g. Design new homepage"
-            />
+            <div>
+              <Field
+                id="title"
+                name="title"
+                className="bg-transparent py-2 px-3 outline-0 text-lg font-bold"
+              />
+              <ErrorMessage
+                name="title"
+                component="p"
+                className="text-red-400"
+              />
+            </div>
             {/* Description */}
-            <FormikControl
-              control="textarea"
-              label="Description"
-              name="description"
-              placeholder="e.g. The homepage of UReason should be redesigned to fit in with the modern web standards. 
-        The homepage of UReason should be redesigned to fit in with the modern web standards."
-            />
+            <div>
+              <Field
+                as="textarea"
+                id="description"
+                name="description"
+                className="bg-transparent py-2 px-3 outline-0 opacity-60 resize-none"
+              />
+              <ErrorMessage
+                name="description"
+                component="p"
+                className="text-red-400"
+              />
+            </div>
             {/* Subtask Container */}
             <FieldArray name="subtasks">
               {(fieldArrayProps) => {
@@ -102,13 +107,21 @@ const FormikForm = ({ boardId, taskId, setShowEditTaskModal }: IndexProps) => {
                     {subtasks.map((subtask: any, index: number) => (
                       <div key={subtask?.uid} className="flex flex-col gap-2">
                         <div className="flex justify-between items-center">
-                          <Field
-                            className="input w-full"
-                            name={`subtasks[${index}].title`}
-                            id={`subtasks[${index}].title`}
-                            placeholder="e.g. Prepare Marketing Campaign Overview"
-                            type="text"
-                          />
+                          <div className="flex justify-between bg-darkBlue rounded py-2 px-3 w-full gap-3">
+                            <Checkbox
+                              checked={checked}
+                              onChange={() => {
+                                setChecked(!checked);
+                              }}
+                              aria-label="subtask checkbox"
+                            />
+                            <Field
+                              className="text-fontPrimary bg-darkBlue border-none outline-0 mr-auto"
+                              name={`subtasks[${index}].title`}
+                              id={`subtasks[${index}].title`}
+                              type="text"
+                            />
+                          </div>
                           {/* Delete Subtask Btn */}
                           <button type="button" onClick={() => remove(index)}>
                             <svg

@@ -65,8 +65,6 @@ const EditTaskModalNew = ({
     });
   }, [selectedTask]);
 
-  // console.log("EditTaskModalNew data:", data);
-
   return (
     <Formik
       initialValues={data || initialValues}

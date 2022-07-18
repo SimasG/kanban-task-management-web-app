@@ -80,6 +80,7 @@ const FormikForm = ({ boardId, setShowAddTaskModal }: IndexProps) => {
               name="description"
               placeholder="e.g. The homepage of UReason should be redesigned to fit in with the modern web standards. 
         The homepage of UReason should be redesigned to fit in with the modern web standards."
+              className="resize-none"
             />
             {/* Subtask Container */}
             <FieldArray name="subtasks">
