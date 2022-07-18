@@ -60,6 +60,8 @@ const FormikForm = ({ boardId, taskId, setShowEditTaskModal }: IndexProps) => {
     setShowEditTaskModal(false);
   };
 
+  console.log("Formik values:", values);
+
   return (
     <>
       {values && (
@@ -144,6 +146,7 @@ const FormikForm = ({ boardId, taskId, setShowEditTaskModal }: IndexProps) => {
                               <Checkbox
                                 name={`subtasks[${index}].checked`}
                                 id={`subtasks[${index}].checked`}
+                                checked={subtask.checked}
                                 onChange={(e) => {
                                   handleChange(e);
                                 }}
@@ -151,24 +154,17 @@ const FormikForm = ({ boardId, taskId, setShowEditTaskModal }: IndexProps) => {
                                 className="cursor-pointer"
                                 radius="xs"
                               />
-                              {/* Thought it's supposed to be the other way around? */}
-                              {subtask?.checked ? (
-                                <Field
-                                  className="text-fontPrimary bg-darkBlue border-none outline-0 w-full line-through opacity-60"
-                                  name={`subtasks[${index}].title`}
-                                  id={`subtasks[${index}].title`}
-                                  type="text"
-                                  placeholder="e.g. Prepare Marketing Campaign Overview"
-                                />
-                              ) : (
-                                <Field
-                                  className="text-fontPrimary bg-darkBlue border-none outline-0 w-full"
-                                  name={`subtasks[${index}].title`}
-                                  id={`subtasks[${index}].title`}
-                                  type="text"
-                                  placeholder="e.g. Prepare Marketing Campaign Overview"
-                                />
-                              )}
+                              <Field
+                                className={
+                                  subtask.checked
+                                    ? "text-fontPrimary bg-darkBlue border-none outline-0 w-full line-through opacity-60"
+                                    : "text-fontPrimary bg-darkBlue border-none outline-0 w-full"
+                                }
+                                name={`subtasks[${index}].title`}
+                                id={`subtasks[${index}].title`}
+                                type="text"
+                                placeholder="e.g. Prepare Marketing Campaign Overview"
+                              />
                             </div>
                             {/* Delete Subtask Btn */}
                             <button type="button" onClick={() => remove(index)}>

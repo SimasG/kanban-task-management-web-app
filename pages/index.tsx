@@ -208,7 +208,6 @@ const Home: NextPage = () => {
             {/* Task Container */}
             <div className="flex flex-col justify-start items-center gap-4">
               {tasks?.map((task: any) => {
-                console.log(task.status);
                 if (task.status === "todo") {
                   return (
                     <div
@@ -242,7 +241,6 @@ const Home: NextPage = () => {
             {/* Task Container */}
             <div className="flex flex-col justify-start items-center gap-4">
               {tasks?.map((task: any) => {
-                console.log(task.status);
                 if (task.status === "doing") {
                   return (
                     <div
@@ -276,7 +274,6 @@ const Home: NextPage = () => {
             {/* Task Container */}
             <div className="flex flex-col justify-start items-center gap-4">
               {tasks?.map((task: any) => {
-                console.log(task.status);
                 if (task.status === "done") {
                   return (
                     <div

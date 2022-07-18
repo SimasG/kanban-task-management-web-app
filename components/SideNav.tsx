@@ -16,6 +16,7 @@ import { UserContext } from "../lib/context";
 import { auth, db } from "../lib/firebase";
 import { v4 as uuidv4 } from "uuid";
 import useFetchFsBoards from "../lib/hooks/useFetchFsBoards";
+import { motion, Reorder } from "framer-motion";
 
 // type LocalStorageDataProps = {
 //   users: UserProps;
@@ -163,6 +164,8 @@ const SideNav = ({ boards, setBoards, boardId, setBoardId }: SideNavProps) => {
     });
   };
 
+  // console.log(boards);
+
   return (
     <nav className="min-w-[250px] bg-darkGray pr-4 py-4 w-1/5 flex flex-col justify-between">
       {/* Logo container */}
@@ -188,50 +191,53 @@ const SideNav = ({ boards, setBoards, boardId, setBoardId }: SideNavProps) => {
                 (board: any) => {
                   return (
                     <div
-                      className={
-                        board.uid === boardId
-                          ? "board bg-fontTertiary text-fontPrimary rounded-r-full"
-                          : "board"
-                      }
                       key={board.uid}
                       onClick={() => {
                         setBoardId(board.uid);
                       }}
                     >
-                      <TbLayoutBoardSplit />
-                      <input
-                        className="bg-transparent cursor-pointer outline-none"
-                        type="text"
-                        value={board.title}
-                        // ** Having trouble refactoring the logic in a separate func
-                        onChange={
-                          user
-                            ? // If user is authenticated, update Firestore
-                              (e) => {
-                                updateBoardName(board.uid, e.target.value);
-                                // setLocalStorageBoards(newBoardList);
-                                // setBoardId(board?.id);
-                              }
-                            : // If user is not authenticated, update localStorage
-                              (e) => {
-                                const newBoardList: {}[] = [];
-                                boards.map((b: BoardSchema) => {
-                                  b.uid === board.uid
-                                    ? newBoardList.push({
-                                        ...board,
-                                        title: e.target.value,
-                                      })
-                                    : newBoardList.push(b);
-                                });
-                                localStorage.setItem(
-                                  "boards",
-                                  JSON.stringify(newBoardList)
-                                );
-                                setBoards(newBoardList);
-                                setBoardId(board.uid);
-                              }
+                      <ul
+                        className={
+                          board.uid === boardId
+                            ? "board bg-fontTertiary text-fontPrimary rounded-r-full"
+                            : "board"
                         }
-                      />
+                      >
+                        <TbLayoutBoardSplit />
+                        <input
+                          className="bg-transparent cursor-pointer outline-none"
+                          type="text"
+                          value={board.title}
+                          // ** Having trouble refactoring the logic in a separate func
+                          onChange={
+                            user
+                              ? // If user is authenticated, update Firestore
+                                (e) => {
+                                  updateBoardName(board.uid, e.target.value);
+                                  // setLocalStorageBoards(newBoardList);
+                                  // setBoardId(board?.id);
+                                }
+                              : // If user is not authenticated, update localStorage
+                                (e) => {
+                                  const newBoardList: {}[] = [];
+                                  boards.map((b: BoardSchema) => {
+                                    b.uid === board.uid
+                                      ? newBoardList.push({
+                                          ...board,
+                                          title: e.target.value,
+                                        })
+                                      : newBoardList.push(b);
+                                  });
+                                  localStorage.setItem(
+                                    "boards",
+                                    JSON.stringify(newBoardList)
+                                  );
+                                  setBoards(newBoardList);
+                                  setBoardId(board.uid);
+                                }
+                          }
+                        />
+                      </ul>
                     </div>
                   );
                 }
