@@ -110,7 +110,16 @@ const Home: NextPage = () => {
     });
   };
 
-  // console.log(tasks?.[0]?.status);
+  // Calculating todo/doing/done task #
+  let todoCount = 0;
+  let doingCount = 0;
+  let doneCount = 0;
+
+  tasks?.map((task: any) => {
+    task.status === "todo" && todoCount++;
+    task.status === "doing" && doingCount++;
+    task.status === "done" && doneCount++;
+  });
 
   return (
     <div
@@ -202,7 +211,7 @@ const Home: NextPage = () => {
               <div className="h-4 w-4 bg-todoColors-brightBlue rounded-full"></div>
               {/* Column Title */}
               <h3 className="uppercase text-fontSecondary font-bold">
-                Todo (4)
+                Todo ({todoCount})
               </h3>
             </div>
             {/* Task Container */}
@@ -235,7 +244,7 @@ const Home: NextPage = () => {
               <div className="h-4 w-4 bg-todoColors-violet rounded-full"></div>
               {/* Column Title */}
               <h3 className="uppercase text-fontSecondary font-bold">
-                Doing (4)
+                Doing ({doingCount})
               </h3>
             </div>
             {/* Task Container */}
@@ -268,7 +277,7 @@ const Home: NextPage = () => {
               <div className="h-4 w-4 bg-todoColors-brightGreen rounded-full"></div>
               {/* Column Title */}
               <h3 className="uppercase text-fontSecondary font-bold">
-                Done (4)
+                Done ({doneCount})
               </h3>
             </div>
             {/* Task Container */}

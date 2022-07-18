@@ -60,8 +60,6 @@ const FormikForm = ({ boardId, taskId, setShowEditTaskModal }: IndexProps) => {
     setShowEditTaskModal(false);
   };
 
-  console.log("Formik values:", values);
-
   return (
     <>
       {values && (

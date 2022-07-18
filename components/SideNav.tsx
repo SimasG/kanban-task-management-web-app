@@ -164,7 +164,7 @@ const SideNav = ({ boards, setBoards, boardId, setBoardId }: SideNavProps) => {
     });
   };
 
-  // console.log(boards);
+  // console.log("boards:", boards);
 
   return (
     <nav className="min-w-[250px] bg-darkGray pr-4 py-4 w-1/5 flex flex-col justify-between">

@@ -504,3 +504,23 @@ export default useFetchDiffFsData;
                                   handleChange(e);
                                 }}
                               /> */}
+
+    let todoCount = 0;
+    let doingCount = 0;
+    let doneCount = 0;
+
+    if (task.status === "todo") {
+      // console.log("task.status === todo ran");
+      todoCount++;
+    }
+    if (task.status === "doing") {
+      // console.log("task.status === doing ran");
+      doingCount++;
+    }
+    if (task.status === "done") {
+      // console.log("task.status === done ran");
+      doneCount++;
+    }
+
+    // Don't know why the counts are returned in an array
+    return { todoCount, doingCount, doneCount };
