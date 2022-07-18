@@ -9,7 +9,6 @@ import type { NextPage } from "next";
 import React, { useContext, useEffect, useState } from "react";
 import AddNewTaskModal from "../components/AddNewTaskModal";
 import EditTaskModal from "../components/EditTaskModal";
-import EditTaskModalNew from "../components/EditTaskModalNew";
 import SideNav from "../components/SideNav";
 import { UserContext } from "../lib/context";
 import { db } from "../lib/firebase";
@@ -66,8 +65,6 @@ const Home: NextPage = () => {
     }
   }, [firestoreData, user]);
 
-  // console.log(boards);
-
   // Fetching all Tasks of selected Board
   const tasks = useFetchFsTasks(user?.uid, boardId);
 
@@ -112,6 +109,8 @@ const Home: NextPage = () => {
       title: newName,
     });
   };
+
+  // console.log(tasks?.[0]?.status);
 
   return (
     <div
@@ -209,20 +208,23 @@ const Home: NextPage = () => {
             {/* Task Container */}
             <div className="flex flex-col justify-start items-center gap-4">
               {tasks?.map((task: any) => {
-                return (
-                  <div
-                    onClick={(e) => {
-                      setTaskId(task?.uid);
-                      e.stopPropagation();
-                      setShowEditTaskModal(true);
-                    }}
-                    className="task"
-                    key={task?.id}
-                  >
-                    <h2 className="task-title">{task?.title}</h2>
-                    <span className="task-body">0 of 3 subtasks</span>
-                  </div>
-                );
+                console.log(task.status);
+                if (task.status === "todo") {
+                  return (
+                    <div
+                      onClick={(e) => {
+                        setTaskId(task?.uid);
+                        e.stopPropagation();
+                        setShowEditTaskModal(true);
+                      }}
+                      className="task"
+                      key={task?.id}
+                    >
+                      <h2 className="task-title">{task?.title}</h2>
+                      <span className="task-body">0 of 3 subtasks</span>
+                    </div>
+                  );
+                }
               })}
             </div>
           </div>
@@ -239,26 +241,25 @@ const Home: NextPage = () => {
             </div>
             {/* Task Container */}
             <div className="flex flex-col justify-start items-center gap-4">
-              {/* Single Task Container */}
-              <div className="task">
-                <h2 className="task-title">Example todo for xyz</h2>
-                <span className="task-body">0 of 3 subtasks</span>
-              </div>
-              {/* Single Task Container */}
-              <div className="task">
-                <h2 className="task-title">Example todo for zyx</h2>
-                <span className="task-body">0 of 7 subtasks</span>
-              </div>
-              {/* Single Task Container */}
-              <div className="task">
-                <h2 className="task-title">Example todo for abc</h2>
-                <span className="task-body">1 of 3 subtasks</span>
-              </div>
-              {/* Single Task Container */}
-              <div className="task">
-                <h2 className="task-title">Example todo for cba</h2>
-                <span className="task-body">2 of 5 subtasks</span>
-              </div>
+              {tasks?.map((task: any) => {
+                console.log(task.status);
+                if (task.status === "doing") {
+                  return (
+                    <div
+                      onClick={(e) => {
+                        setTaskId(task?.uid);
+                        e.stopPropagation();
+                        setShowEditTaskModal(true);
+                      }}
+                      className="task"
+                      key={task?.id}
+                    >
+                      <h2 className="task-title">{task?.title}</h2>
+                      <span className="task-body">0 of 3 subtasks</span>
+                    </div>
+                  );
+                }
+              })}
             </div>
           </div>
           {/* Third Column */}
@@ -274,26 +275,25 @@ const Home: NextPage = () => {
             </div>
             {/* Task Container */}
             <div className="flex flex-col justify-start items-center gap-4">
-              {/* Single Task Container */}
-              <div className="task">
-                <h2 className="task-title">Example todo for xyz</h2>
-                <span className="task-body">0 of 3 subtasks</span>
-              </div>
-              {/* Single Task Container */}
-              <div className="task">
-                <h2 className="task-title">Example todo for zyx</h2>
-                <span className="task-body">0 of 7 subtasks</span>
-              </div>
-              {/* Single Task Container */}
-              <div className="task">
-                <h2 className="task-title">Example todo for abc</h2>
-                <span className="task-body">1 of 3 subtasks</span>
-              </div>
-              {/* Single Task Container */}
-              <div className="task">
-                <h2 className="task-title">Example todo for cba</h2>
-                <span className="task-body">2 of 5 subtasks</span>
-              </div>
+              {tasks?.map((task: any) => {
+                console.log(task.status);
+                if (task.status === "done") {
+                  return (
+                    <div
+                      onClick={(e) => {
+                        setTaskId(task?.uid);
+                        e.stopPropagation();
+                        setShowEditTaskModal(true);
+                      }}
+                      className="task"
+                      key={task?.id}
+                    >
+                      <h2 className="task-title">{task?.title}</h2>
+                      <span className="task-body">0 of 3 subtasks</span>
+                    </div>
+                  );
+                }
+              })}
             </div>
           </div>
           {/* Add New Column btn */}
@@ -311,7 +311,7 @@ const Home: NextPage = () => {
         />
       )}
       {showEditTaskModal && (
-        <EditTaskModalNew
+        <EditTaskModal
           boardId={boardId}
           taskId={taskId}
           setShowEditTaskModal={setShowEditTaskModal}
