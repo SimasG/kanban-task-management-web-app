@@ -23,27 +23,8 @@ const EditTaskModal = ({
   const tasks = useFetchFsTasks(user?.uid, boardId);
 
   const selectedTask = tasks?.filter((task: any) => task?.uid === taskId)?.[0];
-  // console.log(
-  //   selectedTask?.subtasks.map((subtask: any) => console.log(subtask?.uid))
-  // );
 
   const [checked, setChecked] = useState(false);
-
-  // const deleteTask = async () => {
-  //   const taskRef = doc(
-  //     db,
-  //     "users",
-  //     `${user?.uid}`,
-  //     "boards",
-  //     `${boardId}`,
-  //     "tasks",
-  //     `${taskId}`
-  //   );
-  //   // console.log(taskRef);
-  //   await deleteDoc(taskRef);
-  //   setShowEditTaskModal(false);
-  //   toast.success("Task has been deleted!");
-  // };
 
   return (
     <section className="absolute bg-black bg-opacity-50 inset-0 w-full h-screen flex justify-center items-center">

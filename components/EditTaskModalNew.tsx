@@ -4,8 +4,10 @@ import { v4 as uuidv4 } from "uuid";
 import EditTaskFormikForm from "./form/EditTaskFormikForm";
 import { doc } from "firebase/firestore";
 import { db } from "../lib/firebase";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { UserContext } from "../lib/context";
+import useFetchFsTasks from "../lib/hooks/useFetchFsTasks";
+import { useSetState } from "@mantine/hooks";
 
 type IndexProps = {
   boardId: string | null | undefined;
@@ -13,8 +15,17 @@ type IndexProps = {
   setShowEditTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const EditTaskModalNew = ({ taskId, setShowEditTaskModal }: IndexProps) => {
+const EditTaskModalNew = ({
+  boardId,
+  taskId,
+  setShowEditTaskModal,
+}: IndexProps) => {
+  const [data, setData] = useState<any>();
   const user = useContext(UserContext);
+  // Fetching all Tasks of selected Board
+  const tasks = useFetchFsTasks(user?.uid, boardId);
+
+  const selectedTask = tasks?.filter((task: any) => task?.uid === taskId)?.[0];
 
   type initialValuesProps = {
     title: string;
@@ -46,11 +57,26 @@ const EditTaskModalNew = ({ taskId, setShowEditTaskModal }: IndexProps) => {
     status: Yup.string().required("Status is Required!"),
   });
 
+  // Populating the state with the selected Task data
+  useEffect(() => {
+    if (!selectedTask) return;
+    setData({
+      ...selectedTask,
+    });
+  }, [selectedTask]);
+
+  // console.log("EditTaskModalNew data:", data);
+
   return (
-    <Formik initialValues={initialValues} validationSchema={validationSchema}>
+    <Formik
+      initialValues={data || initialValues}
+      validationSchema={validationSchema}
+      enableReinitialize
+    >
       {(formik) => {
         return (
           <EditTaskFormikForm
+            boardId={boardId}
             taskId={taskId}
             setShowEditTaskModal={setShowEditTaskModal}
           />

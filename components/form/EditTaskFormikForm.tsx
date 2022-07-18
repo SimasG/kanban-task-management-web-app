@@ -12,14 +12,20 @@ import { db } from "../../lib/firebase";
 import { useContext } from "react";
 import { UserContext } from "../../lib/context";
 import toast from "react-hot-toast";
+import useFetchFsTasks from "../../lib/hooks/useFetchFsTasks";
 
 type IndexProps = {
+  boardId: string | null | undefined;
   taskId: string | null | undefined;
   setShowEditTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const FormikForm = ({ taskId, setShowEditTaskModal }: IndexProps) => {
+const FormikForm = ({ boardId, taskId, setShowEditTaskModal }: IndexProps) => {
   const user = useContext(UserContext);
+
+  // Fetching all Tasks of selected Board
+  const tasks = useFetchFsTasks(user?.uid, boardId);
+  const selectedTask = tasks?.filter((task: any) => task?.uid === taskId)?.[0];
 
   const dropdownOptions = [
     // "value: ''" will automatically make this option invalid and throw an error
@@ -30,6 +36,8 @@ const FormikForm = ({ taskId, setShowEditTaskModal }: IndexProps) => {
   ];
   const formik = useFormikContext();
   const { values, setSubmitting, resetForm } = formik;
+
+  console.log("EditTaskFormikForm values:", values);
 
   const handleSubmit = async () => {
     setSubmitting(true);
