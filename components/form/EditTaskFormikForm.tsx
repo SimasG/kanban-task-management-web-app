@@ -9,7 +9,7 @@ import FormikControl from "./FormikControl";
 import { v4 as uuidv4 } from "uuid";
 import { deleteDoc, doc, setDoc, Timestamp } from "firebase/firestore";
 import { db } from "../../lib/firebase";
-import { useContext, useState } from "react";
+import { useContext } from "react";
 import { UserContext } from "../../lib/context";
 import toast from "react-hot-toast";
 import { Checkbox } from "@mantine/core";
@@ -23,7 +23,7 @@ type IndexProps = {
 const FormikForm = ({ boardId, taskId, setShowEditTaskModal }: IndexProps) => {
   const user = useContext(UserContext);
 
-  const [checked, setChecked] = useState(false);
+  // const [checked, setChecked] = useState(false);
 
   const dropdownOptions = [
     // "value: ''" will automatically make this option invalid and throw an error
@@ -35,28 +35,26 @@ const FormikForm = ({ boardId, taskId, setShowEditTaskModal }: IndexProps) => {
   const formik = useFormikContext();
   const { values, setSubmitting, resetForm }: any = formik;
 
-  console.log("Formik form values:", values);
+  // console.log("Formik form values:", values);
 
   const handleSubmit = async () => {
     setSubmitting(true);
-    const uid = uuidv4();
     const taskDocRef = doc(
       db,
       "users",
       `${user?.uid}`,
       "boards",
-      `${taskId}`,
+      `${boardId}`,
       "tasks",
-      uid
+      `${taskId}`
     );
 
     await setDoc(taskDocRef, {
       // Using type guard to ensure that we're always spreading an object
       ...(typeof values === "object" ? values : {}),
-      uid: uid,
       updatedAt: Timestamp.fromDate(new Date()),
     });
-    toast.success("New Task Created");
+    toast.success("Task Updated");
     setSubmitting(false);
     resetForm();
     setShowEditTaskModal(false);
