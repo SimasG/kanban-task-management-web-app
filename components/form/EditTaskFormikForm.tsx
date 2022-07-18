@@ -7,7 +7,7 @@ import {
 } from "formik";
 import FormikControl from "./FormikControl";
 import { v4 as uuidv4 } from "uuid";
-import { doc, setDoc, Timestamp } from "firebase/firestore";
+import { deleteDoc, doc, setDoc, Timestamp } from "firebase/firestore";
 import { db } from "../../lib/firebase";
 import { useContext, useState } from "react";
 import { UserContext } from "../../lib/context";
@@ -34,6 +34,8 @@ const FormikForm = ({ boardId, taskId, setShowEditTaskModal }: IndexProps) => {
   ];
   const formik = useFormikContext();
   const { values, setSubmitting, resetForm }: any = formik;
+
+  console.log("Formik form values:", values);
 
   const handleSubmit = async () => {
     setSubmitting(true);
@@ -69,17 +71,49 @@ const FormikForm = ({ boardId, taskId, setShowEditTaskModal }: IndexProps) => {
             className="p-6 bg-darkGray rounded-md flex flex-col justify-between gap-8 min-w-[450px]"
           >
             {/* Title */}
-            <div>
-              <Field
-                id="title"
-                name="title"
-                className="bg-transparent py-2 px-3 outline-0 text-lg font-bold"
-              />
-              <ErrorMessage
-                name="title"
-                component="p"
-                className="text-red-400"
-              />
+            <div className="flex justify-between items-center">
+              {/* Title */}
+              <div>
+                <Field
+                  id="title"
+                  name="title"
+                  className="bg-transparent py-2 px-3 outline-0 text-lg font-bold"
+                />
+                <ErrorMessage
+                  name="title"
+                  component="p"
+                  className="text-red-400"
+                />
+              </div>
+              {/* Delete Task Btn */}
+              <svg
+                className="w-16 h-12 p-2 text-fontSecondary rounded cursor-pointer hover:bg-darkBlue"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+                onClick={async () => {
+                  const taskRef = doc(
+                    db,
+                    "users",
+                    `${user?.uid}`,
+                    "boards",
+                    `${boardId}`,
+                    "tasks",
+                    `${taskId}`
+                  );
+                  await deleteDoc(taskRef);
+                  setShowEditTaskModal(false);
+                  toast.success("Task has been deleted!");
+                }}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                ></path>
+              </svg>
             </div>
             {/* Description */}
             <div>
@@ -87,7 +121,7 @@ const FormikForm = ({ boardId, taskId, setShowEditTaskModal }: IndexProps) => {
                 as="textarea"
                 id="description"
                 name="description"
-                className="bg-transparent py-2 px-3 outline-0 opacity-60 resize-none"
+                className="bg-transparent py-2 px-3 outline-0 opacity-60 resize-none w-full h-24"
               />
               <ErrorMessage
                 name="description"
@@ -104,49 +138,65 @@ const FormikForm = ({ boardId, taskId, setShowEditTaskModal }: IndexProps) => {
                 return (
                   <div className="flex flex-col justify-between gap-3">
                     <label htmlFor="subtasks">Subtasks</label>
-                    {subtasks.map((subtask: any, index: number) => (
-                      <div key={subtask?.uid} className="flex flex-col gap-2">
-                        <div className="flex justify-between items-center">
-                          <div className="flex justify-between bg-darkBlue rounded py-2 px-3 w-full gap-3">
-                            <Checkbox
+                    {subtasks.map((subtask: any, index: number) => {
+                      return (
+                        <div key={subtask?.uid} className="flex flex-col gap-2">
+                          <div className="flex justify-between items-center">
+                            <div className="flex justify-between bg-darkBlue rounded py-2 px-3 w-full gap-3">
+                              {/* <Checkbox
                               checked={checked}
                               onChange={() => {
                                 setChecked(!checked);
                               }}
                               aria-label="subtask checkbox"
-                            />
-                            <Field
-                              className="text-fontPrimary bg-darkBlue border-none outline-0 mr-auto"
-                              name={`subtasks[${index}].title`}
-                              id={`subtasks[${index}].title`}
-                              type="text"
-                            />
+                              id={`subtasks[${index}].checkbox`}
+                              className="cursor-pointer"
+                            /> */}
+                              <input
+                                type="checkbox"
+                                name={`subtasks[${index}].checked`}
+                                id={`subtasks[${index}].checked`}
+                                aria-label="subtask checkbox"
+                                className="checkbox cursor-pointer"
+                                onChange={(e) => {
+                                  console.log(e);
+                                  handleChange(e);
+                                }}
+                              />
+                              <Field
+                                className="text-fontPrimary bg-darkBlue border-none outline-0 w-full"
+                                name={`subtasks[${index}].title`}
+                                id={`subtasks[${index}].title`}
+                                type="text"
+                                placeholder="e.g. Prepare Marketing Campaign Overview"
+                              />
+                            </div>
+                            {/* Delete Subtask Btn */}
+                            <button type="button" onClick={() => remove(index)}>
+                              <svg
+                                className="w-8 h-8 p-1 text-fontSecondary hover:bg-fontSecondary hover:bg-opacity-25 hover:rounded"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth="3"
+                                  d="M6 18L18 6M6 6l12 12"
+                                ></path>
+                              </svg>
+                            </button>
                           </div>
-                          {/* Delete Subtask Btn */}
-                          <button type="button" onClick={() => remove(index)}>
-                            <svg
-                              className="w-8 h-8 p-1 text-fontSecondary hover:bg-fontSecondary hover:bg-opacity-25 hover:rounded"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="3"
-                                d="M6 18L18 6M6 6l12 12"
-                              ></path>
-                            </svg>
-                          </button>
+                          <ErrorMessage
+                            name={`subtasks[${index}].title`}
+                            component="p"
+                            className="text-red-400"
+                          />
                         </div>
-                        <ErrorMessage
-                          name={`subtasks[${index}].title`}
-                          component="p"
-                          className="text-red-400"
-                        />
-                      </div>
-                    ))}
+                      );
+                    })}
                     {/* Add Subtask Btn */}
                     <button
                       type="button"
@@ -155,6 +205,7 @@ const FormikForm = ({ boardId, taskId, setShowEditTaskModal }: IndexProps) => {
                         push({
                           uid: uuidv4(),
                           title: "",
+                          checked: false,
                         })
                       }
                     >
@@ -178,7 +229,7 @@ const FormikForm = ({ boardId, taskId, setShowEditTaskModal }: IndexProps) => {
               className="purpleBtn"
               onClick={() => handleSubmit()}
             >
-              Create Task
+              Edit Task
             </button>
           </Form>
         </section>

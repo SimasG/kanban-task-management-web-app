@@ -134,6 +134,7 @@ const FormikForm = ({ boardId, setShowAddTaskModal }: IndexProps) => {
                         push({
                           uid: uuidv4(),
                           title: "",
+                          checked: false,
                         })
                       }
                     >

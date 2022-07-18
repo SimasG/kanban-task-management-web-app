@@ -29,6 +29,8 @@ const AddNewTaskModal = ({ boardId, setShowAddTaskModal }: IndexProps) => {
       {
         uid: uuidv4(),
         title: "",
+        // checked: []; ?
+        checked: false,
       },
     ],
     status: "",

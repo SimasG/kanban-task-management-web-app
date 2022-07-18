@@ -31,6 +31,10 @@ body {
   @apply border-fontSecondary border-2 bg-transparent rounded py-2 px-3 opacity-60 outline-0 min-h-[150px];
 }
 
+.checkbox {
+  @apply border-none outline-0 bg-red-400;
+}
+
 .purpleBtn {
   @apply py-2 bg-fontTertiary text-fontPrimary font-bold rounded-full hover:bg-fontPrimary hover:text-fontTertiary;
 }

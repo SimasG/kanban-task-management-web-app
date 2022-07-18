@@ -26,7 +26,7 @@ import useFetchFsTasks from "../lib/hooks/useFetchFsTasks";
 
 type BoardSchema = {
   title: string;
-  id: string | null | undefined;
+  uid: string | null | undefined;
   // What type is a Firebase timestamp?
   createdAt: any;
 };
@@ -66,11 +66,13 @@ const Home: NextPage = () => {
     }
   }, [firestoreData, user]);
 
+  // console.log(boards);
+
   // Fetching all Tasks of selected Board
   const tasks = useFetchFsTasks(user?.uid, boardId);
 
   const activeBoard = boards?.filter(
-    (board: BoardSchema) => board.id === boardId
+    (board: BoardSchema) => board.uid === boardId
   );
 
   // Buttons
@@ -84,28 +86,28 @@ const Home: NextPage = () => {
     setShowEditTaskModal(true);
   };
 
-  const handleDeleteBoard = async (id: string | null | undefined) => {
+  const handleDeleteBoard = async (uid: string | null | undefined) => {
     // Deleting Board from localStorage
     if (!user) {
       const lsData = JSON.parse(localStorage.getItem("boards") || "");
-      const newData = lsData.filter((board: BoardSchema) => board.id !== id);
+      const newData = lsData.filter((board: BoardSchema) => board.uid !== uid);
       localStorage.setItem("boards", JSON.stringify(newData));
       setBoards(newData);
-      setBoardId(newData?.[0]?.id);
+      setBoardId(newData?.[0]?.uid);
     } else {
       // Deleting Board from Firestore
-      const docRef = doc(db, "users", `${user?.uid}`, "boards", `${id}`);
+      const docRef = doc(db, "users", `${user?.uid}`, "boards", `${uid}`);
       // If the first Board in the array is deleted, setId to the second Board (which will become the
       // first once the first one is removed from FS). Else, remove the first Board in the array.
-      boards?.[0]?.id === id
-        ? setBoardId(boards?.[1]?.id)
-        : setBoardId(boards?.[0]?.id);
+      boards?.[0]?.uid === uid
+        ? setBoardId(boards?.[1]?.uid)
+        : setBoardId(boards?.[0]?.uid);
       await deleteDoc(docRef);
     }
   };
 
-  const updateBoardName = async (id: string, newName: string) => {
-    const ref = doc(db, "users", `${user?.uid}`, "boards", id);
+  const updateBoardName = async (uid: string, newName: string) => {
+    const ref = doc(db, "users", `${user?.uid}`, "boards", uid);
     await updateDoc(ref, {
       title: newName,
     });
@@ -142,13 +144,13 @@ const Home: NextPage = () => {
               user
                 ? // If user is authenticated, update Firestore
                   (e) => {
-                    updateBoardName(activeBoard?.[0]?.id, e.target.value);
+                    updateBoardName(activeBoard?.[0]?.uid, e.target.value);
                   }
                 : // If user is not authenticated, update localStorage
                   (e) => {
                     const newBoardList: {}[] = [];
                     boards.map((b: BoardSchema) => {
-                      b.id === activeBoard?.[0]?.id
+                      b.uid === activeBoard?.[0]?.id
                         ? newBoardList.push({
                             ...activeBoard?.[0],
                             title: e.target.value,

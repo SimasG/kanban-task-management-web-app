@@ -41,6 +41,8 @@ const EditTaskModalNew = ({
       {
         uid: uuidv4(),
         title: "",
+        // checked: []; ?
+        checked: false,
       },
     ],
     status: "",
