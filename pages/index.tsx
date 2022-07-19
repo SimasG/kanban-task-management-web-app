@@ -121,6 +121,18 @@ const Home: NextPage = () => {
     task.status === "done" && doneCount++;
   });
 
+  let total = 0;
+  let checked = 0;
+  let unchecked = 0;
+
+  tasks?.[0]?.subtasks?.map((subtask: any) => {
+    console.log("subtask:", subtask);
+    total++;
+    subtask.checked === true ? checked++ : unchecked++;
+  });
+
+  // console.log("total:", total, "checked:", checked, "unchecked", unchecked);
+
   return (
     <div
       onClick={() => {
@@ -218,6 +230,11 @@ const Home: NextPage = () => {
             <div className="flex flex-col justify-start items-center gap-4">
               {tasks?.map((task: any) => {
                 if (task.status === "todo") {
+                  // Number of checked subtasks
+                  let checkedNumber = 0;
+                  task.subtasks.map((subtask: any) => {
+                    subtask.checked && checkedNumber++;
+                  });
                   return (
                     <div
                       onClick={(e) => {
@@ -229,7 +246,9 @@ const Home: NextPage = () => {
                       key={task?.id}
                     >
                       <h2 className="task-title">{task?.title}</h2>
-                      <span className="task-body">0 of 3 subtasks</span>
+                      <span className="task-body">
+                        {checkedNumber} of {task.subtasks.length} subtasks
+                      </span>
                     </div>
                   );
                 }
@@ -251,6 +270,11 @@ const Home: NextPage = () => {
             <div className="flex flex-col justify-start items-center gap-4">
               {tasks?.map((task: any) => {
                 if (task.status === "doing") {
+                  // Number of checked subtasks
+                  let checkedNumber = 0;
+                  task.subtasks.map((subtask: any) => {
+                    subtask.checked && checkedNumber++;
+                  });
                   return (
                     <div
                       onClick={(e) => {
@@ -262,7 +286,9 @@ const Home: NextPage = () => {
                       key={task?.id}
                     >
                       <h2 className="task-title">{task?.title}</h2>
-                      <span className="task-body">0 of 3 subtasks</span>
+                      <span className="task-body">
+                        {checkedNumber} of {task.subtasks.length} subtasks
+                      </span>
                     </div>
                   );
                 }
@@ -284,6 +310,11 @@ const Home: NextPage = () => {
             <div className="flex flex-col justify-start items-center gap-4">
               {tasks?.map((task: any) => {
                 if (task.status === "done") {
+                  // Number of checked subtasks
+                  let checkedNumber = 0;
+                  task.subtasks.map((subtask: any) => {
+                    subtask.checked && checkedNumber++;
+                  });
                   return (
                     <div
                       onClick={(e) => {
@@ -295,7 +326,9 @@ const Home: NextPage = () => {
                       key={task?.id}
                     >
                       <h2 className="task-title">{task?.title}</h2>
-                      <span className="task-body">0 of 3 subtasks</span>
+                      <span className="task-body">
+                        {checkedNumber} of {task.subtasks.length} subtasks
+                      </span>
                     </div>
                   );
                 }
