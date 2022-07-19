@@ -524,3 +524,122 @@ export default useFetchDiffFsData;
 
     // Don't know why the counts are returned in an array
     return { todoCount, doingCount, doneCount };
+
+        <Reorder.Group
+          axis="y"
+          onReorder={setBoards}
+          values={boards || [{ title: "", uid: "", createdAt: "" }]}
+        >
+          {/* Specific Board */}
+          {boards
+            ? boards.map(
+                // ** Re-assign board type later
+                (board: any) => {
+                  return (
+                    <Reorder.Item
+                      key={board.uid}
+                      value={board}
+                      onClick={() => {
+                        setBoardId(board.uid);
+                      }}
+                      className={
+                        board.uid === boardId
+                          ? "board bg-fontTertiary text-fontPrimary rounded-r-full"
+                          : "board"
+                      }
+                    >
+                      <TbLayoutBoardSplit />
+                      <input
+                        className="bg-transparent cursor-pointer outline-none"
+                        type="text"
+                        value={board.title}
+                        // ** Having trouble refactoring the logic in a separate func
+                        onChange={
+                          user
+                            ? // If user is authenticated, update Firestore
+                              (e) => {
+                                updateBoardName(board.uid, e.target.value);
+                                // setLocalStorageBoards(newBoardList);
+                                // setBoardId(board?.id);
+                              }
+                            : // If user is not authenticated, update localStorage
+                              (e) => {
+                                const newBoardList: {}[] = [];
+                                boards.map((b: BoardSchema) => {
+                                  b.uid === board.uid
+                                    ? newBoardList.push({
+                                        ...board,
+                                        title: e.target.value,
+                                      })
+                                    : newBoardList.push(b);
+                                });
+                                localStorage.setItem(
+                                  "boards",
+                                  JSON.stringify(newBoardList)
+                                );
+                                setBoards(newBoardList);
+                                setBoardId(board.uid);
+                              }
+                        }
+                      />
+                    </Reorder.Item>
+                  );
+                }
+              )
+            : "There is nothing bro :(!"}
+        </Reorder.Group>
+
+
+                    <Droppable droppableId={board.uid}
+                      key={board.uid}
+                      onClick={() => {
+                        setBoardId(board.uid);
+                      }}
+                      className={
+                        board.uid === boardId
+                          ? "board bg-fontTertiary text-fontPrimary rounded-r-full"
+                          : "board"
+                      }
+                    >
+                      {(provided, snapshot) => {
+                        return (
+                          <div {...provided.droppableProps} ref={provided.innerRef}>
+
+                          </div>
+                        )
+                      }}
+                      <TbLayoutBoardSplit />
+                      <input
+                        className="bg-transparent cursor-pointer outline-none"
+                        type="text"
+                        value={board.title}
+                        // ** Having trouble refactoring the logic in a separate func
+                        onChange={
+                          user
+                            ? // If user is authenticated, update Firestore
+                              (e) => {
+                                updateBoardName(board.uid, e.target.value);
+                                // setLocalStorageBoards(newBoardList);
+                                // setBoardId(board?.id);
+                              }
+                            : // If user is not authenticated, update localStorage
+                              (e) => {
+                                const newBoardList: {}[] = [];
+                                boards.map((b: BoardSchema) => {
+                                  b.uid === board.uid
+                                    ? newBoardList.push({
+                                        ...board,
+                                        title: e.target.value,
+                                      })
+                                    : newBoardList.push(b);
+                                });
+                                localStorage.setItem(
+                                  "boards",
+                                  JSON.stringify(newBoardList)
+                                );
+                                setBoards(newBoardList);
+                                setBoardId(board.uid);
+                              }
+                        }
+                      />
+                    </Droppable>

@@ -17,6 +17,7 @@ import { auth, db } from "../lib/firebase";
 import { v4 as uuidv4 } from "uuid";
 import useFetchFsBoards from "../lib/hooks/useFetchFsBoards";
 import { motion, Reorder } from "framer-motion";
+import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 
 // type LocalStorageDataProps = {
 //   users: UserProps;
@@ -164,7 +165,11 @@ const SideNav = ({ boards, setBoards, boardId, setBoardId }: SideNavProps) => {
     });
   };
 
-  // console.log("boards:", boards);
+  // const onDragEnd = (result, boards, setBoards) => {
+  //   if (!result.destination) return;
+  //   const {source, destination} = result
+
+  // }
 
   return (
     <nav className="min-w-[250px] bg-darkGray pr-4 py-4 w-1/5 flex flex-col justify-between">
@@ -183,64 +188,102 @@ const SideNav = ({ boards, setBoards, boardId, setBoardId }: SideNavProps) => {
             : "No Boards!"}
         </h3>
         {/* Boards subcontainer */}
-        <Reorder.Group axis="y" onReorder={setBoards} values={boards}>
-          {/* Specific Board */}
-          {boards
-            ? boards.map(
-                // ** Re-assign board type later
-                (board: any) => {
-                  return (
-                    <div
-                      key={board.uid}
-                      onClick={() => {
-                        setBoardId(board.uid);
-                      }}
-                      className={
-                        board.uid === boardId
-                          ? "board bg-fontTertiary text-fontPrimary rounded-r-full"
-                          : "board"
-                      }
-                    >
-                      <TbLayoutBoardSplit />
-                      <input
-                        className="bg-transparent cursor-pointer outline-none"
-                        type="text"
-                        value={board.title}
-                        // ** Having trouble refactoring the logic in a separate func
-                        onChange={
-                          user
-                            ? // If user is authenticated, update Firestore
-                              (e) => {
-                                updateBoardName(board.uid, e.target.value);
-                                // setLocalStorageBoards(newBoardList);
-                                // setBoardId(board?.id);
-                              }
-                            : // If user is not authenticated, update localStorage
-                              (e) => {
-                                const newBoardList: {}[] = [];
-                                boards.map((b: BoardSchema) => {
-                                  b.uid === board.uid
-                                    ? newBoardList.push({
-                                        ...board,
-                                        title: e.target.value,
-                                      })
-                                    : newBoardList.push(b);
-                                });
-                                localStorage.setItem(
-                                  "boards",
-                                  JSON.stringify(newBoardList)
+        <DragDropContext onDragEnd={(result: any) => console.log(result)}>
+          <Droppable droppableId={uuidv4()}>
+            {(provided: any, snapshot: any) => {
+              return (
+                <div {...provided.droppableProps} ref={provided.innerRef}>
+                  {boards
+                    ? boards.map(
+                        // ** Re-assign board type later
+                        (board: any, index: number) => {
+                          return (
+                            <Draggable
+                              key={board.uid}
+                              draggableId={board.uid}
+                              index={index}
+                              // className={
+                              //   board.uid === boardId
+                              //     ? "board bg-fontTertiary text-fontPrimary rounded-r-full"
+                              //     : "board"
+                              // }
+                            >
+                              {(provided: any, snapshot: any) => {
+                                return (
+                                  // Single Board
+                                  <div
+                                    onClick={() => {
+                                      setBoardId(board.uid);
+                                    }}
+                                    ref={provided.innerRef}
+                                    {...provided.draggableProps}
+                                    {...provided.dragHandleProps}
+                                    className={
+                                      board.uid === boardId
+                                        ? snapshot.isDragging
+                                          ? "board bg-gray-400 select-none"
+                                          : "board bg-fontTertiary text-fontPrimary rounded-r-full"
+                                        : "board"
+                                    }
+                                    // className={
+                                    //   snapshot.isDragging
+                                    //     ? "board bg-gray-400 select-none"
+                                    //     : "board bg-transparent select-none"
+                                    // }
+                                    // className={board.uid === boardId && "bg-fontTertiary text-fontPrimary rounded-r-full"}
+                                    // style={{ ...provided.draggableProps.style }}
+                                  >
+                                    <TbLayoutBoardSplit />
+                                    <input
+                                      className="bg-transparent cursor-pointer outline-none"
+                                      type="text"
+                                      value={board.title}
+                                      // ** Having trouble refactoring the logic in a separate func
+                                      onChange={
+                                        user
+                                          ? // If user is authenticated, update Firestore
+                                            (e) => {
+                                              updateBoardName(
+                                                board.uid,
+                                                e.target.value
+                                              );
+                                              // setLocalStorageBoards(newBoardList);
+                                              // setBoardId(board?.id);
+                                            }
+                                          : // If user is not authenticated, update localStorage
+                                            (e) => {
+                                              const newBoardList: {}[] = [];
+                                              boards.map((b: BoardSchema) => {
+                                                b.uid === board.uid
+                                                  ? newBoardList.push({
+                                                      ...board,
+                                                      title: e.target.value,
+                                                    })
+                                                  : newBoardList.push(b);
+                                              });
+                                              localStorage.setItem(
+                                                "boards",
+                                                JSON.stringify(newBoardList)
+                                              );
+                                              setBoards(newBoardList);
+                                              setBoardId(board.uid);
+                                            }
+                                      }
+                                    />
+                                  </div>
                                 );
-                                setBoards(newBoardList);
-                                setBoardId(board.uid);
-                              }
+                              }}
+                            </Draggable>
+                          );
                         }
-                      />
-                    </div>
-                  );
-                }
-              )
-            : "There is nothing bro :(!"}
-        </Reorder.Group>
+                      )
+                    : "There is nothing bro :(!"}
+                  {provided.placeholder}
+                </div>
+              );
+            }}
+          </Droppable>
+        </DragDropContext>
         {/* Create new Board container */}
         <div className="pl-4 flex justify-start items-center gap-3 py-1 text-fontTertiary cursor-pointer hover:bg-fontPrimary hover:text-fontTertiary hover:rounded-r-full">
           <TbLayoutBoardSplit />

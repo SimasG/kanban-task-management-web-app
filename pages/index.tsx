@@ -121,17 +121,7 @@ const Home: NextPage = () => {
     task.status === "done" && doneCount++;
   });
 
-  let total = 0;
-  let checked = 0;
-  let unchecked = 0;
-
-  tasks?.[0]?.subtasks?.map((subtask: any) => {
-    console.log("subtask:", subtask);
-    total++;
-    subtask.checked === true ? checked++ : unchecked++;
-  });
-
-  // console.log("total:", total, "checked:", checked, "unchecked", unchecked);
+  // console.log("tasks:", tasks);
 
   return (
     <div
