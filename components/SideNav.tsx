@@ -165,11 +165,29 @@ const SideNav = ({ boards, setBoards, boardId, setBoardId }: SideNavProps) => {
     });
   };
 
-  // const onDragEnd = (result, boards, setBoards) => {
-  //   if (!result.destination) return;
-  //   const {source, destination} = result
+  const onDragEnd = (result: any, boards: any) => {
+    const { source, destination, draggableId } = result;
+    if (!result.destination) return;
+    if (
+      destination.droppableId === source.droppableId &&
+      destination.index === destination.index
+    )
+      return;
 
-  // }
+    // Iffy line
+    const board = boards[source.droppableId];
+  };
+
+  // console.log("boards:", boards);
+
+  // const createNewBoards = () => {
+  //   let newBoards = {};
+  //   boards?.map((board: any) => {
+  //     console.log(board);
+  //   });
+  // };
+
+  // createNewBoards();
 
   return (
     <nav className="min-w-[250px] bg-darkGray pr-4 py-4 w-1/5 flex flex-col justify-between">
@@ -192,6 +210,7 @@ const SideNav = ({ boards, setBoards, boardId, setBoardId }: SideNavProps) => {
           <Droppable droppableId={uuidv4()}>
             {(provided: any, snapshot: any) => {
               return (
+                // ref allows react-beautiful-dnd to control the div
                 <div {...provided.droppableProps} ref={provided.innerRef}>
                   {boards
                     ? boards.map(
@@ -202,11 +221,6 @@ const SideNav = ({ boards, setBoards, boardId, setBoardId }: SideNavProps) => {
                               key={board.uid}
                               draggableId={board.uid}
                               index={index}
-                              // className={
-                              //   board.uid === boardId
-                              //     ? "board bg-fontTertiary text-fontPrimary rounded-r-full"
-                              //     : "board"
-                              // }
                             >
                               {(provided: any, snapshot: any) => {
                                 return (
@@ -221,17 +235,10 @@ const SideNav = ({ boards, setBoards, boardId, setBoardId }: SideNavProps) => {
                                     className={
                                       board.uid === boardId
                                         ? snapshot.isDragging
-                                          ? "board bg-gray-400 select-none"
+                                          ? "board bg-fontTertiary bg-opacity-60 select-none text-fontPrimary rounded-r-full"
                                           : "board bg-fontTertiary text-fontPrimary rounded-r-full"
-                                        : "board"
+                                        : "board active:bg-fontTertiary active:bg-opacity-60 active:text-fontPrimary rounded-r-full"
                                     }
-                                    // className={
-                                    //   snapshot.isDragging
-                                    //     ? "board bg-gray-400 select-none"
-                                    //     : "board bg-transparent select-none"
-                                    // }
-                                    // className={board.uid === boardId && "bg-fontTertiary text-fontPrimary rounded-r-full"}
-                                    // style={{ ...provided.draggableProps.style }}
                                   >
                                     <TbLayoutBoardSplit />
                                     <input
