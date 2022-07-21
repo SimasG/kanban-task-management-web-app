@@ -1,4 +1,4 @@
-import { collection, orderBy, query } from "firebase/firestore";
+import { collection, orderBy, query, where } from "firebase/firestore";
 import { useCollectionData } from "react-firebase-hooks/firestore";
 import { db } from "../firebase";
 
@@ -14,10 +14,10 @@ const useFetchFsTasks = (
     `${boardId}`,
     "tasks"
   );
-  const q = query(tasksCollectionRef);
+  const q = query(tasksCollectionRef, orderBy("status", "asc"));
 
-  // const data = useCollectionData(collection(db, "users", `${uid}`, "boards"));
   const data = useCollectionData(q);
+  // console.log(data);
 
   // Why am I not receiving the array of data I want to fetch immediately
   // (aka why do I have to manually access the first array element to access the desired data)?

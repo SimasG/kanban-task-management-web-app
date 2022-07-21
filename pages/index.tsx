@@ -22,6 +22,7 @@ import { UserContext } from "../lib/context";
 import { db } from "../lib/firebase";
 import useFetchFsBoards from "../lib/hooks/useFetchFsBoards";
 import useFetchFsTasks from "../lib/hooks/useFetchFsTasks";
+import useFetchFsTasksTest from "../lib/hooks/useFetchFsTasksTest";
 
 // type LocalStorageBoardSchema = {
 //   boards: {
@@ -41,7 +42,7 @@ type BoardSchema = {
 const Home: NextPage = () => {
   const user = useContext(UserContext);
   // Fetching all Boards
-  const firestoreData = useFetchFsBoards(user?.uid);
+  const fsBoards = useFetchFsBoards(user?.uid);
 
   // States
   // ** Main State
@@ -49,10 +50,15 @@ const Home: NextPage = () => {
     // ** Change "any" later -> change it once the data schema is more clear
     BoardSchema[] | null | any
   >(null);
+  const [tasks, setTasks] = useState<any>(null);
   const [showAddTaskModal, setShowAddTaskModal] = useState(false);
   const [showEditTaskModal, setShowEditTaskModal] = useState(false);
   const [boardId, setBoardId] = useState<string | null | undefined>(null);
   const [taskId, setTaskId] = useState<string | null | undefined>(null);
+
+  // Fetching all Tasks of selected Board
+  const fsTasks = useFetchFsTasks(user?.uid, boardId);
+  const testFsTasks = useFetchFsTasksTest(user?.uid, boardId);
 
   // Setting main state either from localStorage or Firestore
   useEffect(() => {
@@ -65,16 +71,15 @@ const Home: NextPage = () => {
       return;
     } else {
       // Ensuring that I only set the main state from Firestore once the data has been fetched (async protection)
-      if (!firestoreData) return;
-      setBoards(firestoreData);
-      if (activeBoard === undefined && firestoreData?.length !== 0) {
-        setBoardId(firestoreData?.[0]?.id);
+      if (!fsBoards) return;
+      setBoards(fsBoards);
+      if (activeBoard === undefined && fsBoards?.length !== 0) {
+        setBoardId(fsBoards?.[0]?.id);
       }
+      if (!testFsTasks) return;
+      setTasks(testFsTasks);
     }
-  }, [firestoreData, user]);
-
-  // Fetching all Tasks of selected Board
-  const tasks = useFetchFsTasks(user?.uid, boardId);
+  }, [fsBoards, fsTasks, user]);
 
   const activeBoard = boards?.filter(
     (board: BoardSchema) => board.uid === boardId
@@ -130,10 +135,22 @@ const Home: NextPage = () => {
   });
 
   const onDragEnd = (result: DropResult) => {
-    console.log(result);
-  };
+    const { source, destination } = result;
+    // if (!destination) return;
 
-  // console.log("tasks:", tasks);
+    // if (
+    //   destination.droppableId === source.droppableId &&
+    //   destination.index === source.index
+    // )
+    //   return;
+
+    console.log("onDragEnd ran", result);
+
+    let add;
+
+    if (source.droppableId === "todoList") {
+    }
+  };
 
   return (
     <div
@@ -282,6 +299,7 @@ const Home: NextPage = () => {
                           );
                         }
                       })}
+                      {provided.placeholder}
                     </div>
                   );
                 }}
@@ -348,6 +366,7 @@ const Home: NextPage = () => {
                           );
                         }
                       })}
+                      {provided.placeholder}
                     </div>
                   );
                 }}
@@ -414,6 +433,7 @@ const Home: NextPage = () => {
                           );
                         }
                       })}
+                      {provided.placeholder}
                     </div>
                   );
                 }}
