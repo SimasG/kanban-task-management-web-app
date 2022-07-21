@@ -17,7 +17,14 @@ import { auth, db } from "../lib/firebase";
 import { v4 as uuidv4 } from "uuid";
 import useFetchFsBoards from "../lib/hooks/useFetchFsBoards";
 import { motion, Reorder } from "framer-motion";
-import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
+import {
+  DragDropContext,
+  Draggable,
+  Droppable,
+  DroppableProvided,
+  DropResult,
+  ResponderProvided,
+} from "react-beautiful-dnd";
 
 // type LocalStorageDataProps = {
 //   users: UserProps;
@@ -165,29 +172,30 @@ const SideNav = ({ boards, setBoards, boardId, setBoardId }: SideNavProps) => {
     });
   };
 
-  const onDragEnd = (result: any, boards: any) => {
+  const onDragEnd = (result: DropResult) => {
     const { source, destination, draggableId } = result;
-    if (!result.destination) return;
+    if (!destination) return;
     if (
-      destination.droppableId === source.droppableId &&
-      destination.index === destination.index
+      // ** this condition is only required for multi-column dnd
+      //  destination.droppableId === source.droppableId &&
+      destination.index === source.index
     )
       return;
 
-    // Iffy line
-    const board = boards[source.droppableId];
+    let add;
+    let newBoards = boards;
+
+    add = newBoards[source.index];
+
+    // Removing Board from the array at source.index
+    newBoards.splice(source.index, 1);
+
+    // Adding the same Board in the array at destination.index
+    newBoards.splice(destination.index, 0, add);
+
+    // Changing the main Boards state
+    setBoards(newBoards);
   };
-
-  // console.log("boards:", boards);
-
-  // const createNewBoards = () => {
-  //   let newBoards = {};
-  //   boards?.map((board: any) => {
-  //     console.log(board);
-  //   });
-  // };
-
-  // createNewBoards();
 
   return (
     <nav className="min-w-[250px] bg-darkGray pr-4 py-4 w-1/5 flex flex-col justify-between">
@@ -206,9 +214,9 @@ const SideNav = ({ boards, setBoards, boardId, setBoardId }: SideNavProps) => {
             : "No Boards!"}
         </h3>
         {/* Boards subcontainer */}
-        <DragDropContext onDragEnd={(result: any) => console.log(result)}>
-          <Droppable droppableId={uuidv4()}>
-            {(provided: any, snapshot: any) => {
+        <DragDropContext onDragEnd={onDragEnd}>
+          <Droppable droppableId="boardsSideNav">
+            {(provided: DroppableProvided, snapshot: any) => {
               return (
                 // ref allows react-beautiful-dnd to control the div
                 <div {...provided.droppableProps} ref={provided.innerRef}>
@@ -232,13 +240,13 @@ const SideNav = ({ boards, setBoards, boardId, setBoardId }: SideNavProps) => {
                                     ref={provided.innerRef}
                                     {...provided.draggableProps}
                                     {...provided.dragHandleProps}
-                                    className={
+                                    className={`board rounded-r-full ${
                                       board.uid === boardId
                                         ? snapshot.isDragging
-                                          ? "board bg-fontTertiary bg-opacity-60 select-none text-fontPrimary rounded-r-full"
-                                          : "board bg-fontTertiary text-fontPrimary rounded-r-full"
-                                        : "board active:bg-fontTertiary active:bg-opacity-60 active:text-fontPrimary rounded-r-full"
-                                    }
+                                          ? " bg-fontTertiary bg-opacity-60 select-none text-fontPrimary"
+                                          : " bg-fontTertiary text-fontPrimary opacity-100"
+                                        : " active:bg-fontTertiary active:bg-opacity-60 active:text-fontPrimary"
+                                    }}`}
                                   >
                                     <TbLayoutBoardSplit />
                                     <input
