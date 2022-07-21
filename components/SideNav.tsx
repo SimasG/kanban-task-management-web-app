@@ -20,6 +20,7 @@ import { motion, Reorder } from "framer-motion";
 import {
   DragDropContext,
   Draggable,
+  DraggableProvided,
   Droppable,
   DroppableProvided,
   DropResult,
@@ -230,7 +231,7 @@ const SideNav = ({ boards, setBoards, boardId, setBoardId }: SideNavProps) => {
                               draggableId={board.uid}
                               index={index}
                             >
-                              {(provided: any, snapshot: any) => {
+                              {(provided: DraggableProvided, snapshot: any) => {
                                 return (
                                   // Single Board
                                   <div

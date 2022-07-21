@@ -7,6 +7,14 @@ import {
 } from "firebase/firestore";
 import type { NextPage } from "next";
 import React, { useContext, useEffect, useState } from "react";
+import {
+  DragDropContext,
+  Draggable,
+  DraggableProvided,
+  Droppable,
+  DroppableProvided,
+  DropResult,
+} from "react-beautiful-dnd";
 import AddNewTaskModal from "../components/AddNewTaskModal";
 import EditTaskModal from "../components/EditTaskModal";
 import SideNav from "../components/SideNav";
@@ -121,6 +129,10 @@ const Home: NextPage = () => {
     task.status === "done" && doneCount++;
   });
 
+  const onDragEnd = (result: DropResult) => {
+    console.log(result);
+  };
+
   // console.log("tasks:", tasks);
 
   return (
@@ -204,134 +216,217 @@ const Home: NextPage = () => {
           </div>
         </section>
         {/* Main content */}
-        <section className="h-[90%] bg-darkBlue p-5 flex justify-start items-start gap-6 overflow-x-auto overflow-hidden">
-          {/* First Column */}
-          <div className="min-w-[250px] max-w-[350px]">
-            {/* Column Title Container */}
-            <div className="flex justify-start items-center gap-2 mb-6 text-sm">
-              {/* Colorful circle */}
-              <div className="h-4 w-4 bg-todoColors-brightBlue rounded-full"></div>
-              {/* Column Title */}
-              <h3 className="uppercase text-fontSecondary font-bold">
-                Todo ({todoCount})
-              </h3>
-            </div>
-            {/* Task Container */}
-            <div className="flex flex-col justify-start items-center gap-4">
-              {tasks?.map((task: any) => {
-                if (task.status === "todo") {
-                  // Number of checked subtasks
-                  let checkedNumber = 0;
-                  task.subtasks.map((subtask: any) => {
-                    subtask.checked && checkedNumber++;
-                  });
+        <DragDropContext onDragEnd={onDragEnd}>
+          <section className="h-[90%] bg-darkBlue p-5 flex justify-start items-start gap-6 overflow-x-auto overflow-hidden">
+            {/* First Column */}
+            <div className="min-w-[250px] max-w-[350px]">
+              {/* Column Title Container */}
+              <div className="flex justify-start items-center gap-2 mb-6 text-sm">
+                {/* Colorful circle */}
+                <div className="h-4 w-4 bg-todoColors-brightBlue rounded-full"></div>
+                {/* Column Title */}
+                <h3 className="uppercase text-fontSecondary font-bold">
+                  Todo ({todoCount})
+                </h3>
+              </div>
+              {/* Task Container */}
+              <Droppable droppableId="todoList">
+                {/* Are we using the render props pattern to display the Droppable component 
+                because that's the ideal way to access Droppable's props (provided & snapshot)? */}
+                {(provided: DroppableProvided, snapshot: any) => {
                   return (
+                    // "ref" allows the Droppable component to control its children components/tags
                     <div
-                      onClick={(e) => {
-                        setTaskId(task?.uid);
-                        e.stopPropagation();
-                        setShowEditTaskModal(true);
-                      }}
-                      className="task"
-                      key={task?.id}
+                      {...provided.droppableProps}
+                      ref={provided.innerRef}
+                      className="flex flex-col justify-start items-center gap-4"
                     >
-                      <h2 className="task-title">{task?.title}</h2>
-                      <span className="task-body">
-                        {checkedNumber} of {task.subtasks.length} subtasks
-                      </span>
+                      {tasks?.map((task: any, index: number) => {
+                        if (task.status === "todo") {
+                          // Number of checked subtasks
+                          let checkedNumber = 0;
+                          task.subtasks.map((subtask: any) => {
+                            subtask.checked && checkedNumber++;
+                          });
+                          return (
+                            <Draggable
+                              key={task.uid}
+                              draggableId={task.uid}
+                              index={index}
+                            >
+                              {(provided: DraggableProvided, snapshot: any) => {
+                                return (
+                                  <div
+                                    onClick={(e) => {
+                                      setTaskId(task?.uid);
+                                      e.stopPropagation();
+                                      setShowEditTaskModal(true);
+                                    }}
+                                    className="task"
+                                    key={task?.uid}
+                                    ref={provided.innerRef}
+                                    {...provided.draggableProps}
+                                    {...provided.dragHandleProps}
+                                  >
+                                    <h2 className="task-title">
+                                      {task?.title}
+                                    </h2>
+                                    <span className="task-body">
+                                      {checkedNumber} of {task.subtasks.length}{" "}
+                                      subtasks
+                                    </span>
+                                  </div>
+                                );
+                              }}
+                            </Draggable>
+                          );
+                        }
+                      })}
                     </div>
                   );
-                }
-              })}
+                }}
+              </Droppable>
             </div>
-          </div>
-          {/* Second Column */}
-          <div className="min-w-[250px] max-w-[350px]">
-            {/* Column Title Container */}
-            <div className="flex justify-start items-center gap-2 mb-6 text-sm">
-              {/* Colorful circle */}
-              <div className="h-4 w-4 bg-todoColors-violet rounded-full"></div>
-              {/* Column Title */}
-              <h3 className="uppercase text-fontSecondary font-bold">
-                Doing ({doingCount})
-              </h3>
-            </div>
-            {/* Task Container */}
-            <div className="flex flex-col justify-start items-center gap-4">
-              {tasks?.map((task: any) => {
-                if (task.status === "doing") {
-                  // Number of checked subtasks
-                  let checkedNumber = 0;
-                  task.subtasks.map((subtask: any) => {
-                    subtask.checked && checkedNumber++;
-                  });
+            {/* Second Column */}
+            <div className="min-w-[250px] max-w-[350px]">
+              {/* Column Title Container */}
+              <div className="flex justify-start items-center gap-2 mb-6 text-sm">
+                {/* Colorful circle */}
+                <div className="h-4 w-4 bg-todoColors-violet rounded-full"></div>
+                {/* Column Title */}
+                <h3 className="uppercase text-fontSecondary font-bold">
+                  Doing ({doingCount})
+                </h3>
+              </div>
+              {/* Task Container */}
+              <Droppable droppableId="doingList">
+                {(provided: DroppableProvided, snapshot: any) => {
                   return (
                     <div
-                      onClick={(e) => {
-                        setTaskId(task?.uid);
-                        e.stopPropagation();
-                        setShowEditTaskModal(true);
-                      }}
-                      className="task"
-                      key={task?.id}
+                      {...provided.droppableProps}
+                      ref={provided.innerRef}
+                      className="flex flex-col justify-start items-center gap-4"
                     >
-                      <h2 className="task-title">{task?.title}</h2>
-                      <span className="task-body">
-                        {checkedNumber} of {task.subtasks.length} subtasks
-                      </span>
+                      {tasks?.map((task: any, index: number) => {
+                        if (task.status === "doing") {
+                          // Number of checked subtasks
+                          let checkedNumber = 0;
+                          task.subtasks.map((subtask: any) => {
+                            subtask.checked && checkedNumber++;
+                          });
+                          return (
+                            <Draggable
+                              draggableId={task.uid}
+                              key={task.uid}
+                              index={index}
+                            >
+                              {(provided: DraggableProvided, snapshot: any) => {
+                                return (
+                                  <div
+                                    onClick={(e) => {
+                                      setTaskId(task?.uid);
+                                      e.stopPropagation();
+                                      setShowEditTaskModal(true);
+                                    }}
+                                    className="task"
+                                    key={task?.uid}
+                                    ref={provided.innerRef}
+                                    {...provided.draggableProps}
+                                    {...provided.dragHandleProps}
+                                  >
+                                    <h2 className="task-title">
+                                      {task?.title}
+                                    </h2>
+                                    <span className="task-body">
+                                      {checkedNumber} of {task.subtasks.length}{" "}
+                                      subtasks
+                                    </span>
+                                  </div>
+                                );
+                              }}
+                            </Draggable>
+                          );
+                        }
+                      })}
                     </div>
                   );
-                }
-              })}
+                }}
+              </Droppable>
             </div>
-          </div>
-          {/* Third Column */}
-          <div className="min-w-[250px] max-w-[350px]">
-            {/* Column Title Container */}
-            <div className="flex justify-start items-center gap-2 mb-6 text-sm">
-              {/* Colorful circle */}
-              <div className="h-4 w-4 bg-todoColors-brightGreen rounded-full"></div>
-              {/* Column Title */}
-              <h3 className="uppercase text-fontSecondary font-bold">
-                Done ({doneCount})
-              </h3>
-            </div>
-            {/* Task Container */}
-            <div className="flex flex-col justify-start items-center gap-4">
-              {tasks?.map((task: any) => {
-                if (task.status === "done") {
-                  // Number of checked subtasks
-                  let checkedNumber = 0;
-                  task.subtasks.map((subtask: any) => {
-                    subtask.checked && checkedNumber++;
-                  });
+            {/* Third Column */}
+            <div className="min-w-[250px] max-w-[350px]">
+              {/* Column Title Container */}
+              <div className="flex justify-start items-center gap-2 mb-6 text-sm">
+                {/* Colorful circle */}
+                <div className="h-4 w-4 bg-todoColors-brightGreen rounded-full"></div>
+                {/* Column Title */}
+                <h3 className="uppercase text-fontSecondary font-bold">
+                  Done ({doneCount})
+                </h3>
+              </div>
+              {/* Task Container */}
+              <Droppable droppableId="doneList">
+                {(provided: DroppableProvided, snapshot: any) => {
                   return (
                     <div
-                      onClick={(e) => {
-                        setTaskId(task?.uid);
-                        e.stopPropagation();
-                        setShowEditTaskModal(true);
-                      }}
-                      className="task"
-                      key={task?.id}
+                      {...provided.droppableProps}
+                      ref={provided.innerRef}
+                      className="flex flex-col justify-start items-center gap-4"
                     >
-                      <h2 className="task-title">{task?.title}</h2>
-                      <span className="task-body">
-                        {checkedNumber} of {task.subtasks.length} subtasks
-                      </span>
+                      {tasks?.map((task: any, index: number) => {
+                        if (task.status === "done") {
+                          // Number of checked subtasks
+                          let checkedNumber = 0;
+                          task.subtasks.map((subtask: any) => {
+                            subtask.checked && checkedNumber++;
+                          });
+                          return (
+                            <Draggable
+                              draggableId={task.uid}
+                              key={task.uid}
+                              index={index}
+                            >
+                              {(provided: DraggableProvided, snapshot: any) => {
+                                return (
+                                  <div
+                                    onClick={(e) => {
+                                      setTaskId(task?.uid);
+                                      e.stopPropagation();
+                                      setShowEditTaskModal(true);
+                                    }}
+                                    className="task"
+                                    key={task?.uid}
+                                    ref={provided.innerRef}
+                                    {...provided.draggableProps}
+                                    {...provided.dragHandleProps}
+                                  >
+                                    <h2 className="task-title">
+                                      {task?.title}
+                                    </h2>
+                                    <span className="task-body">
+                                      {checkedNumber} of {task.subtasks.length}{" "}
+                                      subtasks
+                                    </span>
+                                  </div>
+                                );
+                              }}
+                            </Draggable>
+                          );
+                        }
+                      })}
                     </div>
                   );
-                }
-              })}
+                }}
+              </Droppable>
             </div>
-          </div>
-          {/* Add New Column btn */}
-          <div className="min-w-[250px] bg-veryDarkGray mt-11 h-5/6 flex justify-center items-center cursor-pointer rounded-md hover:bg-opacity-50">
-            <h2 className="mb-56 text-2xl text-fontSecondary font-bold">
-              + New Column
-            </h2>
-          </div>
-        </section>
+            {/* Add New Column btn */}
+            <div className="min-w-[250px] bg-veryDarkGray mt-11 h-5/6 flex justify-center items-center cursor-pointer rounded-md hover:bg-opacity-50">
+              <h2 className="mb-56 text-2xl text-fontSecondary font-bold">
+                + New Column
+              </h2>
+            </div>
+          </section>
+        </DragDropContext>
       </main>
       {showAddTaskModal && (
         <AddNewTaskModal
