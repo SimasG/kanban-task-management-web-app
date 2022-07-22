@@ -643,3 +643,54 @@ export default useFetchDiffFsData;
                         }
                       />
                     </Droppable>
+
+        {boards
+          ? boards.map((board: any) => {
+              return (
+                <div key={board.uid}>
+                  {" "}
+                  <div
+                    onClick={() => {
+                      setBoardId(board.uid);
+                    }}
+                    className="board rounded-r-full"
+                  >
+                    <TbLayoutBoardSplit />
+                    <input
+                      className="bg-transparent cursor-pointer outline-none"
+                      type="text"
+                      value={board.title}
+                      // ** Having trouble refactoring the logic in a separate func
+                      onChange={
+                        user
+                          ? // If user is authenticated, update Firestore
+                            (e) => {
+                              updateBoardName(board.uid, e.target.value);
+                              // setLocalStorageBoards(newBoardList);
+                              // setBoardId(board?.id);
+                            }
+                          : // If user is not authenticated, update localStorage
+                            (e) => {
+                              const newBoardList: {}[] = [];
+                              boards.map((b: BoardSchema) => {
+                                b.uid === board.uid
+                                  ? newBoardList.push({
+                                      ...board,
+                                      title: e.target.value,
+                                    })
+                                  : newBoardList.push(b);
+                              });
+                              localStorage.setItem(
+                                "boards",
+                                JSON.stringify(newBoardList)
+                              );
+                              setBoards(newBoardList);
+                              setBoardId(board.uid);
+                            }
+                      }
+                    />
+                  </div>
+                </div>
+              );
+            })
+          : "There is nothing bro :(!"}

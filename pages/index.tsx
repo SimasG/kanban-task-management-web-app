@@ -51,6 +51,10 @@ const Home: NextPage = () => {
     BoardSchema[] | null | any
   >(null);
   const [tasks, setTasks] = useState<any>(null);
+  const [todoTasks, setTodoTasks] = useState<any>(null);
+  const [doingTasks, setDoingTasks] = useState<any>(null);
+  const [doneTasks, setDoneTasks] = useState<any>(null);
+
   const [showAddTaskModal, setShowAddTaskModal] = useState(false);
   const [showEditTaskModal, setShowEditTaskModal] = useState(false);
   const [boardId, setBoardId] = useState<string | null | undefined>(null);
@@ -62,6 +66,11 @@ const Home: NextPage = () => {
 
   // console.log("testFsTasks:", testFsTasks);
   // console.log("tasks:", tasks);
+
+  // Separating Tasks array into arrays of Tasks for different columns -> to ensure each column's Tasks are zero-indexed
+  const todoTasksArray = fsTasks?.filter((task: any) => task?.status === "1");
+  const doingTasksArray = fsTasks?.filter((task: any) => task?.status === "2");
+  const doneTasksArray = fsTasks?.filter((task: any) => task?.status === "3");
 
   // Setting main state either from localStorage or Firestore
   useEffect(() => {
@@ -81,6 +90,9 @@ const Home: NextPage = () => {
       }
       if (!fsTasks) return;
       setTasks(fsTasks);
+      setTodoTasks(todoTasksArray);
+      setDoingTasks(doingTasksArray);
+      setDoneTasks(doneTasksArray);
     }
   }, [fsBoards, fsTasks, user]);
 
@@ -137,28 +149,67 @@ const Home: NextPage = () => {
     task.status === "3" && doneCount++;
   });
 
-  // Separating Tasks array into arrays of Tasks for different columns -> to ensure each column's Tasks are zero-indexed
-  const todoTasks = tasks.filter((task: any) => task?.status === "1");
-  const doingTasks = tasks.filter((task: any) => task?.status === "2");
-  const doneTasks = tasks.filter((task: any) => task?.status === "3");
-
   const onDragEnd = (result: DropResult) => {
     const { source, destination } = result;
-    // if (!destination) return;
+    if (!destination) return;
 
-    // if (
-    //   destination.droppableId === source.droppableId &&
-    //   destination.index === source.index
-    // )
-    //   return;
+    if (
+      destination.droppableId === source.droppableId &&
+      destination.index === source.index
+    )
+      return;
 
     console.log("onDragEnd ran", result);
 
     let add;
+    let todos = todoTasks;
+    let doings = doingTasks;
+    let dones = doneTasks;
 
-    // if (source.droppableId === "todoList") {
-    // }
+    if (source.droppableId === "todoList") {
+      add = todos[source.index];
+      todos.splice(source.index, 1);
+    } else if (source.droppableId === "doingList") {
+      add = doings[source.index];
+      doings.splice(source.index, 1);
+    } else if (source.droppableId === "doneList") {
+      add = dones[source.index];
+      dones.splice(source.index, 1);
+    }
+
+    if (destination.droppableId === "todoList") {
+      todos.splice(destination.index, 0, add);
+    } else if (destination.droppableId === "doingList") {
+      doings.splice(destination.index, 0, add);
+    } else if (destination.droppableId === "doneList") {
+      dones.splice(destination.index, 0, add);
+    }
+
+    // console.log("todos[source.index].uid:", todos[source.index].uid);
+    // console.log("doings[source.index]:", doings[source.index]);
+
+    setTodoTasks(todos);
+    setDoingTasks(doings);
+    setDoneTasks(dones);
   };
+
+  // const updateTask = async (updatedTaskId: string) => {
+  // const taskDocRef = doc(
+  //   db,
+  //   "users",
+  //   `${user?.uid}`,
+  //   "boards",
+  //   `${boardId}`,
+  //   "tasks",
+  //   `${taskId}`
+  // );
+
+  // await setDoc(taskDocRef, {
+  //   // Using type guard to ensure that we're always spreading an object
+  //   ...(typeof values === "object" ? values : {}),
+  //   updatedAt: Timestamp.fromDate(new Date()),
+  // });
+  // }
 
   return (
     <div
@@ -166,7 +217,7 @@ const Home: NextPage = () => {
         setShowAddTaskModal(false);
         setShowEditTaskModal(false);
       }}
-      className="flex justify-center text-white h-screen overflow-x-hidden"
+      className="flex justify-center text-white h-screen overflow-auto"
     >
       <SideNav
         boards={boards}
@@ -242,7 +293,8 @@ const Home: NextPage = () => {
         </section>
         {/* Main content */}
         <DragDropContext onDragEnd={onDragEnd}>
-          <section className="h-[90%] bg-darkBlue p-5 flex justify-start items-start gap-6 overflow-x-auto overflow-hidden">
+          {/* overflow-x-auto overflow-hidden */}
+          <section className="h-[90%] bg-darkBlue p-5 flex justify-start items-start gap-6 ">
             {/* First Column */}
             <div className="min-w-[250px] max-w-[350px]">
               {/* Column Title Container */}
