@@ -2,13 +2,23 @@ import { Formik } from "formik";
 import * as Yup from "yup";
 import { v4 as uuidv4 } from "uuid";
 import FormikForm from "./form/FormikForm";
+import { DocumentData } from "firebase/firestore";
 
 type IndexProps = {
   boardId: string | null | undefined;
   setShowAddTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
+  todoTasksArray: DocumentData[] | undefined;
+  doingTasksArray: DocumentData[] | undefined;
+  doneTasksArray: DocumentData[] | undefined;
 };
 
-const AddNewTaskModal = ({ boardId, setShowAddTaskModal }: IndexProps) => {
+const AddNewTaskModal = ({
+  boardId,
+  setShowAddTaskModal,
+  todoTasksArray,
+  doingTasksArray,
+  doneTasksArray,
+}: IndexProps) => {
   type initialValuesProps = {
     title: string;
     description?: string;
@@ -52,6 +62,9 @@ const AddNewTaskModal = ({ boardId, setShowAddTaskModal }: IndexProps) => {
           <FormikForm
             boardId={boardId}
             setShowAddTaskModal={setShowAddTaskModal}
+            todoTasksArray={todoTasksArray}
+            doingTasksArray={doingTasksArray}
+            doneTasksArray={doneTasksArray}
           />
         );
       }}

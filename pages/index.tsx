@@ -74,6 +74,12 @@ const Home: NextPage = () => {
   const doingTasksArray = fsTasks?.filter((task: any) => task?.status === "2");
   const doneTasksArray = fsTasks?.filter((task: any) => task?.status === "3");
 
+  // console.log("todoTasksArray?.length:", todoTasksArray?.length);
+
+  let todos = todoTasks;
+  let doings = doingTasks;
+  let dones = doneTasks;
+
   // Setting main state either from localStorage or Firestore
   useEffect(() => {
     if (!user) {
@@ -94,11 +100,23 @@ const Home: NextPage = () => {
       setTasks(fsTasks);
       // By default set the state of Tasks via todos/doings/dones because they're automatically sorted
       // in the correct order. Use todoTasksArray/etc only for the initial state load.
-      setTodoTasks(todos || todoTasksArray);
-      setDoingTasks(doings || doingTasksArray);
-      setDoneTasks(dones || doneTasksArray);
+      setTodoTasks(todoTasksArray);
+      setDoingTasks(doingTasksArray);
+      setDoneTasks(doneTasksArray);
     }
   }, [fsBoards, fsTasks, user]);
+
+  // console.log("todoTasks:", todoTasks);
+  // console.log("doingTasks:", doingTasks);
+  // console.log("doneTasks:", doneTasks);
+
+  // console.log("todos:", todos);
+  // console.log("doings:", doings);
+  // console.log("dones:", dones);
+
+  // console.log("todoTasksArray:", todoTasksArray);
+  // console.log("doingTasksArray:", doingTasksArray);
+  // console.log("doneTasksArray:", doneTasksArray);
 
   const activeBoard = boards?.filter(
     (board: BoardSchema) => board.uid === boardId
@@ -152,10 +170,6 @@ const Home: NextPage = () => {
     task.status === "2" && doingCount++;
     task.status === "3" && doneCount++;
   });
-
-  let todos = todoTasks;
-  let doings = doingTasks;
-  let dones = doneTasks;
 
   const onDragEnd = (result: DropResult) => {
     const { source, destination } = result;
@@ -516,6 +530,9 @@ const Home: NextPage = () => {
         <AddNewTaskModal
           boardId={boardId}
           setShowAddTaskModal={setShowAddTaskModal}
+          todoTasksArray={todoTasksArray}
+          doingTasksArray={doingTasksArray}
+          doneTasksArray={doneTasksArray}
         />
       )}
       {showEditTaskModal && (

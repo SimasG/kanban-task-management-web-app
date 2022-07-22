@@ -7,7 +7,7 @@ import {
 } from "formik";
 import FormikControl from "./FormikControl";
 import { v4 as uuidv4 } from "uuid";
-import { doc, setDoc, Timestamp } from "firebase/firestore";
+import { doc, DocumentData, setDoc, Timestamp } from "firebase/firestore";
 import { db } from "../../lib/firebase";
 import { useContext } from "react";
 import { UserContext } from "../../lib/context";
@@ -16,9 +16,18 @@ import toast from "react-hot-toast";
 type IndexProps = {
   boardId: string | null | undefined;
   setShowAddTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
+  todoTasksArray: DocumentData[] | undefined;
+  doingTasksArray: DocumentData[] | undefined;
+  doneTasksArray: DocumentData[] | undefined;
 };
 
-const FormikForm = ({ boardId, setShowAddTaskModal }: IndexProps) => {
+const FormikForm = ({
+  boardId,
+  setShowAddTaskModal,
+  todoTasksArray,
+  doingTasksArray,
+  doneTasksArray,
+}: IndexProps) => {
   const user = useContext(UserContext);
 
   const dropdownOptions = [
@@ -33,28 +42,35 @@ const FormikForm = ({ boardId, setShowAddTaskModal }: IndexProps) => {
   const { values, setSubmitting, resetForm } = formik;
 
   const handleSubmit = async () => {
-    setSubmitting(true);
-    const uid = uuidv4();
-    const taskDocRef = doc(
-      db,
-      "users",
-      `${user?.uid}`,
-      "boards",
-      `${boardId}`,
-      "tasks",
-      uid
-    );
+    console.log("fake submitted bishh");
+    console.log("values:", values);
 
-    await setDoc(taskDocRef, {
-      // Using type guard to ensure that we're always spreading an object
-      ...(typeof values === "object" ? values : {}),
-      uid: uid,
-      updatedAt: Timestamp.fromDate(new Date()),
-    });
-    toast.success("New Task Created");
-    setSubmitting(false);
-    resetForm();
-    setShowAddTaskModal(false);
+    console.log("todoTasksArray?.length:", todoTasksArray?.length);
+    console.log("doingTasksArray?.length:", doingTasksArray?.length);
+    console.log("doneTasksArray?.length:", doneTasksArray?.length);
+
+    // setSubmitting(true);
+    // const uid = uuidv4();
+    // const taskDocRef = doc(
+    //   db,
+    //   "users",
+    //   `${user?.uid}`,
+    //   "boards",
+    //   `${boardId}`,
+    //   "tasks",
+    //   uid
+    // );
+
+    // await setDoc(taskDocRef, {
+    //   // Using type guard to ensure that we're always spreading an object
+    //   ...(typeof values === "object" ? values : {}),
+    //   uid: uid,
+    //   updatedAt: Timestamp.fromDate(new Date()),
+    // });
+    // toast.success("New Task Created");
+    // setSubmitting(false);
+    // resetForm();
+    // setShowAddTaskModal(false);
   };
 
   return (
