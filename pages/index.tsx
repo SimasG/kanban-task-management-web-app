@@ -3,6 +3,8 @@ import {
   deleteDoc,
   doc,
   getDocs,
+  setDoc,
+  Timestamp,
   updateDoc,
 } from "firebase/firestore";
 import type { NextPage } from "next";
@@ -151,13 +153,13 @@ const Home: NextPage = () => {
 
   const onDragEnd = (result: DropResult) => {
     const { source, destination } = result;
-    if (!destination) return;
+    // if (!destination) return;
 
-    if (
-      destination.droppableId === source.droppableId &&
-      destination.index === source.index
-    )
-      return;
+    // if (
+    //   destination.droppableId === source.droppableId &&
+    //   destination.index === source.index
+    // )
+    //   return;
 
     console.log("onDragEnd ran", result);
 
@@ -179,41 +181,42 @@ const Home: NextPage = () => {
 
     if (destination.droppableId === "todoList") {
       todos.splice(destination.index, 0, add);
+      updateTask(todos[destination.index], todos[destination.index].uid, "1");
     } else if (destination.droppableId === "doingList") {
       doings.splice(destination.index, 0, add);
+      updateTask(doings[destination.index], doings[destination.index].uid, "2");
     } else if (destination.droppableId === "doneList") {
       dones.splice(destination.index, 0, add);
+      updateTask(dones[destination.index], dones[destination.index].uid, "3");
     }
-
-    // console.log("todos[source.index].uid:", todos[source.index].uid);
-    // console.log("doings[source.index]:", doings[source.index]);
 
     setTodoTasks(todos);
     setDoingTasks(doings);
     setDoneTasks(dones);
-
-    console.log("todoTasks:", todoTasks);
-    console.log("doingTasks:", doingTasks);
-    console.log("doneTasks:", doneTasks);
   };
 
-  // const updateTask = async (updatedTaskId: string) => {
-  // const taskDocRef = doc(
-  //   db,
-  //   "users",
-  //   `${user?.uid}`,
-  //   "boards",
-  //   `${boardId}`,
-  //   "tasks",
-  //   `${taskId}`
-  // );
+  const updateTask = async (
+    updatedTask: any,
+    updatedTaskId: string,
+    status: string
+  ) => {
+    const taskDocRef = doc(
+      db,
+      "users",
+      `${user?.uid}`,
+      "boards",
+      `${boardId}`,
+      "tasks",
+      `${updatedTaskId}`
+    );
 
-  // await setDoc(taskDocRef, {
-  //   // Using type guard to ensure that we're always spreading an object
-  //   ...(typeof values === "object" ? values : {}),
-  //   updatedAt: Timestamp.fromDate(new Date()),
-  // });
-  // }
+    await setDoc(taskDocRef, {
+      // Using type guard to ensure that we're always spreading an object
+      ...(typeof updatedTask === "object" ? updatedTask : {}),
+      status: status,
+      updatedAt: Timestamp.fromDate(new Date()),
+    });
+  };
 
   return (
     <div
@@ -314,11 +317,11 @@ const Home: NextPage = () => {
               <Droppable droppableId="todoList">
                 {/* Are we using the render props pattern to display the Droppable component 
                 because that's the ideal way to access Droppable's props (provided & snapshot)? */}
-                {(provided: DroppableProvided, snapshot: any) => {
+                {(provided: DroppableProvided) => {
                   return (
                     // "ref" allows the Droppable component to control its children components/tags
                     <div
-                      className="flex flex-col justify-start items-center gap-4"
+                      className="flex flex-col justify-start items-center gap-4 rounded-md h-screen"
                       ref={provided.innerRef}
                       {...provided.droppableProps}
                     >
@@ -380,10 +383,10 @@ const Home: NextPage = () => {
               </div>
               {/* Task Container */}
               <Droppable droppableId="doingList">
-                {(provided: DroppableProvided, snapshot: any) => {
+                {(provided: DroppableProvided) => {
                   return (
                     <div
-                      className="flex flex-col justify-start items-center gap-4"
+                      className="flex flex-col justify-start items-center gap-4 rounded-md h-screen"
                       ref={provided.innerRef}
                       {...provided.droppableProps}
                     >
@@ -448,7 +451,7 @@ const Home: NextPage = () => {
                 {(provided: DroppableProvided, snapshot: any) => {
                   return (
                     <div
-                      className="flex flex-col justify-start items-center gap-4"
+                      className="flex flex-col justify-start items-center gap-4 rounded-md h-screen"
                       ref={provided.innerRef}
                       {...provided.droppableProps}
                     >
