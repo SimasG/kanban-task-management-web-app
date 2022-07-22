@@ -24,10 +24,11 @@ const FormikForm = ({ boardId, setShowAddTaskModal }: IndexProps) => {
   const dropdownOptions = [
     // "value: ''" will automatically make this option invalid and throw an error
     { key: "Select an option", value: "" },
-    { key: "TODO", value: "todo" },
-    { key: "DOING", value: "doing" },
-    { key: "DONE", value: "done" },
+    { key: "TODO", value: 1 },
+    { key: "DOING", value: 2 },
+    { key: "DONE", value: 3 },
   ];
+
   const formik = useFormikContext();
   const { values, setSubmitting, resetForm } = formik;
 

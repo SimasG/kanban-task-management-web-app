@@ -58,7 +58,10 @@ const Home: NextPage = () => {
 
   // Fetching all Tasks of selected Board
   const fsTasks = useFetchFsTasks(user?.uid, boardId);
-  const testFsTasks = useFetchFsTasksTest(user?.uid, boardId);
+  // const testFsTasks = useFetchFsTasksTest(user?.uid, boardId);
+
+  // console.log("testFsTasks:", testFsTasks);
+  // console.log("tasks:", tasks);
 
   // Setting main state either from localStorage or Firestore
   useEffect(() => {
@@ -76,8 +79,8 @@ const Home: NextPage = () => {
       if (activeBoard === undefined && fsBoards?.length !== 0) {
         setBoardId(fsBoards?.[0]?.id);
       }
-      if (!testFsTasks) return;
-      setTasks(testFsTasks);
+      if (!fsTasks) return;
+      setTasks(fsTasks);
     }
   }, [fsBoards, fsTasks, user]);
 
@@ -129,10 +132,15 @@ const Home: NextPage = () => {
   let doneCount = 0;
 
   tasks?.map((task: any) => {
-    task.status === "todo" && todoCount++;
-    task.status === "doing" && doingCount++;
-    task.status === "done" && doneCount++;
+    task.status === "1" && todoCount++;
+    task.status === "2" && doingCount++;
+    task.status === "3" && doneCount++;
   });
+
+  // Separating Tasks array into arrays of Tasks for different columns -> to ensure each column's Tasks are zero-indexed
+  const todoTasks = tasks.filter((task: any) => task?.status === "1");
+  const doingTasks = tasks.filter((task: any) => task?.status === "2");
+  const doneTasks = tasks.filter((task: any) => task?.status === "3");
 
   const onDragEnd = (result: DropResult) => {
     const { source, destination } = result;
@@ -148,8 +156,8 @@ const Home: NextPage = () => {
 
     let add;
 
-    if (source.droppableId === "todoList") {
-    }
+    // if (source.droppableId === "todoList") {
+    // }
   };
 
   return (
@@ -258,8 +266,8 @@ const Home: NextPage = () => {
                       ref={provided.innerRef}
                       className="flex flex-col justify-start items-center gap-4"
                     >
-                      {tasks?.map((task: any, index: number) => {
-                        if (task.status === "todo") {
+                      {todoTasks?.map((task: any, index: number) => {
+                        if (task.status === "1") {
                           // Number of checked subtasks
                           let checkedNumber = 0;
                           task.subtasks.map((subtask: any) => {
@@ -325,8 +333,8 @@ const Home: NextPage = () => {
                       ref={provided.innerRef}
                       className="flex flex-col justify-start items-center gap-4"
                     >
-                      {tasks?.map((task: any, index: number) => {
-                        if (task.status === "doing") {
+                      {doingTasks?.map((task: any, index: number) => {
+                        if (task.status === "2") {
                           // Number of checked subtasks
                           let checkedNumber = 0;
                           task.subtasks.map((subtask: any) => {
@@ -392,8 +400,8 @@ const Home: NextPage = () => {
                       ref={provided.innerRef}
                       className="flex flex-col justify-start items-center gap-4"
                     >
-                      {tasks?.map((task: any, index: number) => {
-                        if (task.status === "done") {
+                      {doneTasks?.map((task: any, index: number) => {
+                        if (task.status === "3") {
                           // Number of checked subtasks
                           let checkedNumber = 0;
                           task.subtasks.map((subtask: any) => {

@@ -2,10 +2,6 @@ import { Formik } from "formik";
 import * as Yup from "yup";
 import { v4 as uuidv4 } from "uuid";
 import FormikForm from "./form/FormikForm";
-import { doc } from "firebase/firestore";
-import { db } from "../lib/firebase";
-import { useContext } from "react";
-import { UserContext } from "../lib/context";
 
 type IndexProps = {
   boardId: string | null | undefined;
@@ -13,8 +9,6 @@ type IndexProps = {
 };
 
 const AddNewTaskModal = ({ boardId, setShowAddTaskModal }: IndexProps) => {
-  const user = useContext(UserContext);
-
   type initialValuesProps = {
     title: string;
     description?: string;
@@ -29,7 +23,6 @@ const AddNewTaskModal = ({ boardId, setShowAddTaskModal }: IndexProps) => {
       {
         uid: uuidv4(),
         title: "",
-        // checked: []; ?
         checked: false,
       },
     ],
