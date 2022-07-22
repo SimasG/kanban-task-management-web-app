@@ -92,9 +92,11 @@ const Home: NextPage = () => {
       }
       if (!fsTasks) return;
       setTasks(fsTasks);
-      setTodoTasks(todoTasksArray);
-      setDoingTasks(doingTasksArray);
-      setDoneTasks(doneTasksArray);
+      // By default set the state of Tasks via todos/doings/dones because they're automatically sorted
+      // in the correct order. Use todoTasksArray/etc only for the initial state load.
+      setTodoTasks(todos || todoTasksArray);
+      setDoingTasks(doings || doingTasksArray);
+      setDoneTasks(dones || doneTasksArray);
     }
   }, [fsBoards, fsTasks, user]);
 
@@ -151,22 +153,23 @@ const Home: NextPage = () => {
     task.status === "3" && doneCount++;
   });
 
+  let todos = todoTasks;
+  let doings = doingTasks;
+  let dones = doneTasks;
+
   const onDragEnd = (result: DropResult) => {
     const { source, destination } = result;
-    // if (!destination) return;
+    if (!destination) return;
 
-    // if (
-    //   destination.droppableId === source.droppableId &&
-    //   destination.index === source.index
-    // )
-    //   return;
+    if (
+      destination.droppableId === source.droppableId &&
+      destination.index === source.index
+    )
+      return;
 
     console.log("onDragEnd ran", result);
 
     let add;
-    let todos = todoTasks;
-    let doings = doingTasks;
-    let dones = doneTasks;
 
     if (source.droppableId === "todoList") {
       add = todos[source.index];
