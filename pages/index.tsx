@@ -191,6 +191,10 @@ const Home: NextPage = () => {
     setTodoTasks(todos);
     setDoingTasks(doings);
     setDoneTasks(dones);
+
+    console.log("todoTasks:", todoTasks);
+    console.log("doingTasks:", doingTasks);
+    console.log("doneTasks:", doneTasks);
   };
 
   // const updateTask = async (updatedTaskId: string) => {
@@ -314,50 +318,48 @@ const Home: NextPage = () => {
                   return (
                     // "ref" allows the Droppable component to control its children components/tags
                     <div
-                      {...provided.droppableProps}
-                      ref={provided.innerRef}
                       className="flex flex-col justify-start items-center gap-4"
+                      ref={provided.innerRef}
+                      {...provided.droppableProps}
                     >
                       {todoTasks?.map((task: any, index: number) => {
-                        if (task.status === "1") {
-                          // Number of checked subtasks
-                          let checkedNumber = 0;
-                          task.subtasks.map((subtask: any) => {
-                            subtask.checked && checkedNumber++;
-                          });
-                          return (
-                            <Draggable
-                              key={task.uid}
-                              draggableId={task.uid}
-                              index={index}
-                            >
-                              {(provided: DraggableProvided, snapshot: any) => {
-                                return (
-                                  <div
-                                    onClick={(e) => {
-                                      setTaskId(task?.uid);
-                                      e.stopPropagation();
-                                      setShowEditTaskModal(true);
-                                    }}
-                                    className="task"
-                                    key={task?.uid}
-                                    ref={provided.innerRef}
-                                    {...provided.draggableProps}
-                                    {...provided.dragHandleProps}
-                                  >
-                                    <h2 className="task-title">
-                                      {task?.title}
-                                    </h2>
-                                    <span className="task-body">
-                                      {checkedNumber} of {task.subtasks.length}{" "}
-                                      subtasks
-                                    </span>
-                                  </div>
-                                );
-                              }}
-                            </Draggable>
-                          );
-                        }
+                        // if (task.status === "1") {
+                        // Number of checked subtasks
+                        let checkedNumber = 0;
+                        task.subtasks.map((subtask: any) => {
+                          subtask.checked && checkedNumber++;
+                        });
+                        return (
+                          <Draggable
+                            key={task.uid}
+                            draggableId={task.uid}
+                            index={index}
+                          >
+                            {(provided: DraggableProvided, snapshot: any) => {
+                              return (
+                                <div
+                                  onClick={(e) => {
+                                    setTaskId(task?.uid);
+                                    e.stopPropagation();
+                                    setShowEditTaskModal(true);
+                                  }}
+                                  className="task"
+                                  key={task?.uid}
+                                  ref={provided.innerRef}
+                                  {...provided.draggableProps}
+                                  {...provided.dragHandleProps}
+                                >
+                                  <h2 className="task-title">{task?.title}</h2>
+                                  <span className="task-body">
+                                    {checkedNumber} of {task.subtasks.length}{" "}
+                                    subtasks
+                                  </span>
+                                </div>
+                              );
+                            }}
+                          </Draggable>
+                        );
+                        // }
                       })}
                       {provided.placeholder}
                     </div>
@@ -381,50 +383,48 @@ const Home: NextPage = () => {
                 {(provided: DroppableProvided, snapshot: any) => {
                   return (
                     <div
-                      {...provided.droppableProps}
-                      ref={provided.innerRef}
                       className="flex flex-col justify-start items-center gap-4"
+                      ref={provided.innerRef}
+                      {...provided.droppableProps}
                     >
                       {doingTasks?.map((task: any, index: number) => {
-                        if (task.status === "2") {
-                          // Number of checked subtasks
-                          let checkedNumber = 0;
-                          task.subtasks.map((subtask: any) => {
-                            subtask.checked && checkedNumber++;
-                          });
-                          return (
-                            <Draggable
-                              draggableId={task.uid}
-                              key={task.uid}
-                              index={index}
-                            >
-                              {(provided: DraggableProvided, snapshot: any) => {
-                                return (
-                                  <div
-                                    onClick={(e) => {
-                                      setTaskId(task?.uid);
-                                      e.stopPropagation();
-                                      setShowEditTaskModal(true);
-                                    }}
-                                    className="task"
-                                    key={task?.uid}
-                                    ref={provided.innerRef}
-                                    {...provided.draggableProps}
-                                    {...provided.dragHandleProps}
-                                  >
-                                    <h2 className="task-title">
-                                      {task?.title}
-                                    </h2>
-                                    <span className="task-body">
-                                      {checkedNumber} of {task.subtasks.length}{" "}
-                                      subtasks
-                                    </span>
-                                  </div>
-                                );
-                              }}
-                            </Draggable>
-                          );
-                        }
+                        // if (task.status === "2") {
+                        // Number of checked subtasks
+                        let checkedNumber = 0;
+                        task.subtasks.map((subtask: any) => {
+                          subtask.checked && checkedNumber++;
+                        });
+                        return (
+                          <Draggable
+                            draggableId={task.uid}
+                            key={task.uid}
+                            index={index}
+                          >
+                            {(provided: DraggableProvided, snapshot: any) => {
+                              return (
+                                <div
+                                  onClick={(e) => {
+                                    setTaskId(task?.uid);
+                                    e.stopPropagation();
+                                    setShowEditTaskModal(true);
+                                  }}
+                                  className="task"
+                                  key={task?.uid}
+                                  ref={provided.innerRef}
+                                  {...provided.draggableProps}
+                                  {...provided.dragHandleProps}
+                                >
+                                  <h2 className="task-title">{task?.title}</h2>
+                                  <span className="task-body">
+                                    {checkedNumber} of {task.subtasks.length}{" "}
+                                    subtasks
+                                  </span>
+                                </div>
+                              );
+                            }}
+                          </Draggable>
+                        );
+                        // }
                       })}
                       {provided.placeholder}
                     </div>
@@ -448,50 +448,48 @@ const Home: NextPage = () => {
                 {(provided: DroppableProvided, snapshot: any) => {
                   return (
                     <div
-                      {...provided.droppableProps}
-                      ref={provided.innerRef}
                       className="flex flex-col justify-start items-center gap-4"
+                      ref={provided.innerRef}
+                      {...provided.droppableProps}
                     >
                       {doneTasks?.map((task: any, index: number) => {
-                        if (task.status === "3") {
-                          // Number of checked subtasks
-                          let checkedNumber = 0;
-                          task.subtasks.map((subtask: any) => {
-                            subtask.checked && checkedNumber++;
-                          });
-                          return (
-                            <Draggable
-                              draggableId={task.uid}
-                              key={task.uid}
-                              index={index}
-                            >
-                              {(provided: DraggableProvided, snapshot: any) => {
-                                return (
-                                  <div
-                                    onClick={(e) => {
-                                      setTaskId(task?.uid);
-                                      e.stopPropagation();
-                                      setShowEditTaskModal(true);
-                                    }}
-                                    className="task"
-                                    key={task?.uid}
-                                    ref={provided.innerRef}
-                                    {...provided.draggableProps}
-                                    {...provided.dragHandleProps}
-                                  >
-                                    <h2 className="task-title">
-                                      {task?.title}
-                                    </h2>
-                                    <span className="task-body">
-                                      {checkedNumber} of {task.subtasks.length}{" "}
-                                      subtasks
-                                    </span>
-                                  </div>
-                                );
-                              }}
-                            </Draggable>
-                          );
-                        }
+                        // if (task.status === "3") {
+                        // Number of checked subtasks
+                        let checkedNumber = 0;
+                        task.subtasks.map((subtask: any) => {
+                          subtask.checked && checkedNumber++;
+                        });
+                        return (
+                          <Draggable
+                            draggableId={task.uid}
+                            key={task.uid}
+                            index={index}
+                          >
+                            {(provided: DraggableProvided, snapshot: any) => {
+                              return (
+                                <div
+                                  onClick={(e) => {
+                                    setTaskId(task?.uid);
+                                    e.stopPropagation();
+                                    setShowEditTaskModal(true);
+                                  }}
+                                  className="task"
+                                  key={task?.uid}
+                                  ref={provided.innerRef}
+                                  {...provided.draggableProps}
+                                  {...provided.dragHandleProps}
+                                >
+                                  <h2 className="task-title">{task?.title}</h2>
+                                  <span className="task-body">
+                                    {checkedNumber} of {task.subtasks.length}{" "}
+                                    subtasks
+                                  </span>
+                                </div>
+                              );
+                            }}
+                          </Draggable>
+                        );
+                        // }
                       })}
                       {provided.placeholder}
                     </div>
