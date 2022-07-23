@@ -2,6 +2,7 @@ import {
   collection,
   deleteDoc,
   doc,
+  FieldValue,
   getDocs,
   setDoc,
   Timestamp,
@@ -37,8 +38,7 @@ import useFetchFsTasksTest from "../lib/hooks/useFetchFsTasksTest";
 type BoardSchema = {
   title: string;
   uid: string | null | undefined;
-  // What type is a Firebase timestamp?
-  createdAt: any;
+  createdAt: FieldValue;
 };
 
 const Home: NextPage = () => {
@@ -65,9 +65,6 @@ const Home: NextPage = () => {
   // Fetching all Tasks of selected Board
   const fsTasks = useFetchFsTasks(user?.uid, boardId);
   // const testFsTasks = useFetchFsTasksTest(user?.uid, boardId);
-
-  // console.log("testFsTasks:", testFsTasks);
-  // console.log("tasks:", tasks);
 
   // Separating Tasks array into arrays of Tasks for different columns -> to ensure each column's Tasks are zero-indexed
   const todoTasksArray = fsTasks?.filter((task: any) => task?.status === "1");
@@ -198,13 +195,28 @@ const Home: NextPage = () => {
 
     if (destination.droppableId === "todoList") {
       todos.splice(destination.index, 0, add);
-      updateTask(todos[destination.index], todos[destination.index].uid, "1");
+      updateTask(
+        todos[destination.index],
+        todos[destination.index].uid,
+        "1",
+        todoTasksArray?.length.toString()
+      );
     } else if (destination.droppableId === "doingList") {
       doings.splice(destination.index, 0, add);
-      updateTask(doings[destination.index], doings[destination.index].uid, "2");
+      updateTask(
+        doings[destination.index],
+        doings[destination.index].uid,
+        "2",
+        doingTasksArray?.length.toString()
+      );
     } else if (destination.droppableId === "doneList") {
       dones.splice(destination.index, 0, add);
-      updateTask(dones[destination.index], dones[destination.index].uid, "3");
+      updateTask(
+        dones[destination.index],
+        dones[destination.index].uid,
+        "3",
+        doneTasksArray?.length.toString()
+      );
     }
 
     setTodoTasks(todos);
@@ -215,7 +227,8 @@ const Home: NextPage = () => {
   const updateTask = async (
     updatedTask: any,
     updatedTaskId: string,
-    status: string
+    status: string,
+    index: string | undefined
   ) => {
     const taskDocRef = doc(
       db,
@@ -230,6 +243,7 @@ const Home: NextPage = () => {
     await setDoc(taskDocRef, {
       // Using type guard to ensure that we're always spreading an object
       ...(typeof updatedTask === "object" ? updatedTask : {}),
+      index: index,
       status: status,
       updatedAt: Timestamp.fromDate(new Date()),
     });

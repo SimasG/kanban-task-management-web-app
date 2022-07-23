@@ -39,38 +39,50 @@ const FormikForm = ({
   ];
 
   const formik = useFormikContext();
-  const { values, setSubmitting, resetForm } = formik;
+  const { values, setSubmitting, resetForm }: any = formik;
 
   const handleSubmit = async () => {
-    console.log("fake submitted bishh");
-    console.log("values:", values);
+    setSubmitting(true);
+    const uid = uuidv4();
+    const taskDocRef = doc(
+      db,
+      "users",
+      `${user?.uid}`,
+      "boards",
+      `${boardId}`,
+      "tasks",
+      uid
+    );
 
-    console.log("todoTasksArray?.length:", todoTasksArray?.length);
-    console.log("doingTasksArray?.length:", doingTasksArray?.length);
-    console.log("doneTasksArray?.length:", doneTasksArray?.length);
+    // Long & ugly if/else block. Wish I could use turnary operators inside setDoc
+    if (values?.status === "1") {
+      await setDoc(taskDocRef, {
+        // Using type guard to ensure that we're always spreading an object
+        ...(typeof values === "object" ? values : {}),
+        index: todoTasksArray?.length.toString(),
+        uid: uid,
+        updatedAt: Timestamp.fromDate(new Date()),
+      });
+    } else if (values?.status === "2") {
+      await setDoc(taskDocRef, {
+        ...(typeof values === "object" ? values : {}),
+        index: doingTasksArray?.length.toString(),
+        uid: uid,
+        updatedAt: Timestamp.fromDate(new Date()),
+      });
+    } else if (values?.status === "3") {
+      await setDoc(taskDocRef, {
+        ...(typeof values === "object" ? values : {}),
+        index: doneTasksArray?.length.toString(),
+        uid: uid,
+        updatedAt: Timestamp.fromDate(new Date()),
+      });
+    }
 
-    // setSubmitting(true);
-    // const uid = uuidv4();
-    // const taskDocRef = doc(
-    //   db,
-    //   "users",
-    //   `${user?.uid}`,
-    //   "boards",
-    //   `${boardId}`,
-    //   "tasks",
-    //   uid
-    // );
-
-    // await setDoc(taskDocRef, {
-    //   // Using type guard to ensure that we're always spreading an object
-    //   ...(typeof values === "object" ? values : {}),
-    //   uid: uid,
-    //   updatedAt: Timestamp.fromDate(new Date()),
-    // });
-    // toast.success("New Task Created");
-    // setSubmitting(false);
-    // resetForm();
-    // setShowAddTaskModal(false);
+    toast.success("New Task Created");
+    setSubmitting(false);
+    resetForm();
+    setShowAddTaskModal(false);
   };
 
   return (

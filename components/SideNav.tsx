@@ -1,7 +1,6 @@
 import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
 import {
   doc,
-  DocumentData,
   serverTimestamp,
   setDoc,
   Timestamp,
@@ -16,7 +15,6 @@ import { UserContext } from "../lib/context";
 import { auth, db } from "../lib/firebase";
 import { v4 as uuidv4 } from "uuid";
 import useFetchFsBoards from "../lib/hooks/useFetchFsBoards";
-import { motion, Reorder } from "framer-motion";
 import {
   DragDropContext,
   Draggable,
