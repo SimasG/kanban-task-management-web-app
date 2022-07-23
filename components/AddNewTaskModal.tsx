@@ -7,9 +7,9 @@ import { DocumentData } from "firebase/firestore";
 type IndexProps = {
   boardId: string | null | undefined;
   setShowAddTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
-  todoTasksArray: DocumentData[] | undefined;
-  doingTasksArray: DocumentData[] | undefined;
-  doneTasksArray: DocumentData[] | undefined;
+  todoTasksArray: DocumentData[] | undefined | any;
+  doingTasksArray: DocumentData[] | undefined | any;
+  doneTasksArray: DocumentData[] | undefined | any;
 };
 
 const AddNewTaskModal = ({
@@ -22,8 +22,9 @@ const AddNewTaskModal = ({
   type initialValuesProps = {
     title: string;
     description?: string;
-    status: string;
     subtasks?: {}[];
+    status: number;
+    index: number;
   };
 
   const initialValues: initialValuesProps = {
@@ -36,7 +37,8 @@ const AddNewTaskModal = ({
         checked: false,
       },
     ],
-    status: "",
+    status: 0,
+    index: 0,
   };
 
   const validationSchema = Yup.object({

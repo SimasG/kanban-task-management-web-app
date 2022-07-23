@@ -30,8 +30,9 @@ const EditTaskModal = ({
   type initialValuesProps = {
     title: string;
     description?: string;
-    status: string;
     subtasks?: {}[];
+    status: number;
+    index: number;
   };
 
   const initialValues: initialValuesProps = {
@@ -45,7 +46,8 @@ const EditTaskModal = ({
         checked: false,
       },
     ],
-    status: "",
+    status: 0,
+    index: 0,
   };
 
   const validationSchema = Yup.object({

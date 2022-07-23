@@ -7,6 +7,7 @@ import {
   setDoc,
   Timestamp,
   updateDoc,
+  writeBatch,
 } from "firebase/firestore";
 import type { NextPage } from "next";
 import React, { useContext, useEffect, useState } from "react";
@@ -64,14 +65,24 @@ const Home: NextPage = () => {
 
   // Fetching all Tasks of selected Board
   const fsTasks = useFetchFsTasks(user?.uid, boardId);
-  // const testFsTasks = useFetchFsTasksTest(user?.uid, boardId);
 
   // Separating Tasks array into arrays of Tasks for different columns -> to ensure each column's Tasks are zero-indexed
-  const todoTasksArray = fsTasks?.filter((task: any) => task?.status === "1");
-  const doingTasksArray = fsTasks?.filter((task: any) => task?.status === "2");
-  const doneTasksArray = fsTasks?.filter((task: any) => task?.status === "3");
+  const todoTasksArray: any = fsTasks?.filter(
+    (task: any) => task?.status === 1
+  );
+  const doingTasksArray: any = fsTasks?.filter(
+    (task: any) => task?.status === 2
+  );
+  const doneTasksArray: any = fsTasks?.filter(
+    (task: any) => task?.status === 3
+  );
 
-  // console.log("todoTasksArray?.length:", todoTasksArray?.length);
+  // console.log("fsTasks:", fsTasks);
+  // console.log("todoTasksArray:", todoTasksArray);
+  // console.log("doingTasksArray:", doingTasksArray);
+  // console.log("doneTasksArray:", doneTasksArray);
+
+  // console.log("fsBoards:", fsBoards);
 
   let todos = todoTasks;
   let doings = doingTasks;
@@ -102,18 +113,6 @@ const Home: NextPage = () => {
       setDoneTasks(doneTasksArray);
     }
   }, [fsBoards, fsTasks, user]);
-
-  // console.log("todoTasks:", todoTasks);
-  // console.log("doingTasks:", doingTasks);
-  // console.log("doneTasks:", doneTasks);
-
-  // console.log("todos:", todos);
-  // console.log("doings:", doings);
-  // console.log("dones:", dones);
-
-  // console.log("todoTasksArray:", todoTasksArray);
-  // console.log("doingTasksArray:", doingTasksArray);
-  // console.log("doneTasksArray:", doneTasksArray);
 
   const activeBoard = boards?.filter(
     (board: BoardSchema) => board.uid === boardId
@@ -163,10 +162,13 @@ const Home: NextPage = () => {
   let doneCount = 0;
 
   tasks?.map((task: any) => {
-    task.status === "1" && todoCount++;
-    task.status === "2" && doingCount++;
-    task.status === "3" && doneCount++;
+    task.status === 1 && todoCount++;
+    task.status === 2 && doingCount++;
+    task.status === 3 && doneCount++;
   });
+
+  // Creating a new write Batch
+  // const batch = writeBatch(db)
 
   const onDragEnd = (result: DropResult) => {
     const { source, destination } = result;
@@ -198,24 +200,25 @@ const Home: NextPage = () => {
       updateTask(
         todos[destination.index],
         todos[destination.index].uid,
-        "1",
-        todoTasksArray?.length.toString()
+        1,
+        parseInt(todoTasksArray?.length)
       );
     } else if (destination.droppableId === "doingList") {
       doings.splice(destination.index, 0, add);
+
       updateTask(
         doings[destination.index],
         doings[destination.index].uid,
-        "2",
-        doingTasksArray?.length.toString()
+        2,
+        parseInt(doingTasksArray?.length)
       );
     } else if (destination.droppableId === "doneList") {
       dones.splice(destination.index, 0, add);
       updateTask(
         dones[destination.index],
         dones[destination.index].uid,
-        "3",
-        doneTasksArray?.length.toString()
+        3,
+        parseInt(doneTasksArray?.length)
       );
     }
 
@@ -227,8 +230,8 @@ const Home: NextPage = () => {
   const updateTask = async (
     updatedTask: any,
     updatedTaskId: string,
-    status: string,
-    index: string | undefined
+    status: number,
+    index: number | undefined
   ) => {
     const taskDocRef = doc(
       db,

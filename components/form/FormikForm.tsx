@@ -16,9 +16,9 @@ import toast from "react-hot-toast";
 type IndexProps = {
   boardId: string | null | undefined;
   setShowAddTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
-  todoTasksArray: DocumentData[] | undefined;
-  doingTasksArray: DocumentData[] | undefined;
-  doneTasksArray: DocumentData[] | undefined;
+  todoTasksArray: DocumentData[] | undefined | any;
+  doingTasksArray: DocumentData[] | undefined | any;
+  doneTasksArray: DocumentData[] | undefined | any;
 };
 
 const FormikForm = ({
@@ -39,6 +39,8 @@ const FormikForm = ({
   ];
 
   const formik = useFormikContext();
+
+  // ** Why is formik automatically storing values.status & values.index as strings and not numbers?
   const { values, setSubmitting, resetForm }: any = formik;
 
   const handleSubmit = async () => {
@@ -54,29 +56,37 @@ const FormikForm = ({
       uid
     );
 
+    // console.log(parseInt(values?.status));
+
     // Long & ugly if/else block. Wish I could use turnary operators inside setDoc
-    if (values?.status === "1") {
+    if (parseInt(values?.status) === 1) {
       await setDoc(taskDocRef, {
         // Using type guard to ensure that we're always spreading an object
         ...(typeof values === "object" ? values : {}),
-        index: todoTasksArray?.length.toString(),
+        index: parseInt(todoTasksArray?.length),
+        status: parseInt(values?.status),
         uid: uid,
         updatedAt: Timestamp.fromDate(new Date()),
       });
-    } else if (values?.status === "2") {
+      console.log("values?.status === 1 ran");
+    } else if (parseInt(values?.status) === 2) {
       await setDoc(taskDocRef, {
         ...(typeof values === "object" ? values : {}),
-        index: doingTasksArray?.length.toString(),
+        index: parseInt(doingTasksArray?.length),
+        status: parseInt(values?.status),
         uid: uid,
         updatedAt: Timestamp.fromDate(new Date()),
       });
-    } else if (values?.status === "3") {
+      console.log("values?.status === 2 ran");
+    } else if (parseInt(values?.status) === 3) {
       await setDoc(taskDocRef, {
         ...(typeof values === "object" ? values : {}),
-        index: doneTasksArray?.length.toString(),
+        index: parseInt(doneTasksArray?.length),
+        status: parseInt(values?.status),
         uid: uid,
         updatedAt: Timestamp.fromDate(new Date()),
       });
+      console.log("values?.status === 3 ran");
     }
 
     toast.success("New Task Created");

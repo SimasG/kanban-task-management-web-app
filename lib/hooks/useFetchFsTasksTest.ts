@@ -17,7 +17,7 @@ const useFetchFsTasksTest = (
 
   const q = query(tasksCollectionRef, orderBy("status", "asc"));
 
-  const data = useCollectionData(q);
+  const data = useCollectionData(q)[0];
 
   // const testQ = query(tasksCollectionRef);
   // const testData = useCollectionData(testQ)[0];
