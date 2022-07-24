@@ -239,61 +239,166 @@ const Home: NextPage = () => {
     if (newStatus === initialStatus) {
       console.log("Within column logic detected");
       if (newStatus === 1) {
-        console.log("sourceIndex:", sourceIndex);
-        console.log("destinationIndex:", destinationIndex);
         todos?.map((todo: any) => {
           if (destinationIndex > sourceIndex) {
             // Decrement Tasks
-            if (todo.index > sourceIndex) {
+            if (todo.index > sourceIndex && todo.index <= destinationIndex) {
               // DECREMENT THE INDEX OF EACH TASK THAT FITS THIS CRITERIA
               console.log("todo to be decremented:", todo);
-              // const taskDocRef = doc(
-              //   db,
-              //   "users",
-              //   `${user?.uid}`,
-              //   "boards",
-              //   `${boardId}`,
-              //   "tasks",
-              //   `${todo?.uid}`
-              // );
-              // batch.update(taskDocRef, { index: increment(-1) });
+              const taskDocRef = doc(
+                db,
+                "users",
+                `${user?.uid}`,
+                "boards",
+                `${boardId}`,
+                "tasks",
+                `${todo?.uid}`
+              );
+              batch.update(taskDocRef, { index: increment(-1) });
             }
           } else if (destinationIndex < sourceIndex) {
             // Increment Tasks
-            if (todo.index >= destinationIndex) {
+            if (todo.index < sourceIndex && todo.index >= destinationIndex) {
               // INCREMENT THE INDEX OF EACH TASK THAT FITS THIS CRITERIA
               console.log("todo to be incremented:", todo);
-              // const taskDocRef = doc(
-              //   db,
-              //   "users",
-              //   `${user?.uid}`,
-              //   "boards",
-              //   `${boardId}`,
-              //   "tasks",
-              //   `${todo?.uid}`
-              // );
-              // batch.update(taskDocRef, { index: increment(-1) });
+              const taskDocRef = doc(
+                db,
+                "users",
+                `${user?.uid}`,
+                "boards",
+                `${boardId}`,
+                "tasks",
+                `${todo?.uid}`
+              );
+              batch.update(taskDocRef, { index: increment(1) });
             }
           }
         });
 
         // Changing index of dragged Task
-        // const taskDocRef = doc(
-        //   db,
-        //   "users",
-        //   `${user?.uid}`,
-        //   "boards",
-        //   `${boardId}`,
-        //   "tasks",
-        //   `${updatedTaskId}`
-        // );
-        // batch.update(taskDocRef, {
-        //   // Using type guard to ensure that we're always spreading an object
-        //   // ...(typeof updatedTask === "object" ? updatedTask : {}),
-        //   index: destinationIndex,
-        //   updatedAt: Timestamp.fromDate(new Date()),
-        // });
+        const taskDocRef = doc(
+          db,
+          "users",
+          `${user?.uid}`,
+          "boards",
+          `${boardId}`,
+          "tasks",
+          `${updatedTaskId}`
+        );
+        batch.update(taskDocRef, {
+          // Using type guard to ensure that we're always spreading an object
+          // ...(typeof updatedTask === "object" ? updatedTask : {}),
+          index: destinationIndex,
+          updatedAt: Timestamp.fromDate(new Date()),
+        });
+      } else if (newStatus === 2) {
+        doings?.map((doing: any) => {
+          if (destinationIndex > sourceIndex) {
+            // Decrement Tasks
+            if (doing.index > sourceIndex && doing.index <= destinationIndex) {
+              // DECREMENT THE INDEX OF EACH TASK THAT FITS THIS CRITERIA
+              console.log("doing to be decremented:", doing);
+              const taskDocRef = doc(
+                db,
+                "users",
+                `${user?.uid}`,
+                "boards",
+                `${boardId}`,
+                "tasks",
+                `${doing?.uid}`
+              );
+              batch.update(taskDocRef, { index: increment(-1) });
+            }
+          } else if (destinationIndex < sourceIndex) {
+            // Increment Tasks
+            if (doing.index < sourceIndex && doing.index >= destinationIndex) {
+              // INCREMENT THE INDEX OF EACH TASK THAT FITS THIS CRITERIA
+              console.log("doing to be incremented:", doing);
+              const taskDocRef = doc(
+                db,
+                "users",
+                `${user?.uid}`,
+                "boards",
+                `${boardId}`,
+                "tasks",
+                `${doing?.uid}`
+              );
+              batch.update(taskDocRef, { index: increment(1) });
+            }
+          }
+        });
+
+        // Changing index of dragged Task
+        const taskDocRef = doc(
+          db,
+          "users",
+          `${user?.uid}`,
+          "boards",
+          `${boardId}`,
+          "tasks",
+          `${updatedTaskId}`
+        );
+        batch.update(taskDocRef, {
+          // Using type guard to ensure that we're always spreading an object
+          // ...(typeof updatedTask === "object" ? updatedTask : {}),
+          index: destinationIndex,
+          updatedAt: Timestamp.fromDate(new Date()),
+        });
+      } else if (newStatus === 3) {
+        dones?.map((done: any) => {
+          if (destinationIndex > sourceIndex) {
+            // Decrement Tasks
+            if (done.index > sourceIndex && done.index <= destinationIndex) {
+              // DECREMENT THE INDEX OF EACH TASK THAT FITS THIS CRITERIA
+              console.log("done to be decremented:", done);
+              const taskDocRef = doc(
+                db,
+                "users",
+                `${user?.uid}`,
+                "boards",
+                `${boardId}`,
+                "tasks",
+                `${done?.uid}`
+              );
+              batch.update(taskDocRef, { index: increment(-1) });
+            }
+          } else if (destinationIndex < sourceIndex) {
+            // Increment Tasks
+            if (done.index < sourceIndex && done.index >= destinationIndex) {
+              // INCREMENT THE INDEX OF EACH TASK THAT FITS THIS CRITERIA
+              console.log("done to be incremented:", done);
+              const taskDocRef = doc(
+                db,
+                "users",
+                `${user?.uid}`,
+                "boards",
+                `${boardId}`,
+                "tasks",
+                `${done?.uid}`
+              );
+              batch.update(taskDocRef, { index: increment(1) });
+            }
+          }
+        });
+
+        // Changing index of dragged Task
+        const taskDocRef = doc(
+          db,
+          "users",
+          `${user?.uid}`,
+          "boards",
+          `${boardId}`,
+          "tasks",
+          `${updatedTaskId}`
+        );
+        batch.update(taskDocRef, {
+          // Using type guard to ensure that we're always spreading an object
+          // ...(typeof updatedTask === "object" ? updatedTask : {}),
+          index: destinationIndex,
+          updatedAt: Timestamp.fromDate(new Date()),
+        });
       }
+      await batch.commit();
       return;
     }
 
@@ -309,8 +414,6 @@ const Home: NextPage = () => {
       `${updatedTaskId}`
     );
     batch.update(taskDocRef, {
-      // Using type guard to ensure that we're always spreading an object
-      // ...(typeof updatedTask === "object" ? updatedTask : {}),
       index: destinationIndex,
       status: newStatus,
       updatedAt: Timestamp.fromDate(new Date()),
