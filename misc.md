@@ -712,3 +712,6 @@ export default useFetchDiffFsData;
     //   status: newStatus,
     //   updatedAt: Timestamp.fromDate(new Date()),
     // });
+
+        // Destination column length before the Task was dragged
+        // parseInt(todoTasksArray?.length)

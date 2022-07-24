@@ -188,49 +188,31 @@ const Home: NextPage = () => {
     if (destination.droppableId === "1") {
       todos.splice(destination.index, 0, add);
       handleUpdateTask(
-        // Dragged Task -> updatedTask
-        todos[destination.index],
-
-        // Dragged Task's uid -> updatedTaskId
         todos[destination.index].uid,
-
-        // Source index -> Task's old index within Column -> sourceIndex
         source.index,
-
-        // Destination index -> Tasks's new index within Column -> destinationIndex
         destination.index,
-
-        // Source Column Status -> initialStatus
         parseInt(source.droppableId),
-
-        // Destination Column Status -> Task's new Column index -> newStatus
         1
-        // Could also be "parseInt(destination.droppableId)"
-
-        // ** Below is shaky
-        // Destination column length before the Task was dragged
-        // parseInt(todoTasksArray?.length)
-        //
+      );
+    } else if (destination.droppableId === "2") {
+      doings.splice(destination.index, 0, add);
+      handleUpdateTask(
+        doings[destination.index].uid,
+        source.index,
+        destination.index,
+        parseInt(source.droppableId),
+        2
+      );
+    } else if (destination.droppableId === "3") {
+      dones.splice(destination.index, 0, add);
+      handleUpdateTask(
+        dones[destination.index].uid,
+        source.index,
+        destination.index,
+        parseInt(source.droppableId),
+        3
       );
     }
-    // else if (destination.droppableId === "2") {
-    //   doings.splice(destination.index, 0, add);
-
-    //   updateTask(
-    //     doings[destination.index],
-    //     doings[destination.index].uid,
-    //     2,
-    //     parseInt(doingTasksArray?.length)
-    //   );
-    // } else if (destination.droppableId === "3") {
-    //   dones.splice(destination.index, 0, add);
-    //   updateTask(
-    //     dones[destination.index],
-    //     dones[destination.index].uid,
-    //     3,
-    //     parseInt(doneTasksArray?.length)
-    //   );
-    // }
 
     setTodoTasks(todos);
     setDoingTasks(doings);
@@ -238,17 +220,84 @@ const Home: NextPage = () => {
   };
 
   const handleUpdateTask = async (
-    updatedTask: any,
+    // Dragged Task's uid -> updatedTaskId
     updatedTaskId: string,
+    // Source index -> Task's old index within Column -> sourceIndex
     sourceIndex: number,
+    // Destination index -> Tasks's new index within Column -> destinationIndex
     destinationIndex: number,
+    // Source Column Status -> initialStatus
     initialStatus: number,
+    // Destination Column Status -> Task's new Column index -> newStatus
     newStatus: number
-    // index: number | undefined
   ) => {
     // Creating a new write Batch
     const batch = writeBatch(db);
 
+    // ** WITHIN COLUMN LOGIC
+    // Same as "destination.droppableId === source.droppableId"
+    if (newStatus === initialStatus) {
+      console.log("Within column logic detected");
+      if (newStatus === 1) {
+        console.log("sourceIndex:", sourceIndex);
+        console.log("destinationIndex:", destinationIndex);
+        todos?.map((todo: any) => {
+          if (destinationIndex > sourceIndex) {
+            // Decrement Tasks
+            if (todo.index > sourceIndex) {
+              // DECREMENT THE INDEX OF EACH TASK THAT FITS THIS CRITERIA
+              console.log("todo to be decremented:", todo);
+              // const taskDocRef = doc(
+              //   db,
+              //   "users",
+              //   `${user?.uid}`,
+              //   "boards",
+              //   `${boardId}`,
+              //   "tasks",
+              //   `${todo?.uid}`
+              // );
+              // batch.update(taskDocRef, { index: increment(-1) });
+            }
+          } else if (destinationIndex < sourceIndex) {
+            // Increment Tasks
+            if (todo.index >= destinationIndex) {
+              // INCREMENT THE INDEX OF EACH TASK THAT FITS THIS CRITERIA
+              console.log("todo to be incremented:", todo);
+              // const taskDocRef = doc(
+              //   db,
+              //   "users",
+              //   `${user?.uid}`,
+              //   "boards",
+              //   `${boardId}`,
+              //   "tasks",
+              //   `${todo?.uid}`
+              // );
+              // batch.update(taskDocRef, { index: increment(-1) });
+            }
+          }
+        });
+
+        // Changing index of dragged Task
+        // const taskDocRef = doc(
+        //   db,
+        //   "users",
+        //   `${user?.uid}`,
+        //   "boards",
+        //   `${boardId}`,
+        //   "tasks",
+        //   `${updatedTaskId}`
+        // );
+        // batch.update(taskDocRef, {
+        //   // Using type guard to ensure that we're always spreading an object
+        //   // ...(typeof updatedTask === "object" ? updatedTask : {}),
+        //   index: destinationIndex,
+        //   updatedAt: Timestamp.fromDate(new Date()),
+        // });
+      }
+      return;
+    }
+
+    // ** BETWEEN COLUMN LOGIC
     // ** 1. Change index & status of dragged Task
     const taskDocRef = doc(
       db,
@@ -259,7 +308,6 @@ const Home: NextPage = () => {
       "tasks",
       `${updatedTaskId}`
     );
-
     batch.update(taskDocRef, {
       // Using type guard to ensure that we're always spreading an object
       // ...(typeof updatedTask === "object" ? updatedTask : {}),
@@ -271,6 +319,22 @@ const Home: NextPage = () => {
     // ** 2. Decrement (by 1) the indexes of Tasks that came after dragged Task in source Column
     if (initialStatus === 1) {
       console.log("Source Column is todos");
+      todos?.map((todo: any, index: number) => {
+        if (index >= sourceIndex) {
+          // DECREMENT THE INDEX OF EACH TASK THAT FITS THIS CRITERIA
+          console.log("todo to be decremented:", todo);
+          const taskDocRef = doc(
+            db,
+            "users",
+            `${user?.uid}`,
+            "boards",
+            `${boardId}`,
+            "tasks",
+            `${todo?.uid}`
+          );
+          batch.update(taskDocRef, { index: increment(-1) });
+        }
+      });
     } else if (initialStatus === 2) {
       console.log("Source Column is doing");
       doings?.map((doing: any, index: number) => {
@@ -291,6 +355,22 @@ const Home: NextPage = () => {
       });
     } else if (initialStatus === 3) {
       console.log("Source Column is done");
+      dones?.map((done: any, index: number) => {
+        if (index >= sourceIndex) {
+          // DECREMENT THE INDEX OF EACH TASK THAT FITS THIS CRITERIA
+          console.log("done to be decremented:", done);
+          const taskDocRef = doc(
+            db,
+            "users",
+            `${user?.uid}`,
+            "boards",
+            `${boardId}`,
+            "tasks",
+            `${done?.uid}`
+          );
+          batch.update(taskDocRef, { index: increment(-1) });
+        }
+      });
     }
 
     // ** 3. Increment (by 1) the indexes of Tasks that came after dragged Task in destination Column
@@ -314,8 +394,40 @@ const Home: NextPage = () => {
       });
     } else if (newStatus === 2) {
       console.log("Destination Column is doing");
+      doings?.map((doing: any, index: number) => {
+        if (index > destinationIndex) {
+          // INCREMENT THE INDEX OF EACH TASK THAT FITS THIS CRITERIA
+          console.log("doing to be incremented:", doing);
+          const taskDocRef = doc(
+            db,
+            "users",
+            `${user?.uid}`,
+            "boards",
+            `${boardId}`,
+            "tasks",
+            `${doing?.uid}`
+          );
+          batch.update(taskDocRef, { index: increment(1) });
+        }
+      });
     } else if (newStatus === 3) {
       console.log("Destination Column is done");
+      dones?.map((done: any, index: number) => {
+        if (index > destinationIndex) {
+          // INCREMENT THE INDEX OF EACH TASK THAT FITS THIS CRITERIA
+          console.log("done to be incremented:", done);
+          const taskDocRef = doc(
+            db,
+            "users",
+            `${user?.uid}`,
+            "boards",
+            `${boardId}`,
+            "tasks",
+            `${done?.uid}`
+          );
+          batch.update(taskDocRef, { index: increment(1) });
+        }
+      });
     }
 
     await batch.commit();
