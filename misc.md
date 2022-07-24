@@ -694,3 +694,21 @@ export default useFetchDiffFsData;
               );
             })
           : "There is nothing bro :(!"}
+
+    // const taskDocRef = doc(
+    //   db,
+    //   "users",
+    //   `${user?.uid}`,
+    //   "boards",
+    //   `${boardId}`,
+    //   "tasks",
+    //   `${updatedTaskId}`
+    // );
+
+    // await setDoc(taskDocRef, {
+    //   // Using type guard to ensure that we're always spreading an object
+    //   ...(typeof updatedTask === "object" ? updatedTask : {}),
+    //   index: destinationIndex,
+    //   status: newStatus,
+    //   updatedAt: Timestamp.fromDate(new Date()),
+    // });

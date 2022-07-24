@@ -4,6 +4,7 @@ import {
   doc,
   FieldValue,
   getDocs,
+  increment,
   setDoc,
   Timestamp,
   updateDoc,
@@ -159,9 +160,6 @@ const Home: NextPage = () => {
     task.status === 3 && doneCount++;
   });
 
-  // Creating a new write Batch
-  // const batch = writeBatch(db)
-
   const onDragEnd = (result: DropResult) => {
     const { source, destination } = result;
     if (!destination) return;
@@ -189,10 +187,7 @@ const Home: NextPage = () => {
 
     if (destination.droppableId === "1") {
       todos.splice(destination.index, 0, add);
-      // 1. Change index of dragged Task -> DONE
-      // 2. Decrement (by 1) the indexes of Tasks that came after dragged Task in source Column
-      // 3. Increment (by 1) the indexes of Tasks that came after dragged Task in destination Column
-      updateTask(
+      handleUpdateTask(
         // Dragged Task -> updatedTask
         todos[destination.index],
 
@@ -242,7 +237,7 @@ const Home: NextPage = () => {
     setDoneTasks(dones);
   };
 
-  const updateTask = async (
+  const handleUpdateTask = async (
     updatedTask: any,
     updatedTaskId: string,
     sourceIndex: number,
@@ -251,6 +246,29 @@ const Home: NextPage = () => {
     newStatus: number
     // index: number | undefined
   ) => {
+    // Creating a new write Batch
+    const batch = writeBatch(db);
+
+    // ** 1. Change index & status of dragged Task
+    const taskDocRef = doc(
+      db,
+      "users",
+      `${user?.uid}`,
+      "boards",
+      `${boardId}`,
+      "tasks",
+      `${updatedTaskId}`
+    );
+
+    batch.update(taskDocRef, {
+      // Using type guard to ensure that we're always spreading an object
+      // ...(typeof updatedTask === "object" ? updatedTask : {}),
+      index: destinationIndex,
+      status: newStatus,
+      updatedAt: Timestamp.fromDate(new Date()),
+    });
+
+    // ** 2. Decrement (by 1) the indexes of Tasks that came after dragged Task in source Column
     if (initialStatus === 1) {
       console.log("Source Column is todos");
     } else if (initialStatus === 2) {
@@ -259,18 +277,39 @@ const Home: NextPage = () => {
         if (index >= sourceIndex) {
           // DECREMENT THE INDEX OF EACH TASK THAT FITS THIS CRITERIA
           console.log("doing to be decremented:", doing);
+          const taskDocRef = doc(
+            db,
+            "users",
+            `${user?.uid}`,
+            "boards",
+            `${boardId}`,
+            "tasks",
+            `${doing?.uid}`
+          );
+          batch.update(taskDocRef, { index: increment(-1) });
         }
       });
     } else if (initialStatus === 3) {
       console.log("Source Column is done");
     }
 
+    // ** 3. Increment (by 1) the indexes of Tasks that came after dragged Task in destination Column
     if (newStatus === 1) {
       console.log("Destination Column is todos");
       todos?.map((todo: any, index: number) => {
         if (index > destinationIndex) {
           // INCREMENT THE INDEX OF EACH TASK THAT FITS THIS CRITERIA
           console.log("todo to be incremented:", todo);
+          const taskDocRef = doc(
+            db,
+            "users",
+            `${user?.uid}`,
+            "boards",
+            `${boardId}`,
+            "tasks",
+            `${todo?.uid}`
+          );
+          batch.update(taskDocRef, { index: increment(1) });
         }
       });
     } else if (newStatus === 2) {
@@ -278,23 +317,8 @@ const Home: NextPage = () => {
     } else if (newStatus === 3) {
       console.log("Destination Column is done");
     }
-    // const taskDocRef = doc(
-    //   db,
-    //   "users",
-    //   `${user?.uid}`,
-    //   "boards",
-    //   `${boardId}`,
-    //   "tasks",
-    //   `${updatedTaskId}`
-    // );
 
-    // await setDoc(taskDocRef, {
-    //   // Using type guard to ensure that we're always spreading an object
-    //   ...(typeof updatedTask === "object" ? updatedTask : {}),
-    //   index: destinationIndex,
-    //   status: newStatus,
-    //   updatedAt: Timestamp.fromDate(new Date()),
-    // });
+    await batch.commit();
   };
 
   return (
