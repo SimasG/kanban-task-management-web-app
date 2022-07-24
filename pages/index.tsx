@@ -26,7 +26,6 @@ import { UserContext } from "../lib/context";
 import { db } from "../lib/firebase";
 import useFetchFsBoards from "../lib/hooks/useFetchFsBoards";
 import useFetchFsTasks from "../lib/hooks/useFetchFsTasks";
-import useFetchFsTasksTest from "../lib/hooks/useFetchFsTasksTest";
 
 // type LocalStorageBoardSchema = {
 //   boards: {
@@ -76,13 +75,6 @@ const Home: NextPage = () => {
   const doneTasksArray: any = fsTasks?.filter(
     (task: any) => task?.status === 3
   );
-
-  // console.log("fsTasks:", fsTasks);
-  // console.log("todoTasksArray:", todoTasksArray);
-  // console.log("doingTasksArray:", doingTasksArray);
-  // console.log("doneTasksArray:", doneTasksArray);
-
-  // console.log("fsBoards:", fsBoards);
 
   let todos = todoTasks;
   let doings = doingTasks;
@@ -184,43 +176,66 @@ const Home: NextPage = () => {
 
     let add;
 
-    if (source.droppableId === "todoList") {
+    if (source.droppableId === "1") {
       add = todos[source.index];
       todos.splice(source.index, 1);
-    } else if (source.droppableId === "doingList") {
+    } else if (source.droppableId === "2") {
       add = doings[source.index];
       doings.splice(source.index, 1);
-    } else if (source.droppableId === "doneList") {
+    } else if (source.droppableId === "3") {
       add = dones[source.index];
       dones.splice(source.index, 1);
     }
 
-    if (destination.droppableId === "todoList") {
+    if (destination.droppableId === "1") {
       todos.splice(destination.index, 0, add);
+      // 1. Change index of dragged Task -> DONE
+      // 2. Decrement (by 1) the indexes of Tasks that came after dragged Task in source Column
+      // 3. Increment (by 1) the indexes of Tasks that came after dragged Task in destination Column
       updateTask(
+        // Dragged Task -> updatedTask
         todos[destination.index],
-        todos[destination.index].uid,
-        1,
-        parseInt(todoTasksArray?.length)
-      );
-    } else if (destination.droppableId === "doingList") {
-      doings.splice(destination.index, 0, add);
 
-      updateTask(
-        doings[destination.index],
-        doings[destination.index].uid,
-        2,
-        parseInt(doingTasksArray?.length)
-      );
-    } else if (destination.droppableId === "doneList") {
-      dones.splice(destination.index, 0, add);
-      updateTask(
-        dones[destination.index],
-        dones[destination.index].uid,
-        3,
-        parseInt(doneTasksArray?.length)
+        // Dragged Task's uid -> updatedTaskId
+        todos[destination.index].uid,
+
+        // Source index -> Task's old index within Column -> sourceIndex
+        source.index,
+
+        // Destination index -> Tasks's new index within Column -> destinationIndex
+        destination.index,
+
+        // Source Column Status -> initialStatus
+        parseInt(source.droppableId),
+
+        // Destination Column Status -> Task's new Column index -> newStatus
+        1
+        // Could also be "parseInt(destination.droppableId)"
+
+        // ** Below is shaky
+        // Destination column length before the Task was dragged
+        // parseInt(todoTasksArray?.length)
+        //
       );
     }
+    // else if (destination.droppableId === "2") {
+    //   doings.splice(destination.index, 0, add);
+
+    //   updateTask(
+    //     doings[destination.index],
+    //     doings[destination.index].uid,
+    //     2,
+    //     parseInt(doingTasksArray?.length)
+    //   );
+    // } else if (destination.droppableId === "3") {
+    //   dones.splice(destination.index, 0, add);
+    //   updateTask(
+    //     dones[destination.index],
+    //     dones[destination.index].uid,
+    //     3,
+    //     parseInt(doneTasksArray?.length)
+    //   );
+    // }
 
     setTodoTasks(todos);
     setDoingTasks(doings);
@@ -230,26 +245,56 @@ const Home: NextPage = () => {
   const updateTask = async (
     updatedTask: any,
     updatedTaskId: string,
-    status: number,
-    index: number | undefined
+    sourceIndex: number,
+    destinationIndex: number,
+    initialStatus: number,
+    newStatus: number
+    // index: number | undefined
   ) => {
-    const taskDocRef = doc(
-      db,
-      "users",
-      `${user?.uid}`,
-      "boards",
-      `${boardId}`,
-      "tasks",
-      `${updatedTaskId}`
-    );
+    if (initialStatus === 1) {
+      console.log("Source Column is todos");
+    } else if (initialStatus === 2) {
+      console.log("Source Column is doing");
+      doings?.map((doing: any, index: number) => {
+        if (index >= sourceIndex) {
+          // DECREMENT THE INDEX OF EACH TASK THAT FITS THIS CRITERIA
+          console.log("doing to be decremented:", doing);
+        }
+      });
+    } else if (initialStatus === 3) {
+      console.log("Source Column is done");
+    }
 
-    await setDoc(taskDocRef, {
-      // Using type guard to ensure that we're always spreading an object
-      ...(typeof updatedTask === "object" ? updatedTask : {}),
-      index: index,
-      status: status,
-      updatedAt: Timestamp.fromDate(new Date()),
-    });
+    if (newStatus === 1) {
+      console.log("Destination Column is todos");
+      todos?.map((todo: any, index: number) => {
+        if (index > destinationIndex) {
+          // INCREMENT THE INDEX OF EACH TASK THAT FITS THIS CRITERIA
+          console.log("todo to be incremented:", todo);
+        }
+      });
+    } else if (newStatus === 2) {
+      console.log("Destination Column is doing");
+    } else if (newStatus === 3) {
+      console.log("Destination Column is done");
+    }
+    // const taskDocRef = doc(
+    //   db,
+    //   "users",
+    //   `${user?.uid}`,
+    //   "boards",
+    //   `${boardId}`,
+    //   "tasks",
+    //   `${updatedTaskId}`
+    // );
+
+    // await setDoc(taskDocRef, {
+    //   // Using type guard to ensure that we're always spreading an object
+    //   ...(typeof updatedTask === "object" ? updatedTask : {}),
+    //   index: destinationIndex,
+    //   status: newStatus,
+    //   updatedAt: Timestamp.fromDate(new Date()),
+    // });
   };
 
   return (
@@ -348,7 +393,8 @@ const Home: NextPage = () => {
                 </h3>
               </div>
               {/* Task Container */}
-              <Droppable droppableId="todoList">
+              {/* <Droppable droppableId="todoList"> */}
+              <Droppable droppableId="1">
                 {/* Are we using the render props pattern to display the Droppable component 
                 because that's the ideal way to access Droppable's props (provided & snapshot)? */}
                 {(provided: DroppableProvided) => {
@@ -416,7 +462,8 @@ const Home: NextPage = () => {
                 </h3>
               </div>
               {/* Task Container */}
-              <Droppable droppableId="doingList">
+              {/* <Droppable droppableId="doingList"> */}
+              <Droppable droppableId="2">
                 {(provided: DroppableProvided) => {
                   return (
                     <div
@@ -481,7 +528,8 @@ const Home: NextPage = () => {
                 </h3>
               </div>
               {/* Task Container */}
-              <Droppable droppableId="doneList">
+              {/* <Droppable droppableId="doneList"> */}
+              <Droppable droppableId="3">
                 {(provided: DroppableProvided, snapshot: any) => {
                   return (
                     <div
