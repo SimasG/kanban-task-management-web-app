@@ -45,6 +45,7 @@ const FormikForm = ({
 
   const handleSubmit = async () => {
     setSubmitting(true);
+
     const uid = uuidv4();
     const taskDocRef = doc(
       db,
@@ -52,11 +53,13 @@ const FormikForm = ({
       `${user?.uid}`,
       "boards",
       `${boardId}`,
+      // "columns",
+      // values?.status,
       "tasks",
       uid
     );
 
-    // console.log(parseInt(values?.status));
+    // console.log("taskDocRef:", taskDocRef);
 
     // Long & ugly if/else block. Wish I could use turnary operators inside setDoc
     if (parseInt(values?.status) === 1) {
