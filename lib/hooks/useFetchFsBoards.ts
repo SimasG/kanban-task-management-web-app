@@ -6,7 +6,7 @@ import { db } from "../firebase";
 const useFetchFsBoards = (uid: string | null | undefined) => {
   const q = query(
     collection(db, "users", `${uid}`, "boards"),
-    orderBy("createdAt", "desc")
+    orderBy("index", "asc")
   );
 
   // const data = useCollectionData(collection(db, "users", `${uid}`, "boards"));

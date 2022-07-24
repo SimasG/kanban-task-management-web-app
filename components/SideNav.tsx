@@ -1,10 +1,12 @@
 import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
 import {
   doc,
+  increment,
   serverTimestamp,
   setDoc,
   Timestamp,
   updateDoc,
+  writeBatch,
 } from "firebase/firestore";
 import Image from "next/image";
 import React, { useContext } from "react";
@@ -120,9 +122,10 @@ const SideNav = ({ boards, setBoards, boardId, setBoardId }: SideNavProps) => {
         const newData = [
           ...oldData,
           {
-            id: uuidv4(),
+            uid: uuidv4(),
             title: "New Board",
             createdAt: Date.now(),
+            // Add index (similar to "index: parseInt(oldData?.length)")
           },
         ];
         localStorage.setItem("boards", JSON.stringify(newData));
@@ -135,20 +138,21 @@ const SideNav = ({ boards, setBoards, boardId, setBoardId }: SideNavProps) => {
           setBoards(newData);
         }
 
-        setBoardId(newData?.[0]?.id);
+        setBoardId(newData?.[0]?.uid);
       }
       // If LS is empty
       else {
         const newData = [
           {
-            id: uuidv4(),
+            uid: uuidv4(),
             title: "New Board",
             createdAt: Date.now(),
+            // Add index (similar to "index: parseInt(oldData?.length)")
           },
         ];
         localStorage.setItem("boards", JSON.stringify(newData));
         setBoards(newData);
-        setBoardId(newData?.[0]?.id);
+        setBoardId(newData?.[0]?.uid);
       }
     } else {
       // Creating new Board in Firestore
@@ -158,6 +162,7 @@ const SideNav = ({ boards, setBoards, boardId, setBoardId }: SideNavProps) => {
         title: "New Board",
         uid: uuid,
         createdAt: Timestamp.fromDate(new Date()),
+        index: boards?.length,
       });
       setBoardId(uuid);
     }
@@ -192,8 +197,71 @@ const SideNav = ({ boards, setBoards, boardId, setBoardId }: SideNavProps) => {
     // Adding the same Board in the array at destination.index
     newBoards.splice(destination.index, 0, add);
 
+    // Reflecting UI changes in Firestore
+    updateBoardIndex(
+      newBoards[destination.index].uid,
+      source.index,
+      destination.index
+    );
+
     // Changing the main Boards state
     setBoards(newBoards);
+  };
+
+  const updateBoardIndex = async (
+    updatedBoardId: string,
+    sourceIndex: number,
+    destinationIndex: number
+  ) => {
+    const batch = writeBatch(db);
+
+    // ** Changing indexes of Boards affected
+    boards?.map((board: any) => {
+      if (destinationIndex > sourceIndex) {
+        // Decrement Boards
+        if (board.index > sourceIndex && board.index <= destinationIndex) {
+          // DECREMENT THE INDEX OF EACH BOARD THAT FITS THIS CRITERIA
+          console.log("board to be decremented:", board);
+          const boardDocRef = doc(
+            db,
+            "users",
+            `${user?.uid}`,
+            "boards",
+            `${board?.uid}`
+          );
+          batch.update(boardDocRef, { index: increment(-1) });
+        }
+      } else if (destinationIndex < sourceIndex) {
+        // Increment Boards
+        if (board.index < sourceIndex && board.index >= destinationIndex) {
+          // INCREMENT THE INDEX OF EACH BOARD THAT FITS THIS CRITERIA
+          console.log("board to be incremented:", board);
+          const taskDocRef = doc(
+            db,
+            "users",
+            `${user?.uid}`,
+            "boards",
+            `${board?.uid}`
+          );
+          batch.update(taskDocRef, { index: increment(1) });
+        }
+      }
+    });
+
+    // ** Changing index of dragged Board
+    const boardDocRef = doc(
+      db,
+      "users",
+      `${user?.uid}`,
+      "boards",
+      `${updatedBoardId}`
+    );
+    batch.update(boardDocRef, {
+      index: destinationIndex,
+      updatedAt: Timestamp.fromDate(new Date()),
+    });
+    console.log("end of func");
+    await batch.commit();
   };
 
   return (

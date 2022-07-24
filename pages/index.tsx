@@ -174,6 +174,7 @@ const Home: NextPage = () => {
 
     let add;
 
+    // Removing Task from array at source.index
     if (source.droppableId === "1") {
       add = todos[source.index];
       todos.splice(source.index, 1);
@@ -185,6 +186,7 @@ const Home: NextPage = () => {
       dones.splice(source.index, 1);
     }
 
+    // Adding Task to an array at destination.index
     if (destination.droppableId === "1") {
       todos.splice(destination.index, 0, add);
       handleUpdateTask(
