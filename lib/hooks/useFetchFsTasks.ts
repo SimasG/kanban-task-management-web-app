@@ -12,7 +12,8 @@ const useFetchFsTasks = (
     `${userId}`,
     "boards",
     `${boardId}`,
-    // "columns"
+    "columns",
+    "1",
     "tasks"
   );
 
@@ -25,7 +26,7 @@ const useFetchFsTasks = (
   // Why am I not receiving the array of data I want to fetch immediately
   // (aka why do I have to manually access the first array element to access the desired data)?
   const data = useCollectionData(q)[0];
-  // console.log("data:", data);
+  // console.log("test data:", data);
 
   // const indexSortedData = data?.sort((a, b) => a.index - b.index);
   // const statusIndexSortedData = indexSortedData?.sort(

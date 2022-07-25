@@ -53,8 +53,8 @@ const FormikForm = ({
       `${user?.uid}`,
       "boards",
       `${boardId}`,
-      // "columns",
-      // values?.status,
+      "columns",
+      values?.status,
       "tasks",
       uid
     );
@@ -68,8 +68,9 @@ const FormikForm = ({
         ...(typeof values === "object" ? values : {}),
         index: parseInt(todoTasksArray?.length),
         status: parseInt(values?.status),
+        boardId: boardId,
         uid: uid,
-        updatedAt: Timestamp.fromDate(new Date()),
+        createdAt: Timestamp.fromDate(new Date()),
       });
       console.log("values?.status === 1 ran");
     } else if (parseInt(values?.status) === 2) {
@@ -77,8 +78,9 @@ const FormikForm = ({
         ...(typeof values === "object" ? values : {}),
         index: parseInt(doingTasksArray?.length),
         status: parseInt(values?.status),
+        boardId: boardId,
         uid: uid,
-        updatedAt: Timestamp.fromDate(new Date()),
+        createdAt: Timestamp.fromDate(new Date()),
       });
       console.log("values?.status === 2 ran");
     } else if (parseInt(values?.status) === 3) {
@@ -86,8 +88,9 @@ const FormikForm = ({
         ...(typeof values === "object" ? values : {}),
         index: parseInt(doneTasksArray?.length),
         status: parseInt(values?.status),
+        boardId: boardId,
         uid: uid,
-        updatedAt: Timestamp.fromDate(new Date()),
+        createdAt: Timestamp.fromDate(new Date()),
       });
       console.log("values?.status === 3 ran");
     }
