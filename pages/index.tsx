@@ -66,8 +66,8 @@ const Home: NextPage = () => {
 
   // Fetching all Tasks of selected Board
   const fsTasks = useFetchFsTasks(user?.uid, boardId);
-
   const fsTasksTest = useFetchTasksCollectionGroup(boardId);
+  console.log("fsTasksTest:", fsTasksTest);
 
   // Separating Tasks array into arrays of Tasks for different columns -> to ensure each column's Tasks are zero-indexed
   const todoTasksArray: any = fsTasks?.filter(
