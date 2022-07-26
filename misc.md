@@ -739,3 +739,15 @@ const [doneTasks, setDoneTasks] = useState<any>(null);
 const todoTasksArray: any = tasks?.filter((task: any) => task?.status === 1);
 const doingTasksArray: any = tasks?.filter((task: any) => task?.status === 2);
 const doneTasksArray: any = tasks?.filter((task: any) => task?.status === 3);
+
+// console.log("todoTasksArray:", todoTasksArray);
+// console.log("doingTasksArray:", doingTasksArray);
+// console.log("doneTasksArray:", doneTasksArray);
+
+// console.log("todoTasks (state):", todoTasks);
+// console.log("doingTasks (state):", doingTasks);
+// console.log("doneTasks (state):", doneTasks);
+
+// console.log("todos:", todos);
+// console.log("doings:", doings);
+// console.log("dones:", dones);
