@@ -26,6 +26,7 @@ import {
   DropResult,
   ResponderProvided,
 } from "react-beautiful-dnd";
+import { BoardSchema } from "../lib/types";
 
 // type LocalStorageDataProps = {
 //   users: UserProps;
@@ -42,13 +43,6 @@ import {
 // type BoardsProps = {
 //   board: BoardProps;
 // };
-
-type BoardSchema = {
-  title: string;
-  uid: string;
-  // Change "createdAt" type later
-  createdAt: any;
-};
 
 type LocalStorageBoardSchema = {
   boards: {

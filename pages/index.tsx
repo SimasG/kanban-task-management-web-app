@@ -3,26 +3,12 @@ import type { NextPage } from "next";
 import React, { useContext, useEffect, useState } from "react";
 import AddNewTaskModal from "../components/AddNewTaskModal";
 import EditTaskModal from "../components/EditTaskModal";
-import Main from "../components/Main";
+import Main from "../components/Main/Main";
 import SideNav from "../components/SideNav";
 import { UserContext } from "../lib/context";
 import useFetchFsBoards from "../lib/hooks/useFetchFsBoards";
 import useFetchTasksCollectionGroup from "../lib/hooks/useFetchTasksCollectionGroup";
-
-// type LocalStorageBoardSchema = {
-//   boards: {
-//     title: string;
-//     id: string | null | undefined;
-// createdAt: any
-//   }[];
-// };
-
-type BoardSchema = {
-  createdAt: FieldValue;
-  index: number;
-  title: string;
-  uid: string | null | undefined;
-};
+import { BoardSchema } from "../lib/types";
 
 const Home: NextPage = () => {
   // ** Fetching Data
@@ -30,7 +16,6 @@ const Home: NextPage = () => {
   const fsBoards = useFetchFsBoards(user?.uid);
 
   // ** STATES
-  // ** Main State
   const [boards, setBoards] = useState<
     // ** Change "any" later -> change it once the data schema is more clear
     BoardSchema[] | null | any
@@ -102,6 +87,8 @@ const Home: NextPage = () => {
         dones={dones}
         tasks={tasks}
         setTaskId={setTaskId}
+        setShowAddTaskModal={setShowAddTaskModal}
+        setShowEditTaskModal={setShowEditTaskModal}
       />
       {showAddTaskModal && (
         <AddNewTaskModal
