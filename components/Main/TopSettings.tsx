@@ -6,22 +6,22 @@ import { BoardSchema } from "../../lib/types";
 
 type TopSettingsProps = {
   activeBoard: any;
-  updateBoardName: (uid: string, newName: string) => Promise<void>;
   boards: any;
   setBoards: React.Dispatch<any>;
   boardId: string | null | undefined;
   setBoardId: React.Dispatch<React.SetStateAction<string | null | undefined>>;
   setShowAddTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
+  updateBoardName: (uid: string, newName: string) => Promise<void>;
 };
 
 const TopSettings = ({
   activeBoard,
-  updateBoardName,
   boards,
   setBoards,
   boardId,
   setBoardId,
   setShowAddTaskModal,
+  updateBoardName,
 }: TopSettingsProps) => {
   // ** Fetching Data
   const user = useContext(UserContext);

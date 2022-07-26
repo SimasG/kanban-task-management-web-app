@@ -1,4 +1,4 @@
-import { FieldValue } from "firebase/firestore";
+import { doc, FieldValue, updateDoc } from "firebase/firestore";
 import type { NextPage } from "next";
 import React, { useContext, useEffect, useState } from "react";
 import AddNewTaskModal from "../components/AddNewTaskModal";
@@ -6,6 +6,7 @@ import EditTaskModal from "../components/EditTaskModal";
 import Main from "../components/Main/Main";
 import SideNav from "../components/SideNav";
 import { UserContext } from "../lib/context";
+import { db } from "../lib/firebase";
 import useFetchFsBoards from "../lib/hooks/useFetchFsBoards";
 import useFetchTasksCollectionGroup from "../lib/hooks/useFetchTasksCollectionGroup";
 import { BoardSchema } from "../lib/types";
@@ -61,6 +62,13 @@ const Home: NextPage = () => {
     (board: BoardSchema) => board.uid === boardId
   );
 
+  const updateBoardName = async (uid: string, newName: string) => {
+    const ref = doc(db, "users", `${user?.uid}`, "boards", uid);
+    await updateDoc(ref, {
+      title: newName,
+    });
+  };
+
   return (
     <div
       onClick={() => {
@@ -74,6 +82,7 @@ const Home: NextPage = () => {
         setBoards={setBoards}
         boardId={boardId}
         setBoardId={setBoardId}
+        updateBoardName={updateBoardName}
       />
       {/* Main */}
       <Main
@@ -89,6 +98,7 @@ const Home: NextPage = () => {
         setTaskId={setTaskId}
         setShowAddTaskModal={setShowAddTaskModal}
         setShowEditTaskModal={setShowEditTaskModal}
+        updateBoardName={updateBoardName}
       />
       {showAddTaskModal && (
         <AddNewTaskModal

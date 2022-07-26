@@ -43,7 +43,7 @@ const Column = ({
         </h3>
       </div>
       {/* Task Container */}
-      <Droppable droppableId="1">
+      <Droppable droppableId={columnStatus.toString()}>
         {/* Are we using the render props pattern to display the Droppable component 
     because that's the ideal way to access Droppable's props (provided & snapshot)? */}
         {(provided: DroppableProvided) => {

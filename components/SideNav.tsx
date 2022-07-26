@@ -57,9 +57,16 @@ type SideNavProps = {
   setBoards: React.Dispatch<React.SetStateAction<any>>;
   boardId: string | null | undefined;
   setBoardId: React.Dispatch<React.SetStateAction<string | null | undefined>>;
+  updateBoardName: (uid: string, newName: string) => Promise<void>;
 };
 
-const SideNav = ({ boards, setBoards, boardId, setBoardId }: SideNavProps) => {
+const SideNav = ({
+  boards,
+  setBoards,
+  boardId,
+  setBoardId,
+  updateBoardName,
+}: SideNavProps) => {
   const user = useContext(UserContext);
 
   const handleGoogleLogin = () => {
@@ -160,14 +167,6 @@ const SideNav = ({ boards, setBoards, boardId, setBoardId }: SideNavProps) => {
       });
       setBoardId(uuid);
     }
-  };
-
-  // U -> Firestore
-  const updateBoardName = async (uid: string, newName: string) => {
-    const ref = doc(db, "users", `${user?.uid}`, "boards", uid);
-    await updateDoc(ref, {
-      title: newName,
-    });
   };
 
   const onDragEnd = (result: DropResult) => {

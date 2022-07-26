@@ -3,18 +3,10 @@ import {
   increment,
   runTransaction,
   Timestamp,
-  updateDoc,
   writeBatch,
 } from "firebase/firestore";
 import { useContext } from "react";
-import {
-  DragDropContext,
-  Draggable,
-  DraggableProvided,
-  Droppable,
-  DroppableProvided,
-  DropResult,
-} from "react-beautiful-dnd";
+import { DragDropContext, DropResult } from "react-beautiful-dnd";
 import { UserContext } from "../../lib/context";
 import { db } from "../../lib/firebase";
 import Column from "./Column";
@@ -33,6 +25,7 @@ type MainProps = {
   setTaskId: React.Dispatch<React.SetStateAction<string | null | undefined>>;
   setShowAddTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
   setShowEditTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
+  updateBoardName: (uid: string, newName: string) => Promise<void>;
 };
 
 const Main = ({
@@ -48,82 +41,85 @@ const Main = ({
   setTaskId,
   setShowAddTaskModal,
   setShowEditTaskModal,
+  updateBoardName,
 }: MainProps) => {
   // ** Fetching Data
   const user = useContext(UserContext);
 
-  const updateBoardName = async (uid: string, newName: string) => {
-    const ref = doc(db, "users", `${user?.uid}`, "boards", uid);
-    await updateDoc(ref, {
-      title: newName,
-    });
-  };
-
-  // Calculating todo/doing/done task #
-  let todoCount = 0;
-  let doingCount = 0;
-  let doneCount = 0;
-
-  tasks?.map((task: any) => {
-    task.status === 1 && todoCount++;
-    task.status === 2 && doingCount++;
-    task.status === 3 && doneCount++;
-  });
-
   const onDragEnd = (result: DropResult) => {
     const { source, destination } = result;
-    // if (!destination) return;
-    // if (
-    //   destination.droppableId === source.droppableId &&
-    //   destination.index === source.index
-    // )
-    //   return;
+    if (!destination) return;
+    if (
+      destination.droppableId === source.droppableId &&
+      destination.index === source.index
+    )
+      return;
 
     console.log("onDragEnd ran", result);
 
     let add;
 
     // Removing Task from array at source.index
-    // if (source.droppableId === "1") {
-    //   add = todos[source.index];
-    //   todos.splice(source.index, 1);
-    // } else if (source.droppableId === "2") {
-    //   add = doings[source.index];
-    //   doings.splice(source.index, 1);
-    // } else if (source.droppableId === "3") {
-    //   add = dones[source.index];
-    //   dones.splice(source.index, 1);
-    // }
+    if (source.droppableId === "1") {
+      add = todos[source.index];
+      todos.splice(source.index, 1);
+    } else if (source.droppableId === "2") {
+      add = doings[source.index];
+      doings.splice(source.index, 1);
+    } else if (source.droppableId === "3") {
+      add = dones[source.index];
+      dones.splice(source.index, 1);
+    }
+
+    // Returns Task array (from the respective Column) without the dragged Task
+    removeTaskDnd(parseInt(source.droppableId), source.index);
 
     // Adding Task to an array at destination.index
-    // if (destination.droppableId === "1") {
-    //   todos.splice(destination.index, 0, add);
-    //   handleUpdateTask(
-    //     todos[destination.index].uid,
-    //     source.index,
-    //     destination.index,
-    //     parseInt(source.droppableId),
-    //     parseInt(destination.droppableId)
-    //   );
-    // } else if (destination.droppableId === "2") {
-    //   doings.splice(destination.index, 0, add);
-    //   handleUpdateTask(
-    //     doings[destination.index].uid,
-    //     source.index,
-    //     destination.index,
-    //     parseInt(source.droppableId),
-    //     parseInt(destination.droppableId)
-    //   );
-    // } else if (destination.droppableId === "3") {
-    //   dones.splice(destination.index, 0, add);
-    //   handleUpdateTask(
-    //     dones[destination.index].uid,
-    //     source.index,
-    //     destination.index,
-    //     parseInt(source.droppableId),
-    //     parseInt(destination.droppableId)
-    //   );
-    // }
+    if (destination.droppableId === "1") {
+      todos.splice(destination.index, 0, add);
+      handleUpdateTask(
+        todos[destination.index].uid,
+        source.index,
+        destination.index,
+        parseInt(source.droppableId),
+        parseInt(destination.droppableId)
+      );
+    } else if (destination.droppableId === "2") {
+      doings.splice(destination.index, 0, add);
+      handleUpdateTask(
+        doings[destination.index].uid,
+        source.index,
+        destination.index,
+        parseInt(source.droppableId),
+        parseInt(destination.droppableId)
+      );
+    } else if (destination.droppableId === "3") {
+      dones.splice(destination.index, 0, add);
+      handleUpdateTask(
+        dones[destination.index].uid,
+        source.index,
+        destination.index,
+        parseInt(source.droppableId),
+        parseInt(destination.droppableId)
+      );
+    }
+  };
+
+  const removeTaskDnd = (newStatus: number, sourceIndex: number) => {
+    // Put the dragged Task into a separate variable
+    let add;
+    const filteredTasks = tasks?.filter(
+      (task: any) => task?.status === newStatus
+    );
+    add = filteredTasks[sourceIndex];
+
+    // Remove Task from array at source.index
+    filteredTasks.splice(sourceIndex, 1);
+
+    // return Task array (from the respective Column) without the dragged Task
+    //  (displays un-updated indexes of these Tasks)
+    console.log(`Filtered Tasks from Column ${newStatus}:`, filteredTasks);
+    return filteredTasks;
   };
 
   const handleUpdateTask = async (
@@ -508,18 +504,19 @@ const Main = ({
     <main className="w-4/5">
       <TopSettings
         activeBoard={activeBoard}
-        updateBoardName={updateBoardName}
         boards={boards}
         setBoards={setBoards}
         boardId={boardId}
         setBoardId={setBoardId}
         setShowAddTaskModal={setShowAddTaskModal}
+        updateBoardName={updateBoardName}
       />
       {/* Main content */}
       <DragDropContext onDragEnd={onDragEnd}>
         {/* overflow-x-auto overflow-hidden */}
         <section className="h-[90%] bg-darkBlue p-5 flex justify-start items-start gap-6 ">
           {/* Hardcoding the Column count *for now* */}
+          {/* Columns? -> later */}
           <Column
             setTaskId={setTaskId}
             setShowEditTaskModal={setShowEditTaskModal}
