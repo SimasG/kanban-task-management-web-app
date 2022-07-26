@@ -715,3 +715,27 @@ export default useFetchDiffFsData;
 
         // Destination column length before the Task was dragged
         // parseInt(todoTasksArray?.length)
+
+const handleEditTask = (e: React.MouseEvent<HTMLDivElement>) => {
+e.stopPropagation();
+setShowEditTaskModal(true);
+};
+
+const [todoTasks, setTodoTasks] = useState<any>(null);
+const [doingTasks, setDoingTasks] = useState<any>(null);
+const [doneTasks, setDoneTasks] = useState<any>(null);
+
+    // setTodoTasks(todos);
+    // setDoingTasks(doings);
+    // setDoneTasks(dones);
+
+      // By default set the state of Tasks via todos/doings/dones because they're automatically sorted
+      // in the correct order. Use todoTasksArray/etc only for the initial state load.
+
+          // setTodoTasks(todoTasksArray);
+      // setDoingTasks(doingTasksArray);
+      // setDoneTasks(doneTasksArray);
+
+const todoTasksArray: any = tasks?.filter((task: any) => task?.status === 1);
+const doingTasksArray: any = tasks?.filter((task: any) => task?.status === 2);
+const doneTasksArray: any = tasks?.filter((task: any) => task?.status === 3);

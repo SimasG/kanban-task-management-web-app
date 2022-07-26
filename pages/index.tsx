@@ -27,7 +27,6 @@ import SideNav from "../components/SideNav";
 import { UserContext } from "../lib/context";
 import { db } from "../lib/firebase";
 import useFetchFsBoards from "../lib/hooks/useFetchFsBoards";
-// import useFetchFsTasks from "../lib/hooks/useFetchFsTasks";
 import useFetchTasksCollectionGroup from "../lib/hooks/useFetchTasksCollectionGroup";
 
 // type LocalStorageBoardSchema = {
@@ -39,50 +38,31 @@ import useFetchTasksCollectionGroup from "../lib/hooks/useFetchTasksCollectionGr
 // };
 
 type BoardSchema = {
+  createdAt: FieldValue;
+  index: number;
   title: string;
   uid: string | null | undefined;
-  createdAt: FieldValue;
 };
 
 const Home: NextPage = () => {
+  // ** Fetching Data
   const user = useContext(UserContext);
-  // Fetching all Boards
   const fsBoards = useFetchFsBoards(user?.uid);
 
-  // States
+  // ** STATES
   // ** Main State
   const [boards, setBoards] = useState<
     // ** Change "any" later -> change it once the data schema is more clear
     BoardSchema[] | null | any
   >(null);
   const [tasks, setTasks] = useState<any>(null);
-  const [todoTasks, setTodoTasks] = useState<any>(null);
-  const [doingTasks, setDoingTasks] = useState<any>(null);
-  const [doneTasks, setDoneTasks] = useState<any>(null);
-
   const [showAddTaskModal, setShowAddTaskModal] = useState(false);
   const [showEditTaskModal, setShowEditTaskModal] = useState(false);
   const [boardId, setBoardId] = useState<string | null | undefined>(null);
   const [taskId, setTaskId] = useState<string | null | undefined>(null);
 
   // Fetching all Tasks of selected Board
-  // const fsTasks = useFetchFsTasks(user?.uid, boardId);
   const fsTasks: any = useFetchTasksCollectionGroup(boardId);
-
-  // Separating Tasks array into arrays of Tasks for different columns -> to ensure each column's Tasks are zero-indexed
-  const todoTasksArray: any = fsTasks?.filter(
-    (task: any) => task?.status === 1
-  );
-  const doingTasksArray: any = fsTasks?.filter(
-    (task: any) => task?.status === 2
-  );
-  const doneTasksArray: any = fsTasks?.filter(
-    (task: any) => task?.status === 3
-  );
-
-  let todos = todoTasks;
-  let doings = doingTasks;
-  let dones = doneTasks;
 
   // Setting main state either from localStorage or Firestore
   useEffect(() => {
@@ -92,6 +72,7 @@ const Home: NextPage = () => {
         setBoards(JSON.parse(localStorage.getItem("boards") || ""));
         setBoardId(JSON.parse(localStorage.getItem("boards") || "")?.[0]?.id);
       }
+      // get "tasks" (& "subtasks"?) as well later..
       return;
     } else {
       // Ensuring that I only set the main state from Firestore once the data has been fetched (async protection)
@@ -102,13 +83,14 @@ const Home: NextPage = () => {
       }
       if (!fsTasks) return;
       setTasks(fsTasks);
-      // By default set the state of Tasks via todos/doings/dones because they're automatically sorted
-      // in the correct order. Use todoTasksArray/etc only for the initial state load.
-      setTodoTasks(todoTasksArray);
-      setDoingTasks(doingTasksArray);
-      setDoneTasks(doneTasksArray);
+      console.log("useEffect shit ran");
     }
   }, [fsBoards, fsTasks, user]);
+
+  // Separating Tasks array into arrays of Tasks for different columns -> to ensure each column's Tasks are zero-indexed
+  let todos = tasks?.filter((task: any) => task?.status === 1);
+  let doings = tasks?.filter((task: any) => task?.status === 2);
+  let dones = tasks?.filter((task: any) => task?.status === 3);
 
   const activeBoard = boards?.filter(
     (board: BoardSchema) => board.uid === boardId
@@ -118,11 +100,6 @@ const Home: NextPage = () => {
   const handleAddNewTaskBtn = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     setShowAddTaskModal(true);
-  };
-
-  const handleEditTask = (e: React.MouseEvent<HTMLDivElement>) => {
-    e.stopPropagation();
-    setShowEditTaskModal(true);
   };
 
   const handleDeleteBoard = async (uid: string | null | undefined) => {
@@ -166,7 +143,6 @@ const Home: NextPage = () => {
   const onDragEnd = (result: DropResult) => {
     const { source, destination } = result;
     if (!destination) return;
-
     if (
       destination.droppableId === source.droppableId &&
       destination.index === source.index
@@ -197,7 +173,7 @@ const Home: NextPage = () => {
         source.index,
         destination.index,
         parseInt(source.droppableId),
-        1
+        parseInt(destination.droppableId)
       );
     } else if (destination.droppableId === "2") {
       doings.splice(destination.index, 0, add);
@@ -206,7 +182,7 @@ const Home: NextPage = () => {
         source.index,
         destination.index,
         parseInt(source.droppableId),
-        2
+        parseInt(destination.droppableId)
       );
     } else if (destination.droppableId === "3") {
       dones.splice(destination.index, 0, add);
@@ -215,13 +191,9 @@ const Home: NextPage = () => {
         source.index,
         destination.index,
         parseInt(source.droppableId),
-        3
+        parseInt(destination.droppableId)
       );
     }
-
-    setTodoTasks(todos);
-    setDoingTasks(doings);
-    setDoneTasks(dones);
   };
 
   const handleUpdateTask = async (
@@ -602,6 +574,18 @@ const Home: NextPage = () => {
     console.log("END OF FUNCTION");
   };
 
+  // console.log("todoTasksArray:", todoTasksArray);
+  // console.log("doingTasksArray:", doingTasksArray);
+  // console.log("doneTasksArray:", doneTasksArray);
+
+  // console.log("todoTasks (state):", todoTasks);
+  // console.log("doingTasks (state):", doingTasks);
+  // console.log("doneTasks (state):", doneTasks);
+
+  // console.log("todos:", todos);
+  // console.log("doings:", doings);
+  // console.log("dones:", dones);
+
   return (
     <div
       onClick={() => {
@@ -708,7 +692,7 @@ const Home: NextPage = () => {
                       ref={provided.innerRef}
                       {...provided.droppableProps}
                     >
-                      {todoTasks?.map((task: any, index: number) => {
+                      {todos?.map((task: any, index: number) => {
                         // if (task.status === "1") {
                         // Number of checked subtasks
                         let checkedNumber = 0;
@@ -774,7 +758,7 @@ const Home: NextPage = () => {
                       ref={provided.innerRef}
                       {...provided.droppableProps}
                     >
-                      {doingTasks?.map((task: any, index: number) => {
+                      {doings?.map((task: any, index: number) => {
                         // if (task.status === "2") {
                         // Number of checked subtasks
                         let checkedNumber = 0;
@@ -840,7 +824,7 @@ const Home: NextPage = () => {
                       ref={provided.innerRef}
                       {...provided.droppableProps}
                     >
-                      {doneTasks?.map((task: any, index: number) => {
+                      {dones?.map((task: any, index: number) => {
                         // if (task.status === "3") {
                         // Number of checked subtasks
                         let checkedNumber = 0;
@@ -898,9 +882,9 @@ const Home: NextPage = () => {
         <AddNewTaskModal
           boardId={boardId}
           setShowAddTaskModal={setShowAddTaskModal}
-          todoTasksArray={todoTasksArray}
-          doingTasksArray={doingTasksArray}
-          doneTasksArray={doneTasksArray}
+          todoTasksArray={todos}
+          doingTasksArray={doings}
+          doneTasksArray={dones}
         />
       )}
       {showEditTaskModal && (

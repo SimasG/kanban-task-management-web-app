@@ -30,6 +30,7 @@ const useFetchTasksCollectionGroup = (boardId: string | null | undefined) => {
     (a: any, b: any) => a.status - b.status
   );
 
+  // console.log("refetching shit from useFetchTasksCollectionGroup");
   return statusIndexSortedData;
 };
 export default useFetchTasksCollectionGroup;

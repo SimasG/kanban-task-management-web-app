@@ -77,7 +77,7 @@ const FormikForm = ({
 
     // console.log("taskDocRef:", taskDocRef);
 
-    // Long & ugly if/else block. Wish I could use turnary operators inside setDoc
+    // Long & ugly if/else block. Wish I could use ternary operators inside setDoc
     if (parseInt(values?.status) === 1) {
       await setDoc(taskDocRef, {
         // Using type guard to ensure that we're always spreading an object
