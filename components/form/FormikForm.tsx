@@ -7,7 +7,13 @@ import {
 } from "formik";
 import FormikControl from "./FormikControl";
 import { v4 as uuidv4 } from "uuid";
-import { doc, DocumentData, setDoc, Timestamp } from "firebase/firestore";
+import {
+  doc,
+  DocumentData,
+  setDoc,
+  Timestamp,
+  updateDoc,
+} from "firebase/firestore";
 import { db } from "../../lib/firebase";
 import { useContext } from "react";
 import { UserContext } from "../../lib/context";
@@ -59,6 +65,16 @@ const FormikForm = ({
       uid
     );
 
+    // const columnDocRef = doc(
+    //   db,
+    //   "users",
+    //   `${user?.uid}`,
+    //   "boards",
+    //   `${boardId}`,
+    //   "columns",
+    //   values?.status
+    // );
+
     // console.log("taskDocRef:", taskDocRef);
 
     // Long & ugly if/else block. Wish I could use turnary operators inside setDoc
@@ -72,6 +88,9 @@ const FormikForm = ({
         uid: uid,
         createdAt: Timestamp.fromDate(new Date()),
       });
+      // await updateDoc(columnDocRef, {
+      //   title: "todo",
+      // });
       console.log("values?.status === 1 ran");
     } else if (parseInt(values?.status) === 2) {
       await setDoc(taskDocRef, {

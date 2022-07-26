@@ -23,8 +23,6 @@ type IndexProps = {
 const FormikForm = ({ boardId, taskId, setShowEditTaskModal }: IndexProps) => {
   const user = useContext(UserContext);
 
-  // const [checked, setChecked] = useState(false);
-
   const dropdownOptions = [
     // "value: ''" will automatically make this option invalid and throw an error
     { key: "Select an option", value: "" },
@@ -35,7 +33,7 @@ const FormikForm = ({ boardId, taskId, setShowEditTaskModal }: IndexProps) => {
   const formik = useFormikContext();
   const { values, setSubmitting, resetForm }: any = formik;
 
-  // console.log("Formik form values:", values);
+  // console.log("formik values:", values);
 
   const handleSubmit = async () => {
     setSubmitting(true);
@@ -45,6 +43,8 @@ const FormikForm = ({ boardId, taskId, setShowEditTaskModal }: IndexProps) => {
       `${user?.uid}`,
       "boards",
       `${boardId}`,
+      "columns",
+      `${values?.status}`,
       "tasks",
       `${taskId}`
     );
@@ -90,20 +90,25 @@ const FormikForm = ({ boardId, taskId, setShowEditTaskModal }: IndexProps) => {
                 stroke="currentColor"
                 viewBox="0 0 24 24"
                 xmlns="http://www.w3.org/2000/svg"
-                onClick={async () => {
-                  const taskRef = doc(
-                    db,
-                    "users",
-                    `${user?.uid}`,
-                    "boards",
-                    `${boardId}`,
-                    "tasks",
-                    `${taskId}`
-                  );
-                  await deleteDoc(taskRef);
-                  setShowEditTaskModal(false);
-                  toast.success("Task has been deleted!");
-                }}
+                onClick={
+                  // () => deleteTask()
+                  async () => {
+                    const taskRef = doc(
+                      db,
+                      "users",
+                      `${user?.uid}`,
+                      "boards",
+                      `${boardId}`,
+                      "columns",
+                      `${values?.status}`,
+                      "tasks",
+                      `${taskId}`
+                    );
+                    await deleteDoc(taskRef);
+                    setShowEditTaskModal(false);
+                    toast.success("Task has been deleted!");
+                  }
+                }
               >
                 <path
                   strokeLinecap="round"

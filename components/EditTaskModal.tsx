@@ -8,6 +8,7 @@ import { useContext, useEffect, useState } from "react";
 import { UserContext } from "../lib/context";
 import useFetchFsTasks from "../lib/hooks/useFetchFsTasks";
 import { useSetState } from "@mantine/hooks";
+import useFetchTasksCollectionGroup from "../lib/hooks/useFetchTasksCollectionGroup";
 
 type IndexProps = {
   boardId: string | null | undefined;
@@ -21,9 +22,10 @@ const EditTaskModal = ({
   setShowEditTaskModal,
 }: IndexProps) => {
   const [data, setData] = useState<any>();
-  const user = useContext(UserContext);
+  // const user = useContext(UserContext);
   // Fetching all Tasks of selected Board
-  const tasks = useFetchFsTasks(user?.uid, boardId);
+  // const tasks = useFetchFsTasks(user?.uid, boardId);
+  const tasks: any = useFetchTasksCollectionGroup(boardId);
 
   const selectedTask = tasks?.filter((task: any) => task?.uid === taskId)?.[0];
 

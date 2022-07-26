@@ -1,33 +1,9 @@
-// import { collectionGroup, getDocs, query, where } from "firebase/firestore";
-// import { db } from "../firebase";
-
 import { collectionGroup, onSnapshot, query, where } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { db } from "../firebase";
 
-// const useFetchTasksCollectionGroup = async (
-//   boardId: string | null | undefined
-// ) => {
-//   let tasks: any = [];
-
-//   const tasksQ = query(
-//     collectionGroup(db, "tasks"),
-//     where("boardId", "==", `${boardId}`)
-//   );
-//   const querySnapshot = await getDocs(tasksQ);
-//   querySnapshot.forEach((doc) => {
-//     // console.log("doc.data():", doc.data());
-//     tasks?.push(doc.data());
-//   });
-
-//   // console.log("Collection Group Tasks:", tasks);
-//   return tasks;
-// };
-
-// export default useFetchTasksCollectionGroup;
-
 const useFetchTasksCollectionGroup = (boardId: string | null | undefined) => {
-  const [data, setData] = useState();
+  const [data, setData] = useState<any>();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -49,7 +25,11 @@ const useFetchTasksCollectionGroup = (boardId: string | null | undefined) => {
     fetchData();
   }, [boardId]);
 
-  // console.log("Collection Group Data:", data);
-  return data;
+  const indexSortedData = data?.sort((a: any, b: any) => a.index - b.index);
+  const statusIndexSortedData = indexSortedData?.sort(
+    (a: any, b: any) => a.status - b.status
+  );
+
+  return statusIndexSortedData;
 };
 export default useFetchTasksCollectionGroup;

@@ -5,6 +5,7 @@ import {
   FieldValue,
   getDocs,
   increment,
+  runTransaction,
   setDoc,
   Timestamp,
   updateDoc,
@@ -26,7 +27,7 @@ import SideNav from "../components/SideNav";
 import { UserContext } from "../lib/context";
 import { db } from "../lib/firebase";
 import useFetchFsBoards from "../lib/hooks/useFetchFsBoards";
-import useFetchFsTasks from "../lib/hooks/useFetchFsTasks";
+// import useFetchFsTasks from "../lib/hooks/useFetchFsTasks";
 import useFetchTasksCollectionGroup from "../lib/hooks/useFetchTasksCollectionGroup";
 
 // type LocalStorageBoardSchema = {
@@ -65,9 +66,8 @@ const Home: NextPage = () => {
   const [taskId, setTaskId] = useState<string | null | undefined>(null);
 
   // Fetching all Tasks of selected Board
-  const fsTasks = useFetchFsTasks(user?.uid, boardId);
-  const fsTasksTest = useFetchTasksCollectionGroup(boardId);
-  console.log("fsTasksTest:", fsTasksTest);
+  // const fsTasks = useFetchFsTasks(user?.uid, boardId);
+  const fsTasks: any = useFetchTasksCollectionGroup(boardId);
 
   // Separating Tasks array into arrays of Tasks for different columns -> to ensure each column's Tasks are zero-indexed
   const todoTasksArray: any = fsTasks?.filter(
@@ -240,9 +240,9 @@ const Home: NextPage = () => {
     const batch = writeBatch(db);
 
     // ** WITHIN COLUMN LOGIC
-    // Same as "destination.droppableId === source.droppableId"
     if (newStatus === initialStatus) {
       console.log("Within column logic detected");
+      // TODOS
       if (newStatus === 1) {
         todos?.map((todo: any) => {
           if (destinationIndex > sourceIndex) {
@@ -256,6 +256,8 @@ const Home: NextPage = () => {
                 `${user?.uid}`,
                 "boards",
                 `${boardId}`,
+                "columns",
+                `${newStatus}`,
                 "tasks",
                 `${todo?.uid}`
               );
@@ -272,6 +274,8 @@ const Home: NextPage = () => {
                 `${user?.uid}`,
                 "boards",
                 `${boardId}`,
+                "columns",
+                `${newStatus}`,
                 "tasks",
                 `${todo?.uid}`
               );
@@ -279,7 +283,6 @@ const Home: NextPage = () => {
             }
           }
         });
-
         // Changing index of dragged Task
         const taskDocRef = doc(
           db,
@@ -287,6 +290,8 @@ const Home: NextPage = () => {
           `${user?.uid}`,
           "boards",
           `${boardId}`,
+          "columns",
+          `${newStatus}`,
           "tasks",
           `${updatedTaskId}`
         );
@@ -296,7 +301,9 @@ const Home: NextPage = () => {
           index: destinationIndex,
           updatedAt: Timestamp.fromDate(new Date()),
         });
-      } else if (newStatus === 2) {
+      }
+      // DOINGS
+      else if (newStatus === 2) {
         doings?.map((doing: any) => {
           if (destinationIndex > sourceIndex) {
             // Decrement Tasks
@@ -309,6 +316,8 @@ const Home: NextPage = () => {
                 `${user?.uid}`,
                 "boards",
                 `${boardId}`,
+                "columns",
+                `${newStatus}`,
                 "tasks",
                 `${doing?.uid}`
               );
@@ -325,6 +334,8 @@ const Home: NextPage = () => {
                 `${user?.uid}`,
                 "boards",
                 `${boardId}`,
+                "columns",
+                `${newStatus}`,
                 "tasks",
                 `${doing?.uid}`
               );
@@ -332,7 +343,6 @@ const Home: NextPage = () => {
             }
           }
         });
-
         // Changing index of dragged Task
         const taskDocRef = doc(
           db,
@@ -340,16 +350,18 @@ const Home: NextPage = () => {
           `${user?.uid}`,
           "boards",
           `${boardId}`,
+          "columns",
+          `${newStatus}`,
           "tasks",
           `${updatedTaskId}`
         );
         batch.update(taskDocRef, {
-          // Using type guard to ensure that we're always spreading an object
-          // ...(typeof updatedTask === "object" ? updatedTask : {}),
           index: destinationIndex,
           updatedAt: Timestamp.fromDate(new Date()),
         });
-      } else if (newStatus === 3) {
+      }
+      // DONES
+      else if (newStatus === 3) {
         dones?.map((done: any) => {
           if (destinationIndex > sourceIndex) {
             // Decrement Tasks
@@ -362,6 +374,8 @@ const Home: NextPage = () => {
                 `${user?.uid}`,
                 "boards",
                 `${boardId}`,
+                "columns",
+                `${newStatus}`,
                 "tasks",
                 `${done?.uid}`
               );
@@ -378,6 +392,8 @@ const Home: NextPage = () => {
                 `${user?.uid}`,
                 "boards",
                 `${boardId}`,
+                "columns",
+                `${newStatus}`,
                 "tasks",
                 `${done?.uid}`
               );
@@ -393,12 +409,12 @@ const Home: NextPage = () => {
           `${user?.uid}`,
           "boards",
           `${boardId}`,
+          "columns",
+          `${newStatus}`,
           "tasks",
           `${updatedTaskId}`
         );
         batch.update(taskDocRef, {
-          // Using type guard to ensure that we're always spreading an object
-          // ...(typeof updatedTask === "object" ? updatedTask : {}),
           index: destinationIndex,
           updatedAt: Timestamp.fromDate(new Date()),
         });
@@ -408,28 +424,11 @@ const Home: NextPage = () => {
     }
 
     // ** BETWEEN COLUMN LOGIC
-    // ** 1. Change index & status of dragged Task
-    const taskDocRef = doc(
-      db,
-      "users",
-      `${user?.uid}`,
-      "boards",
-      `${boardId}`,
-      "tasks",
-      `${updatedTaskId}`
-    );
-    batch.update(taskDocRef, {
-      index: destinationIndex,
-      status: newStatus,
-      updatedAt: Timestamp.fromDate(new Date()),
-    });
-
-    // ** 2. Decrement (by 1) the indexes of Tasks that came after dragged Task in source Column
+    // ** 1. Decrement (by 1) the indexes of Tasks that came after dragged Task in source Column
     if (initialStatus === 1) {
       console.log("Source Column is todos");
-      todos?.map((todo: any, index: number) => {
-        if (index >= sourceIndex) {
-          // DECREMENT THE INDEX OF EACH TASK THAT FITS THIS CRITERIA
+      todos?.map((todo: any) => {
+        if (todo.index >= sourceIndex) {
           console.log("todo to be decremented:", todo);
           const taskDocRef = doc(
             db,
@@ -437,6 +436,8 @@ const Home: NextPage = () => {
             `${user?.uid}`,
             "boards",
             `${boardId}`,
+            "columns",
+            `${initialStatus}`,
             "tasks",
             `${todo?.uid}`
           );
@@ -445,9 +446,8 @@ const Home: NextPage = () => {
       });
     } else if (initialStatus === 2) {
       console.log("Source Column is doing");
-      doings?.map((doing: any, index: number) => {
-        if (index >= sourceIndex) {
-          // DECREMENT THE INDEX OF EACH TASK THAT FITS THIS CRITERIA
+      doings?.map((doing: any) => {
+        if (doing.index >= sourceIndex) {
           console.log("doing to be decremented:", doing);
           const taskDocRef = doc(
             db,
@@ -455,6 +455,8 @@ const Home: NextPage = () => {
             `${user?.uid}`,
             "boards",
             `${boardId}`,
+            "columns",
+            `${initialStatus}`,
             "tasks",
             `${doing?.uid}`
           );
@@ -463,9 +465,8 @@ const Home: NextPage = () => {
       });
     } else if (initialStatus === 3) {
       console.log("Source Column is done");
-      dones?.map((done: any, index: number) => {
-        if (index >= sourceIndex) {
-          // DECREMENT THE INDEX OF EACH TASK THAT FITS THIS CRITERIA
+      dones?.map((done: any) => {
+        if (done.index >= sourceIndex) {
           console.log("done to be decremented:", done);
           const taskDocRef = doc(
             db,
@@ -473,6 +474,8 @@ const Home: NextPage = () => {
             `${user?.uid}`,
             "boards",
             `${boardId}`,
+            "columns",
+            `${initialStatus}`,
             "tasks",
             `${done?.uid}`
           );
@@ -481,12 +484,14 @@ const Home: NextPage = () => {
       });
     }
 
-    // ** 3. Increment (by 1) the indexes of Tasks that came after dragged Task in destination Column
+    // ** 2. Increment (by 1) the indexes of Tasks that came after dragged Task in destination Column
     if (newStatus === 1) {
       console.log("Destination Column is todos");
-      todos?.map((todo: any, index: number) => {
-        if (index > destinationIndex) {
-          // INCREMENT THE INDEX OF EACH TASK THAT FITS THIS CRITERIA
+      todos?.map((todo: any) => {
+        // |todo.index reflects the Tasks' indexes before being updated with the dragged Task.
+        // That's why the Task index at todo.index === destinationIndex should still be incremented.
+        if (todo.index >= destinationIndex) {
+          if (todo.uid === updatedTaskId) return;
           console.log("todo to be incremented:", todo);
           const taskDocRef = doc(
             db,
@@ -494,6 +499,8 @@ const Home: NextPage = () => {
             `${user?.uid}`,
             "boards",
             `${boardId}`,
+            "columns",
+            `${newStatus}`,
             "tasks",
             `${todo?.uid}`
           );
@@ -502,9 +509,9 @@ const Home: NextPage = () => {
       });
     } else if (newStatus === 2) {
       console.log("Destination Column is doing");
-      doings?.map((doing: any, index: number) => {
-        if (index > destinationIndex) {
-          // INCREMENT THE INDEX OF EACH TASK THAT FITS THIS CRITERIA
+      doings?.map((doing: any) => {
+        if (doing.index >= destinationIndex) {
+          if (doing.uid === updatedTaskId) return;
           console.log("doing to be incremented:", doing);
           const taskDocRef = doc(
             db,
@@ -512,6 +519,8 @@ const Home: NextPage = () => {
             `${user?.uid}`,
             "boards",
             `${boardId}`,
+            "columns",
+            `${newStatus}`,
             "tasks",
             `${doing?.uid}`
           );
@@ -520,9 +529,9 @@ const Home: NextPage = () => {
       });
     } else if (newStatus === 3) {
       console.log("Destination Column is done");
-      dones?.map((done: any, index: number) => {
-        if (index > destinationIndex) {
-          // INCREMENT THE INDEX OF EACH TASK THAT FITS THIS CRITERIA
+      dones?.map((done: any) => {
+        if (done.index >= destinationIndex) {
+          if (done.uid === updatedTaskId) return;
           console.log("done to be incremented:", done);
           const taskDocRef = doc(
             db,
@@ -530,6 +539,8 @@ const Home: NextPage = () => {
             `${user?.uid}`,
             "boards",
             `${boardId}`,
+            "columns",
+            `${newStatus}`,
             "tasks",
             `${done?.uid}`
           );
@@ -538,7 +549,57 @@ const Home: NextPage = () => {
       });
     }
 
-    await batch.commit();
+    // ** 3. Change index & status of dragged Task -> Read, Delete, Write
+    try {
+      await runTransaction(db, async (transaction) => {
+        const taskDocRef = doc(
+          db,
+          "users",
+          `${user?.uid}`,
+          "boards",
+          `${boardId}`,
+          "columns",
+          `${initialStatus}`,
+          "tasks",
+          `${updatedTaskId}`
+        );
+
+        // READ
+        const draggedTaskRaw = await transaction.get(taskDocRef);
+        if (!draggedTaskRaw.exists()) {
+          throw "Task does not exist!";
+        }
+        const draggedTask = draggedTaskRaw.data();
+
+        const newTaskDocRef = doc(
+          db,
+          "users",
+          `${user?.uid}`,
+          "boards",
+          `${boardId}`,
+          "columns",
+          `${newStatus}`,
+          "tasks",
+          `${updatedTaskId}`
+        );
+        // CREATE
+        transaction.set(newTaskDocRef, {
+          // Using type guard to ensure that we're always spreading an object
+          ...(typeof draggedTask === "object" ? draggedTask : {}),
+          status: newStatus,
+          index: destinationIndex,
+          updatedAt: Timestamp.fromDate(new Date()),
+        });
+        // DELETE
+        transaction.delete(taskDocRef);
+      });
+      // ** Commiting the batched writes from 1. (decrements) & 2. (increments) only when the transaction has succeeded.
+      await batch.commit();
+    } catch (err) {
+      console.log("Transaction failed: ", err);
+    }
+
+    console.log("END OF FUNCTION");
   };
 
   return (
@@ -559,9 +620,6 @@ const Home: NextPage = () => {
       <main className="w-4/5">
         {/* Top Settings */}
         <section className="h-[10%] min-w-[500px] p-4 flex justify-between items-center bg-darkGray">
-          {/* <h1 className="text-2xl">
-            {(activeBoard && activeBoard?.[0]?.title) || "Future Board Name 🤓"}
-          </h1> */}
           <input
             className="text-2xl bg-transparent cursor-pointer outline-none"
             type="text"
@@ -632,6 +690,7 @@ const Home: NextPage = () => {
                 {/* Colorful circle */}
                 <div className="h-4 w-4 bg-todoColors-brightBlue rounded-full"></div>
                 {/* Column Title */}
+                {/* CHANGE HEADING INTO INPUT */}
                 <h3 className="uppercase text-fontSecondary font-bold">
                   Todo ({todoCount})
                 </h3>
