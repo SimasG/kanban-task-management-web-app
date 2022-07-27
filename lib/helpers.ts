@@ -1,15 +1,15 @@
 // Default 3 Column Structure
 export const defaultColumns = [
   {
-    title: 1,
     uid: 1,
+    title: "todo",
   },
   {
-    title: 2,
     uid: 2,
+    title: "doing",
   },
   {
-    title: 3,
     uid: 3,
+    title: "done",
   },
 ];

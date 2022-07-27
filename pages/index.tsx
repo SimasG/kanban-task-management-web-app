@@ -49,7 +49,7 @@ const Home: NextPage = () => {
       }
       if (!fsTasks) return;
       setTasks(fsTasks);
-      console.log("useEffect shit ran");
+      // console.log("useEffect shit ran");
     }
   }, [fsBoards, fsTasks, user]);
 

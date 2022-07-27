@@ -9,7 +9,6 @@ import { useContext } from "react";
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
 import { UserContext } from "../../lib/context";
 import { db } from "../../lib/firebase";
-import { defaultColumns } from "../../lib/helpers";
 import useFetchFsColumns from "../../lib/hooks/useFetchFsColumns";
 import Column from "./Column";
 import TopSettings from "./TopSettings";
@@ -41,11 +40,7 @@ const Main = ({
 }: MainProps) => {
   // ** Fetching Data
   const user = useContext(UserContext);
-
-  // Calculating Column count;
-  const columnCount = useFetchFsColumns(boardId)?.length;
-
-  console.log("columnCount:", columnCount);
+  const columns = useFetchFsColumns(boardId);
 
   const onDragEnd = (result: DropResult) => {
     const { source, destination } = result;
@@ -338,13 +333,15 @@ const Main = ({
         <section className="h-[90%] bg-darkBlue p-5 flex justify-start items-start gap-6 ">
           {/* Hardcoding the Column count *for now* */}
           {/* Columns? -> later */}
-          {defaultColumns?.map((column: any) => (
+          {columns?.map((column: any) => (
             <Column
-              key={column?.uid}
+              key={column?.status}
               setTaskId={setTaskId}
               setShowEditTaskModal={setShowEditTaskModal}
               tasks={tasks}
-              columnStatus={column?.uid}
+              columnStatus={column?.status}
+              columnTitle={column?.title}
+              boardId={boardId}
             />
           ))}
           {/* Add New Column btn */}

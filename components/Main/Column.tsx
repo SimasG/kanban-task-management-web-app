@@ -1,15 +1,21 @@
+import { doc, updateDoc } from "firebase/firestore";
+import { useContext } from "react";
 import {
   Draggable,
   DraggableProvided,
   Droppable,
   DroppableProvided,
 } from "react-beautiful-dnd";
+import { UserContext } from "../../lib/context";
+import { db } from "../../lib/firebase";
 
 type ColumnProps = {
   setTaskId: React.Dispatch<React.SetStateAction<string | null | undefined>>;
   setShowEditTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
   tasks: any;
   columnStatus: number;
+  columnTitle: string;
+  boardId: string | null | undefined;
 };
 
 const Column = ({
@@ -17,10 +23,27 @@ const Column = ({
   setShowEditTaskModal,
   tasks,
   columnStatus,
+  columnTitle,
+  boardId,
 }: ColumnProps) => {
+  const user = useContext(UserContext);
   const taskCount = tasks?.filter(
     (task: any) => task?.status === columnStatus
   ).length;
+
+  const changeColumnTitle = async (newTitle: string) => {
+    const columnDocRef = doc(
+      db,
+      "users",
+      `${user?.uid}`,
+      "boards",
+      `${boardId}`,
+      "columns",
+      `${columnStatus}`
+    );
+    // console.log("columnDocRef:", columnDocRef, "newTitle:", newTitle);
+    await updateDoc(columnDocRef, { title: newTitle });
+  };
 
   return (
     <div className="min-w-[250px] max-w-[350px]">
@@ -35,12 +58,13 @@ const Column = ({
           }`}
         ></div>
         {/* Column Title */}
-        {/* CHANGE HEADING INTO INPUT */}
-        <h3 className="uppercase text-fontSecondary font-bold">
-          {columnStatus === 1 && `Todo (${taskCount})`}
-          {columnStatus === 2 && `Doing (${taskCount})`}
-          {columnStatus === 3 && `Done (${taskCount})`}
-        </h3>
+        <input
+          // value={`${columnTitle} (${taskCount})`}
+
+          value={`${columnTitle}`}
+          onChange={(e) => changeColumnTitle(e.target.value)}
+          className="uppercase text-fontSecondary font-bold bg-transparent cursor-pointer outline-none"
+        />
       </div>
       {/* Task Container */}
       <Droppable droppableId={columnStatus.toString()}>

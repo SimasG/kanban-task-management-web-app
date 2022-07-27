@@ -181,7 +181,7 @@ const SideNav = ({
           "columns",
           `${column?.uid}`
         );
-        batch.set(columnRef, { title: column?.title });
+        batch.set(columnRef, { title: column?.title, status: column?.uid });
       });
       await batch.commit();
     }
