@@ -8,7 +8,7 @@ import SideNav from "../components/SideNav";
 import { UserContext } from "../lib/context";
 import { db } from "../lib/firebase";
 import useFetchFsBoards from "../lib/hooks/useFetchFsBoards";
-import useFetchTasksCollectionGroup from "../lib/hooks/useFetchTasksCollectionGroup";
+import useFetchTasksCollectionGroup from "../lib/hooks/useFetchFsTasks";
 import { BoardSchema } from "../lib/types";
 
 const Home: NextPage = () => {

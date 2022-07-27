@@ -4,7 +4,7 @@ import { useContext, useState } from "react";
 import toast from "react-hot-toast";
 import { UserContext } from "../../lib/context";
 import { db } from "../../lib/firebase";
-import useFetchFsTasks from "../../lib/hooks/useFetchFsTasks";
+import useFetchFsTasks from "../../lib/hooks/old/useFetchFsTasksOld";
 
 type IndexProps = {
   boardId: string | null | undefined;

@@ -27,6 +27,7 @@ import {
   ResponderProvided,
 } from "react-beautiful-dnd";
 import { BoardSchema } from "../lib/types";
+import { defaultColumns } from "../lib/helpers";
 
 // type LocalStorageDataProps = {
 //   users: UserProps;
@@ -157,15 +158,32 @@ const SideNav = ({
       }
     } else {
       // Creating new Board in Firestore
+      const batch = writeBatch(db);
       const uuid = uuidv4();
-      const ref = doc(db, "users", `${user?.uid}`, "boards", uuid);
-      await setDoc(ref, {
+      const boardRef = doc(db, "users", `${user?.uid}`, "boards", `${uuid}`);
+      batch.set(boardRef, {
         title: "New Board",
         uid: uuid,
         createdAt: Timestamp.fromDate(new Date()),
         index: boards?.length,
       });
       setBoardId(uuid);
+
+      // ** Create 3 default Columns & add title to each
+      defaultColumns?.map((column: any) => {
+        console.log(column);
+        const columnRef = doc(
+          db,
+          "users",
+          `${user?.uid}`,
+          "boards",
+          `${uuid}`,
+          "columns",
+          `${column?.uid}`
+        );
+        batch.set(columnRef, { title: column?.title });
+      });
+      await batch.commit();
     }
   };
 

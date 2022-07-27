@@ -9,6 +9,8 @@ import { useContext } from "react";
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
 import { UserContext } from "../../lib/context";
 import { db } from "../../lib/firebase";
+import { defaultColumns } from "../../lib/helpers";
+import useFetchFsColumns from "../../lib/hooks/useFetchFsColumns";
 import Column from "./Column";
 import TopSettings from "./TopSettings";
 
@@ -39,6 +41,11 @@ const Main = ({
 }: MainProps) => {
   // ** Fetching Data
   const user = useContext(UserContext);
+
+  // Calculating Column count;
+  const columnCount = useFetchFsColumns(boardId)?.length;
+
+  console.log("columnCount:", columnCount);
 
   const onDragEnd = (result: DropResult) => {
     const { source, destination } = result;
@@ -331,24 +338,15 @@ const Main = ({
         <section className="h-[90%] bg-darkBlue p-5 flex justify-start items-start gap-6 ">
           {/* Hardcoding the Column count *for now* */}
           {/* Columns? -> later */}
-          <Column
-            setTaskId={setTaskId}
-            setShowEditTaskModal={setShowEditTaskModal}
-            tasks={tasks}
-            columnStatus={1}
-          />
-          <Column
-            setTaskId={setTaskId}
-            setShowEditTaskModal={setShowEditTaskModal}
-            tasks={tasks}
-            columnStatus={2}
-          />
-          <Column
-            setTaskId={setTaskId}
-            setShowEditTaskModal={setShowEditTaskModal}
-            tasks={tasks}
-            columnStatus={3}
-          />
+          {defaultColumns?.map((column: any) => (
+            <Column
+              key={column?.uid}
+              setTaskId={setTaskId}
+              setShowEditTaskModal={setShowEditTaskModal}
+              tasks={tasks}
+              columnStatus={column?.uid}
+            />
+          ))}
           {/* Add New Column btn */}
           <div className="min-w-[250px] bg-veryDarkGray mt-11 h-5/6 flex justify-center items-center cursor-pointer rounded-md hover:bg-opacity-50">
             <h2 className="mb-56 text-2xl text-fontSecondary font-bold">

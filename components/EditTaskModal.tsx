@@ -6,9 +6,9 @@ import { doc } from "firebase/firestore";
 import { db } from "../lib/firebase";
 import { useContext, useEffect, useState } from "react";
 import { UserContext } from "../lib/context";
-import useFetchFsTasks from "../lib/hooks/useFetchFsTasks";
+import useFetchFsTasks from "../lib/hooks/old/useFetchFsTasksOld";
 import { useSetState } from "@mantine/hooks";
-import useFetchTasksCollectionGroup from "../lib/hooks/useFetchTasksCollectionGroup";
+import useFetchTasksCollectionGroup from "../lib/hooks/useFetchFsTasks";
 
 type IndexProps = {
   boardId: string | null | undefined;
