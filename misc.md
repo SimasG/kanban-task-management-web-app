@@ -887,3 +887,48 @@ const doneTasksArray: any = tasks?.filter((task: any) => task?.status === 3);
               }}
             </Droppable>
           </div>
+
+    // Removing Task from array at source.index
+
+      let add;
+    if (source.droppableId === "1") {
+      add = todos[source.index];
+      todos.splice(source.index, 1);
+    } else if (source.droppableId === "2") {
+      add = doings[source.index];
+      doings.splice(source.index, 1);
+    } else if (source.droppableId === "3") {
+      add = dones[source.index];
+      dones.splice(source.index, 1);
+    }
+
+
+    // Adding Task to an array at destination.index
+    if (destination.droppableId === "1") {
+      todos.splice(destination.index, 0, add);
+      handleUpdateTask(
+        todos[destination.index].uid,
+        source.index,
+        destination.index,
+        parseInt(source.droppableId),
+        parseInt(destination.droppableId)
+      );
+    } else if (destination.droppableId === "2") {
+      doings.splice(destination.index, 0, add);
+      handleUpdateTask(
+        doings[destination.index].uid,
+        source.index,
+        destination.index,
+        parseInt(source.droppableId),
+        parseInt(destination.droppableId)
+      );
+    } else if (destination.droppableId === "3") {
+      dones.splice(destination.index, 0, add);
+      handleUpdateTask(
+        dones[destination.index].uid,
+        source.index,
+        destination.index,
+        parseInt(source.droppableId),
+        parseInt(destination.droppableId)
+      );
+    }

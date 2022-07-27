@@ -57,69 +57,72 @@ const Main = ({
 
     console.log("onDragEnd ran", result);
 
-    let add;
-
     // Removing Task from array at source.index
-    if (source.droppableId === "1") {
-      add = todos[source.index];
-      todos.splice(source.index, 1);
-    } else if (source.droppableId === "2") {
-      add = doings[source.index];
-      doings.splice(source.index, 1);
-    } else if (source.droppableId === "3") {
-      add = dones[source.index];
-      dones.splice(source.index, 1);
-    }
-
-    // Returns Task array (from the respective Column) without the dragged Task
-    removeTaskDnd(parseInt(source.droppableId), source.index);
+    const { filteredSourceColumnTasks, draggedTask } = removeTaskDnd(
+      parseInt(source.droppableId),
+      source.index
+    );
 
     // Adding Task to an array at destination.index
-    if (destination.droppableId === "1") {
-      todos.splice(destination.index, 0, add);
-      handleUpdateTask(
-        todos[destination.index].uid,
-        source.index,
-        destination.index,
-        parseInt(source.droppableId),
-        parseInt(destination.droppableId)
-      );
-    } else if (destination.droppableId === "2") {
-      doings.splice(destination.index, 0, add);
-      handleUpdateTask(
-        doings[destination.index].uid,
-        source.index,
-        destination.index,
-        parseInt(source.droppableId),
-        parseInt(destination.droppableId)
-      );
-    } else if (destination.droppableId === "3") {
-      dones.splice(destination.index, 0, add);
-      handleUpdateTask(
-        dones[destination.index].uid,
-        source.index,
-        destination.index,
-        parseInt(source.droppableId),
-        parseInt(destination.droppableId)
-      );
-    }
+    addTaskDnd(
+      parseInt(source.droppableId),
+      parseInt(destination.droppableId),
+      source.index,
+      destination.index,
+      draggedTask,
+      filteredSourceColumnTasks
+    );
   };
 
-  const removeTaskDnd = (newStatus: number, sourceIndex: number) => {
+  // Helper Functions
+  const removeTaskDnd = (initialStatus: number, sourceIndex: number) => {
     // Put the dragged Task into a separate variable
-    let add;
-    const filteredTasks = tasks?.filter(
-      (task: any) => task?.status === newStatus
+    let draggedTask: {};
+    const sourceColumnTasks = tasks?.filter(
+      (task: any) => task?.status === initialStatus
     );
-    add = filteredTasks[sourceIndex];
+    draggedTask = sourceColumnTasks[sourceIndex];
 
     // Remove Task from array at source.index
-    filteredTasks.splice(sourceIndex, 1);
+    const filteredSourceColumnTasks = sourceColumnTasks.splice(sourceIndex, 1);
 
     // return Task array (from the respective Column) without the dragged Task
     //  (displays un-updated indexes of these Tasks)
-    console.log(`Filtered Tasks from Column ${newStatus}:`, filteredTasks);
-    return filteredTasks;
+    return { filteredSourceColumnTasks, draggedTask };
+  };
+
+  const addTaskDnd = (
+    initialStatus: number,
+    newStatus: number,
+    sourceIndex: number,
+    destinationIndex: number,
+    draggedTask: any,
+    filteredSourceColumnTasks: any
+  ) => {
+    // If Task has been dnd'ed within the same column, use the initial array where draggedTask has been removed
+    if (newStatus === initialStatus) {
+      filteredSourceColumnTasks.splice(destinationIndex, 0, draggedTask);
+      handleUpdateTask(
+        filteredSourceColumnTasks[destinationIndex].uid,
+        sourceIndex,
+        destinationIndex,
+        initialStatus,
+        newStatus
+      );
+    }
+
+    // Otherwise, use scalable logic
+    const destinationColumnTasks = tasks?.filter(
+      (task: any) => task?.status === newStatus
+    );
+    destinationColumnTasks.splice(destinationIndex, 0, draggedTask);
+    handleUpdateTask(
+      destinationColumnTasks[destinationIndex].uid,
+      sourceIndex,
+      destinationIndex,
+      initialStatus,
+      newStatus
+    );
   };
 
   const handleUpdateTask = async (
