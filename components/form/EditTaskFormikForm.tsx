@@ -7,7 +7,14 @@ import {
 } from "formik";
 import FormikControl from "./FormikControl";
 import { v4 as uuidv4 } from "uuid";
-import { deleteDoc, doc, setDoc, Timestamp } from "firebase/firestore";
+import {
+  deleteDoc,
+  doc,
+  increment,
+  setDoc,
+  Timestamp,
+  writeBatch,
+} from "firebase/firestore";
 import { db } from "../../lib/firebase";
 import { useContext } from "react";
 import { UserContext } from "../../lib/context";
@@ -18,9 +25,15 @@ type IndexProps = {
   boardId: string | null | undefined;
   taskId: string | null | undefined;
   setShowEditTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
+  tasks: any;
 };
 
-const FormikForm = ({ boardId, taskId, setShowEditTaskModal }: IndexProps) => {
+const FormikForm = ({
+  boardId,
+  taskId,
+  setShowEditTaskModal,
+  tasks,
+}: IndexProps) => {
   const user = useContext(UserContext);
 
   const dropdownOptions = [
@@ -60,6 +73,50 @@ const FormikForm = ({ boardId, taskId, setShowEditTaskModal }: IndexProps) => {
     setShowEditTaskModal(false);
   };
 
+  const deleteTask = async () => {
+    const batch = writeBatch(db);
+
+    const selectedColumnTasks = tasks?.filter(
+      (task: any) => task?.status === values?.status
+    );
+
+    // Delete chosen Task
+    const taskRef = doc(
+      db,
+      "users",
+      `${user?.uid}`,
+      "boards",
+      `${boardId}`,
+      "columns",
+      `${values?.status}`,
+      "tasks",
+      `${taskId}`
+    );
+    batch.delete(taskRef);
+
+    // Decrement indexes of Tasks that came after the deleted Task
+    selectedColumnTasks.map((task: any) => {
+      if (task?.index <= values?.index) return;
+      console.log(`task to be decremented in Column: ${values?.status}:`, task);
+      const taskDocRef = doc(
+        db,
+        "users",
+        `${user?.uid}`,
+        "boards",
+        `${boardId}`,
+        "columns",
+        `${values?.status}`,
+        "tasks",
+        `${task?.uid}`
+      );
+      batch.update(taskDocRef, { index: increment(-1) });
+    });
+
+    await batch.commit();
+    setShowEditTaskModal(false);
+    toast.success("Task has been deleted!");
+  };
+
   return (
     <>
       {values && (
@@ -91,23 +148,23 @@ const FormikForm = ({ boardId, taskId, setShowEditTaskModal }: IndexProps) => {
                 viewBox="0 0 24 24"
                 xmlns="http://www.w3.org/2000/svg"
                 onClick={
-                  // () => deleteTask()
-                  async () => {
-                    const taskRef = doc(
-                      db,
-                      "users",
-                      `${user?.uid}`,
-                      "boards",
-                      `${boardId}`,
-                      "columns",
-                      `${values?.status}`,
-                      "tasks",
-                      `${taskId}`
-                    );
-                    await deleteDoc(taskRef);
-                    setShowEditTaskModal(false);
-                    toast.success("Task has been deleted!");
-                  }
+                  () => deleteTask()
+                  // async () => {
+                  //   const taskRef = doc(
+                  //     db,
+                  //     "users",
+                  //     `${user?.uid}`,
+                  //     "boards",
+                  //     `${boardId}`,
+                  //     "columns",
+                  //     `${values?.status}`,
+                  //     "tasks",
+                  //     `${taskId}`
+                  //   );
+                  //   await deleteDoc(taskRef);
+                  //   setShowEditTaskModal(false);
+                  //   toast.success("Task has been deleted!");
+                  // }
                 }
               >
                 <path

@@ -91,9 +91,6 @@ const Home: NextPage = () => {
         setBoards={setBoards}
         boardId={boardId}
         setBoardId={setBoardId}
-        todos={todos}
-        doings={doings}
-        dones={dones}
         tasks={tasks}
         setTaskId={setTaskId}
         setShowAddTaskModal={setShowAddTaskModal}
@@ -114,6 +111,7 @@ const Home: NextPage = () => {
           boardId={boardId}
           taskId={taskId}
           setShowEditTaskModal={setShowEditTaskModal}
+          tasks={tasks}
         />
       )}
     </div>

@@ -18,9 +18,6 @@ type MainProps = {
   setBoards: React.Dispatch<any>;
   boardId: string | null | undefined;
   setBoardId: React.Dispatch<React.SetStateAction<string | null | undefined>>;
-  todos: any;
-  doings: any;
-  dones: any;
   tasks: any;
   setTaskId: React.Dispatch<React.SetStateAction<string | null | undefined>>;
   setShowAddTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
@@ -34,9 +31,6 @@ const Main = ({
   setBoards,
   boardId,
   setBoardId,
-  todos,
-  doings,
-  dones,
   tasks,
   setTaskId,
   setShowAddTaskModal,
@@ -74,12 +68,12 @@ const Main = ({
 
     // Making changes in Firestore
     if (source.droppableId === destination.droppableId) {
-      // updateTaskWithinColumn(
-      //   parseInt(source.droppableId),
-      //   source.index,
-      //   destination.index,
-      //   updatedTaskId
-      // );
+      updateTaskWithinColumn(
+        parseInt(source.droppableId),
+        source.index,
+        destination.index,
+        updatedTaskId
+      );
     } else {
       updateTaskBetweenColumns(
         updatedTaskId,
@@ -143,62 +137,9 @@ const Main = ({
     // Destination Column Status -> Task's new Column index -> newStatus
     newStatus: number
   ) => {
-    // Creating a new write Batch
-    const batch = writeBatch(db);
-
-    // ** 1. Decrement (by 1) the indexes of Tasks that came after dragged Task in source Column
-    const sourceColumnTasks = tasks?.filter(
-      (task: any) => task?.status === initialStatus
-    );
-
-    sourceColumnTasks?.map((task: any) => {
-      if (task.index >= sourceIndex) {
-        if (task.uid === updatedTaskId) return;
-        console.log(`task to be decremented in Column ${initialStatus}:`, task);
-        const taskDocRef = doc(
-          db,
-          "users",
-          `${user?.uid}`,
-          "boards",
-          `${boardId}`,
-          "columns",
-          `${initialStatus}`,
-          "tasks",
-          `${task?.uid}`
-        );
-        batch.update(taskDocRef, { index: increment(-1) });
-      }
-    });
-
-    // ** 2. Increment (by 1) the indexes of Tasks that came after dragged Task in destination Column
-    const destinationColumnTasks = tasks?.filter(
-      (task: any) => task?.status === newStatus
-    );
-
-    destinationColumnTasks?.map((task: any) => {
-      // |task.index reflects the Tasks' indexes before being updated with the dragged Task.
-      // That's why the Task index at task.index === destinationIndex should still be incremented.
-      if (task.index >= destinationIndex) {
-        if (task.uid === updatedTaskId) return;
-        console.log(`task to be incremented in Column ${newStatus}:`, task);
-        const taskDocRef = doc(
-          db,
-          "users",
-          `${user?.uid}`,
-          "boards",
-          `${boardId}`,
-          "columns",
-          `${newStatus}`,
-          "tasks",
-          `${task?.uid}`
-        );
-        batch.update(taskDocRef, { index: increment(1) });
-      }
-    });
-
-    // ** 3. Change index & status of dragged Task -> Read, Delete, Write
     try {
       await runTransaction(db, async (transaction) => {
+        // ** 1. Change index & status of dragged Task -> Read, Delete, Write
         const taskDocRef = doc(
           db,
           "users",
@@ -239,9 +180,58 @@ const Main = ({
         });
         // DELETE
         transaction.delete(taskDocRef);
+
+        // ** 2. Decrement (by 1) the indexes of Tasks that came after dragged Task in source Column
+        const sourceColumnTasks = tasks?.filter(
+          (task: any) => task?.status === initialStatus
+        );
+        sourceColumnTasks?.map((task: any) => {
+          if (task.index >= sourceIndex) {
+            if (task.uid === updatedTaskId) return;
+            console.log(
+              `task to be decremented in Column ${initialStatus}:`,
+              task
+            );
+            const taskDocRef = doc(
+              db,
+              "users",
+              `${user?.uid}`,
+              "boards",
+              `${boardId}`,
+              "columns",
+              `${initialStatus}`,
+              "tasks",
+              `${task?.uid}`
+            );
+            transaction.update(taskDocRef, { index: increment(-1) });
+          }
+        });
+
+        // ** 3. Increment (by 1) the indexes of Tasks that came after dragged Task in destination Column
+        const destinationColumnTasks = tasks?.filter(
+          (task: any) => task?.status === newStatus
+        );
+        destinationColumnTasks?.map((task: any) => {
+          // |task.index reflects the Tasks' indexes before being updated with the dragged Task.
+          // That's why the Task index at task.index === destinationIndex should still be incremented.
+          if (task.index >= destinationIndex) {
+            if (task.uid === updatedTaskId) return;
+            console.log(`task to be incremented in Column ${newStatus}:`, task);
+            const taskDocRef = doc(
+              db,
+              "users",
+              `${user?.uid}`,
+              "boards",
+              `${boardId}`,
+              "columns",
+              `${newStatus}`,
+              "tasks",
+              `${task?.uid}`
+            );
+            transaction.update(taskDocRef, { index: increment(1) });
+          }
+        });
       });
-      // ** Commiting the batched writes from 1. (decrements) & 2. (increments) only when the transaction has succeeded.
-      await batch.commit();
     } catch (err) {
       console.log("Transaction failed: ", err);
     }

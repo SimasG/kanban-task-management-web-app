@@ -1198,3 +1198,121 @@ const doneTasksArray: any = tasks?.filter((task: any) => task?.status === 3);
         }
       });
     }
+
+// const updateTaskBetweenColumns = async (
+// // Dragged Task's uid -> updatedTaskId
+// updatedTaskId: string,
+// // Source index -> Task's old index within Column -> sourceIndex
+// sourceIndex: number,
+// // Destination index -> Tasks's new index within Column -> destinationIndex
+// destinationIndex: number,
+// // Source Column Status -> initialStatus
+// initialStatus: number,
+// // Destination Column Status -> Task's new Column index -> newStatus
+// newStatus: number
+// ) => {
+// // Creating a new write Batch
+// const batch = writeBatch(db);
+
+// // \*\* 1. Decrement (by 1) the indexes of Tasks that came after dragged Task in source Column
+// const sourceColumnTasks = tasks?.filter(
+// (task: any) => task?.status === initialStatus
+// );
+
+// sourceColumnTasks?.map((task: any) => {
+// if (task.index >= sourceIndex) {
+// if (task.uid === updatedTaskId) return;
+// console.log(`task to be decremented in Column ${initialStatus}:`, task);
+// const taskDocRef = doc(
+// db,
+// "users",
+// `${user?.uid}`,
+// "boards",
+// `${boardId}`,
+// "columns",
+// `${initialStatus}`,
+// "tasks",
+// `${task?.uid}`
+// );
+// batch.update(taskDocRef, { index: increment(-1) });
+// }
+// });
+
+// // \*\* 2. Increment (by 1) the indexes of Tasks that came after dragged Task in destination Column
+// const destinationColumnTasks = tasks?.filter(
+// (task: any) => task?.status === newStatus
+// );
+
+// destinationColumnTasks?.map((task: any) => {
+// // |task.index reflects the Tasks' indexes before being updated with the dragged Task.
+// // That's why the Task index at task.index === destinationIndex should still be incremented.
+// if (task.index >= destinationIndex) {
+// if (task.uid === updatedTaskId) return;
+// console.log(`task to be incremented in Column ${newStatus}:`, task);
+// const taskDocRef = doc(
+// db,
+// "users",
+// `${user?.uid}`,
+// "boards",
+// `${boardId}`,
+// "columns",
+// `${newStatus}`,
+// "tasks",
+// `${task?.uid}`
+// );
+// batch.update(taskDocRef, { index: increment(1) });
+// }
+// });
+
+// // \*\* 3. Change index & status of dragged Task -> Read, Delete, Write
+// try {
+// await runTransaction(db, async (transaction) => {
+// const taskDocRef = doc(
+// db,
+// "users",
+// `${user?.uid}`,
+// "boards",
+// `${boardId}`,
+// "columns",
+// `${initialStatus}`,
+// "tasks",
+// `${updatedTaskId}`
+// );
+
+// // READ
+// const draggedTaskRaw = await transaction.get(taskDocRef);
+// if (!draggedTaskRaw.exists()) {
+// throw "Task does not exist!";
+// }
+// const draggedTask = draggedTaskRaw.data();
+
+// const newTaskDocRef = doc(
+// db,
+// "users",
+// `${user?.uid}`,
+// "boards",
+// `${boardId}`,
+// "columns",
+// `${newStatus}`,
+// "tasks",
+// `${updatedTaskId}`
+// );
+// // CREATE
+// transaction.set(newTaskDocRef, {
+// // Using type guard to ensure that we're always spreading an object
+// ...(typeof draggedTask === "object" ? draggedTask : {}),
+// status: newStatus,
+// index: destinationIndex,
+// updatedAt: Timestamp.fromDate(new Date()),
+// });
+// // DELETE
+// transaction.delete(taskDocRef);
+// });
+// // \*\* Commiting the batched writes from 1. (decrements) & 2. (increments) only when the transaction has succeeded.
+// await batch.commit();
+// } catch (err) {
+// console.log("Transaction failed: ", err);
+// }
+
+// console.log("END OF FUNCTION");
+// };

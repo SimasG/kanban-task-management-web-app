@@ -14,18 +14,20 @@ type IndexProps = {
   boardId: string | null | undefined;
   taskId: string | null | undefined;
   setShowEditTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
+  tasks: any;
 };
 
 const EditTaskModal = ({
   boardId,
   taskId,
   setShowEditTaskModal,
+  tasks,
 }: IndexProps) => {
   const [data, setData] = useState<any>();
   // const user = useContext(UserContext);
   // Fetching all Tasks of selected Board
   // const tasks = useFetchFsTasks(user?.uid, boardId);
-  const tasks: any = useFetchTasksCollectionGroup(boardId);
+  // const tasks: any = useFetchTasksCollectionGroup(boardId);
 
   const selectedTask = tasks?.filter((task: any) => task?.uid === taskId)?.[0];
 
@@ -83,6 +85,7 @@ const EditTaskModal = ({
             boardId={boardId}
             taskId={taskId}
             setShowEditTaskModal={setShowEditTaskModal}
+            tasks={tasks}
           />
         );
       }}
