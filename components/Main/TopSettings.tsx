@@ -1,4 +1,4 @@
-import { deleteDoc, doc } from "firebase/firestore";
+import { deleteDoc, doc, increment, writeBatch } from "firebase/firestore";
 import { useContext } from "react";
 import { UserContext } from "../../lib/context";
 import { db } from "../../lib/firebase";
@@ -40,14 +40,36 @@ const TopSettings = ({
       setBoards(newData);
       setBoardId(newData?.[0]?.uid);
     } else {
-      // Deleting Board from Firestore
-      const docRef = doc(db, "users", `${user?.uid}`, "boards", `${uid}`);
+      const batch = writeBatch(db);
+
+      const activeBoard = boards?.filter(
+        (board: any) => board?.uid === boardId
+      );
+
+      // Delete Board
+      const boardDocRef = doc(db, "users", `${user?.uid}`, "boards", `${uid}`);
       // If the first Board in the array is deleted, setId to the second Board (which will become the
       // first once the first one is removed from FS). Else, remove the first Board in the array.
       boards?.[0]?.uid === uid
         ? setBoardId(boards?.[1]?.uid)
         : setBoardId(boards?.[0]?.uid);
-      await deleteDoc(docRef);
+      batch.delete(boardDocRef);
+
+      // Decrement indexes of Boards that come after deleted Board
+      boards?.map((board: any) => {
+        if (board?.index <= activeBoard?.[0]?.index) return;
+        console.log(`Board to be decremented:`, board);
+        const boardDocRef = doc(
+          db,
+          "users",
+          `${user?.uid}`,
+          "boards",
+          `${board?.uid}`
+        );
+        batch.update(boardDocRef, { index: increment(-1) });
+      });
+
+      await batch.commit();
     }
   };
 
