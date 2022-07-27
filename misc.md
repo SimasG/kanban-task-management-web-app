@@ -1115,3 +1115,86 @@ const doneTasksArray: any = tasks?.filter((task: any) => task?.status === 3);
     //   await batch.commit();
     //   return;
     // }
+
+    // else if (initialStatus === 2) {
+    //   console.log("Source Column is doing");
+    //   doings?.map((doing: any) => {
+    //     if (doing.index >= sourceIndex) {
+    //       console.log("doing to be decremented:", doing);
+    //       const taskDocRef = doc(
+    //         db,
+    //         "users",
+    //         `${user?.uid}`,
+    //         "boards",
+    //         `${boardId}`,
+    //         "columns",
+    //         `${initialStatus}`,
+    //         "tasks",
+    //         `${doing?.uid}`
+    //       );
+    //       batch.update(taskDocRef, { index: increment(-1) });
+    //     }
+    //   });
+    // } else if (initialStatus === 3) {
+    //   console.log("Source Column is done");
+    //   dones?.map((done: any) => {
+    //     if (done.index >= sourceIndex) {
+    //       console.log("done to be decremented:", done);
+    //       const taskDocRef = doc(
+    //         db,
+    //         "users",
+    //         `${user?.uid}`,
+    //         "boards",
+    //         `${boardId}`,
+    //         "columns",
+    //         `${initialStatus}`,
+    //         "tasks",
+    //         `${done?.uid}`
+    //       );
+    //       batch.update(taskDocRef, { index: increment(-1) });
+    //     }
+    //   });
+    // }
+
+
+    else if (newStatus === 2) {
+      console.log("Destination Column is doing");
+      doings?.map((doing: any) => {
+        if (doing.index >= destinationIndex) {
+          if (doing.uid === updatedTaskId) return;
+          console.log("doing to be incremented:", doing);
+          const taskDocRef = doc(
+            db,
+            "users",
+            `${user?.uid}`,
+            "boards",
+            `${boardId}`,
+            "columns",
+            `${newStatus}`,
+            "tasks",
+            `${doing?.uid}`
+          );
+          batch.update(taskDocRef, { index: increment(1) });
+        }
+      });
+    } else if (newStatus === 3) {
+      console.log("Destination Column is done");
+      dones?.map((done: any) => {
+        if (done.index >= destinationIndex) {
+          if (done.uid === updatedTaskId) return;
+          console.log("done to be incremented:", done);
+          const taskDocRef = doc(
+            db,
+            "users",
+            `${user?.uid}`,
+            "boards",
+            `${boardId}`,
+            "columns",
+            `${newStatus}`,
+            "tasks",
+            `${done?.uid}`
+          );
+          batch.update(taskDocRef, { index: increment(1) });
+        }
+      });
+    }
