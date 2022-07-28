@@ -1,10 +1,4 @@
-import {
-  ErrorMessage,
-  Field,
-  FieldArray,
-  Form,
-  useFormikContext,
-} from "formik";
+import { ErrorMessage, Field, FieldArray, Form } from "formik";
 import FormikControl from "./FormikControl";
 import { v4 as uuidv4 } from "uuid";
 import {
@@ -22,35 +16,31 @@ import toast from "react-hot-toast";
 type IndexProps = {
   boardId: string | null | undefined;
   setShowAddTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
-  todoTasksArray: DocumentData[] | undefined | any;
-  doingTasksArray: DocumentData[] | undefined | any;
-  doneTasksArray: DocumentData[] | undefined | any;
+  tasks: any;
+  formik: any;
 };
 
 const FormikForm = ({
   boardId,
   setShowAddTaskModal,
-  todoTasksArray,
-  doingTasksArray,
-  doneTasksArray,
+  tasks,
+  formik,
 }: IndexProps) => {
   const user = useContext(UserContext);
 
   const dropdownOptions = [
-    // "value: ''" will automatically make this option invalid and throw an error
+    // "value: ''" will automatically make this option invalid (falsy value) and throw an error
     { key: "Select an option", value: "" },
     { key: "TODO", value: 1 },
     { key: "DOING", value: 2 },
     { key: "DONE", value: 3 },
   ];
 
-  const formik = useFormikContext();
-
   // ** Why is formik automatically storing values.status & values.index as strings and not numbers?
   const { values, setSubmitting, resetForm }: any = formik;
 
   const handleSubmit = async () => {
-    setSubmitting(true);
+    // setSubmitting(true);
 
     const uid = uuidv4();
     const taskDocRef = doc(
@@ -65,54 +55,19 @@ const FormikForm = ({
       uid
     );
 
-    // const columnDocRef = doc(
-    //   db,
-    //   "users",
-    //   `${user?.uid}`,
-    //   "boards",
-    //   `${boardId}`,
-    //   "columns",
-    //   values?.status
-    // );
+    const chosenColumnTasks = tasks?.filter(
+      (task: any) => task?.status === parseInt(values?.status)
+    );
 
-    // console.log("taskDocRef:", taskDocRef);
-
-    // Long & ugly if/else block. Wish I could use ternary operators inside setDoc
-    if (parseInt(values?.status) === 1) {
-      await setDoc(taskDocRef, {
-        // Using type guard to ensure that we're always spreading an object
-        ...(typeof values === "object" ? values : {}),
-        index: parseInt(todoTasksArray?.length),
-        status: parseInt(values?.status),
-        boardId: boardId,
-        uid: uid,
-        createdAt: Timestamp.fromDate(new Date()),
-      });
-      // await updateDoc(columnDocRef, {
-      //   title: "todo",
-      // });
-      console.log("values?.status === 1 ran");
-    } else if (parseInt(values?.status) === 2) {
-      await setDoc(taskDocRef, {
-        ...(typeof values === "object" ? values : {}),
-        index: parseInt(doingTasksArray?.length),
-        status: parseInt(values?.status),
-        boardId: boardId,
-        uid: uid,
-        createdAt: Timestamp.fromDate(new Date()),
-      });
-      console.log("values?.status === 2 ran");
-    } else if (parseInt(values?.status) === 3) {
-      await setDoc(taskDocRef, {
-        ...(typeof values === "object" ? values : {}),
-        index: parseInt(doneTasksArray?.length),
-        status: parseInt(values?.status),
-        boardId: boardId,
-        uid: uid,
-        createdAt: Timestamp.fromDate(new Date()),
-      });
-      console.log("values?.status === 3 ran");
-    }
+    await setDoc(taskDocRef, {
+      // Using type guard to ensure that we're always spreading an object
+      ...(typeof values === "object" ? values : {}),
+      index: parseInt(chosenColumnTasks?.length),
+      status: parseInt(values?.status),
+      boardId: boardId,
+      uid: uid,
+      createdAt: Timestamp.fromDate(new Date()),
+    });
 
     toast.success("New Task Created");
     setSubmitting(false);

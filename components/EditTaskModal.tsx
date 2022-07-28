@@ -2,13 +2,7 @@ import { Formik } from "formik";
 import * as Yup from "yup";
 import { v4 as uuidv4 } from "uuid";
 import EditTaskFormikForm from "./form/EditTaskFormikForm";
-import { doc } from "firebase/firestore";
-import { db } from "../lib/firebase";
-import { useContext, useEffect, useState } from "react";
-import { UserContext } from "../lib/context";
-import useFetchFsTasks from "../lib/hooks/old/useFetchFsTasksOld";
-import { useSetState } from "@mantine/hooks";
-import useFetchTasksCollectionGroup from "../lib/hooks/useFetchFsTasks";
+import { useEffect, useState } from "react";
 
 type IndexProps = {
   boardId: string | null | undefined;
@@ -24,10 +18,6 @@ const EditTaskModal = ({
   tasks,
 }: IndexProps) => {
   const [data, setData] = useState<any>();
-  // const user = useContext(UserContext);
-  // Fetching all Tasks of selected Board
-  // const tasks = useFetchFsTasks(user?.uid, boardId);
-  // const tasks: any = useFetchTasksCollectionGroup(boardId);
 
   const selectedTask = tasks?.filter((task: any) => task?.uid === taskId)?.[0];
 
@@ -35,8 +25,8 @@ const EditTaskModal = ({
     title: string;
     description?: string;
     subtasks?: {}[];
-    status: number;
-    index: number;
+    status: number | string;
+    index: number | string;
   };
 
   const initialValues: initialValuesProps = {
@@ -50,8 +40,8 @@ const EditTaskModal = ({
         checked: false,
       },
     ],
-    status: 0,
-    index: 0,
+    status: "",
+    index: "",
   };
 
   const validationSchema = Yup.object({
@@ -86,6 +76,7 @@ const EditTaskModal = ({
             taskId={taskId}
             setShowEditTaskModal={setShowEditTaskModal}
             tasks={tasks}
+            formik={formik}
           />
         );
       }}

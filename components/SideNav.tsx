@@ -169,9 +169,8 @@ const SideNav = ({
       });
       setBoardId(uuid);
 
-      // ** Create 3 default Columns & add title to each
+      // ** Create 3 default Columns + add title & status to each
       defaultColumns?.map((column: any) => {
-        console.log(column);
         const columnRef = doc(
           db,
           "users",

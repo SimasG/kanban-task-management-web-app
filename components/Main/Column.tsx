@@ -52,6 +52,7 @@ const Column = ({
         {/* Colorful circle */}
         <div
           className={`h-4 w-4 rounded-full ${
+            // Find a way to remove the hardcoding
             columnStatus === 1 && "bg-todoColors-brightBlue"
           } ${columnStatus === 2 && "bg-todoColors-violet"} ${
             columnStatus === 3 && "bg-todoColors-brightGreen"
@@ -59,12 +60,12 @@ const Column = ({
         ></div>
         {/* Column Title */}
         <input
-          // value={`${columnTitle} (${taskCount})`}
-
           value={`${columnTitle}`}
           onChange={(e) => changeColumnTitle(e.target.value)}
-          className="uppercase text-fontSecondary font-bold bg-transparent cursor-pointer outline-none"
+          className="uppercase text-fontSecondary font-bold bg-transparent cursor-pointer outline-none hover:opacity-75 w-16 max-w-fit"
         />
+        {/* Task Count */}
+        <h3 className="text-fontSecondary font-bold">{`(${taskCount})`}</h3>
       </div>
       {/* Task Container */}
       <Droppable droppableId={columnStatus.toString()}>

@@ -1316,3 +1316,36 @@ const doneTasksArray: any = tasks?.filter((task: any) => task?.status === 3);
 
 // console.log("END OF FUNCTION");
 // };
+
+if (parseInt(values?.status) === 1) {
+console.log("values:", values);
+await setDoc(taskDocRef, {
+// Using type guard to ensure that we're always spreading an object
+...(typeof values === "object" ? values : {}),
+index: parseInt(todoTasksArray?.length),
+status: parseInt(values?.status),
+boardId: boardId,
+uid: uid,
+createdAt: Timestamp.fromDate(new Date()),
+});
+} else if (parseInt(values?.status) === 2) {
+console.log("values:", values);
+await setDoc(taskDocRef, {
+...(typeof values === "object" ? values : {}),
+index: parseInt(doingTasksArray?.length),
+status: parseInt(values?.status),
+boardId: boardId,
+uid: uid,
+createdAt: Timestamp.fromDate(new Date()),
+});
+} else if (parseInt(values?.status) === 3) {
+console.log("values:", values);
+await setDoc(taskDocRef, {
+...(typeof values === "object" ? values : {}),
+index: parseInt(doneTasksArray?.length),
+status: parseInt(values?.status),
+boardId: boardId,
+uid: uid,
+createdAt: Timestamp.fromDate(new Date()),
+});
+}

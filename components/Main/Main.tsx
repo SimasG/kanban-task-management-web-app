@@ -331,8 +331,6 @@ const Main = ({
       <DragDropContext onDragEnd={onDragEnd}>
         {/* overflow-x-auto overflow-hidden */}
         <section className="h-[90%] bg-darkBlue p-5 flex justify-start items-start gap-6 ">
-          {/* Hardcoding the Column count *for now* */}
-          {/* Columns? -> later */}
           {columns?.map((column: any) => (
             <Column
               key={column?.status}

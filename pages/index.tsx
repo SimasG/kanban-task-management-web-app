@@ -53,11 +53,6 @@ const Home: NextPage = () => {
     }
   }, [fsBoards, fsTasks, user]);
 
-  // Separating Tasks array into arrays of Tasks for different columns -> to ensure each column's Tasks are zero-indexed
-  let todos = tasks?.filter((task: any) => task?.status === 1);
-  let doings = tasks?.filter((task: any) => task?.status === 2);
-  let dones = tasks?.filter((task: any) => task?.status === 3);
-
   const activeBoard = boards?.filter(
     (board: BoardSchema) => board.uid === boardId
   );
@@ -101,9 +96,7 @@ const Home: NextPage = () => {
         <AddNewTaskModal
           boardId={boardId}
           setShowAddTaskModal={setShowAddTaskModal}
-          todoTasksArray={todos}
-          doingTasksArray={doings}
-          doneTasksArray={dones}
+          tasks={tasks}
         />
       )}
       {showEditTaskModal && (

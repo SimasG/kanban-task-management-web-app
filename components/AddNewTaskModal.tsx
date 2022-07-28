@@ -7,17 +7,13 @@ import { DocumentData } from "firebase/firestore";
 type IndexProps = {
   boardId: string | null | undefined;
   setShowAddTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
-  todoTasksArray: DocumentData[] | undefined | any;
-  doingTasksArray: DocumentData[] | undefined | any;
-  doneTasksArray: DocumentData[] | undefined | any;
+  tasks: any;
 };
 
 const AddNewTaskModal = ({
   boardId,
   setShowAddTaskModal,
-  todoTasksArray,
-  doingTasksArray,
-  doneTasksArray,
+  tasks,
 }: IndexProps) => {
   type initialValuesProps = {
     title: string;
@@ -64,9 +60,8 @@ const AddNewTaskModal = ({
           <FormikForm
             boardId={boardId}
             setShowAddTaskModal={setShowAddTaskModal}
-            todoTasksArray={todoTasksArray}
-            doingTasksArray={doingTasksArray}
-            doneTasksArray={doneTasksArray}
+            tasks={tasks}
+            formik={formik}
           />
         );
       }}

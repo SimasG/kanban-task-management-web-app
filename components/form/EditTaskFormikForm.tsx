@@ -1,14 +1,7 @@
-import {
-  ErrorMessage,
-  Field,
-  FieldArray,
-  Form,
-  useFormikContext,
-} from "formik";
+import { ErrorMessage, Field, FieldArray, Form } from "formik";
 import FormikControl from "./FormikControl";
 import { v4 as uuidv4 } from "uuid";
 import {
-  deleteDoc,
   doc,
   increment,
   setDoc,
@@ -26,6 +19,7 @@ type IndexProps = {
   taskId: string | null | undefined;
   setShowEditTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
   tasks: any;
+  formik: any;
 };
 
 const FormikForm = ({
@@ -33,20 +27,21 @@ const FormikForm = ({
   taskId,
   setShowEditTaskModal,
   tasks,
+  formik,
 }: IndexProps) => {
   const user = useContext(UserContext);
 
   const dropdownOptions = [
     // "value: ''" will automatically make this option invalid and throw an error
     { key: "Select an option", value: "" },
-    { key: "TODO", value: "todo" },
-    { key: "DOING", value: "doing" },
-    { key: "DONE", value: "done" },
+    { key: "TODO", value: "1" },
+    { key: "DOING", value: "2" },
+    { key: "DONE", value: "3" },
   ];
-  const formik = useFormikContext();
+
   const { values, setSubmitting, resetForm }: any = formik;
 
-  // console.log("formik values:", values);
+  // console.log("editTaskFormikFormik values:", values);
 
   const handleSubmit = async () => {
     setSubmitting(true);
@@ -147,25 +142,7 @@ const FormikForm = ({
                 stroke="currentColor"
                 viewBox="0 0 24 24"
                 xmlns="http://www.w3.org/2000/svg"
-                onClick={
-                  () => deleteTask()
-                  // async () => {
-                  //   const taskRef = doc(
-                  //     db,
-                  //     "users",
-                  //     `${user?.uid}`,
-                  //     "boards",
-                  //     `${boardId}`,
-                  //     "columns",
-                  //     `${values?.status}`,
-                  //     "tasks",
-                  //     `${taskId}`
-                  //   );
-                  //   await deleteDoc(taskRef);
-                  //   setShowEditTaskModal(false);
-                  //   toast.success("Task has been deleted!");
-                  // }
-                }
+                onClick={() => deleteTask()}
               >
                 <path
                   strokeLinecap="round"
@@ -275,7 +252,6 @@ const FormikForm = ({
               control="select"
               label="Status"
               name="status"
-              placeholder="todo"
               options={dropdownOptions}
             />
             {/* Create Task Btn */}
