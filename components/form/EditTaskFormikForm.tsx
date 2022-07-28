@@ -4,8 +4,9 @@ import { v4 as uuidv4 } from "uuid";
 import {
   doc,
   increment,
-  setDoc,
+  runTransaction,
   Timestamp,
+  updateDoc,
   writeBatch,
 } from "firebase/firestore";
 import { db } from "../../lib/firebase";
@@ -34,17 +35,27 @@ const FormikForm = ({
   const dropdownOptions = [
     // "value: ''" will automatically make this option invalid and throw an error
     { key: "Select an option", value: "" },
-    { key: "TODO", value: "1" },
-    { key: "DOING", value: "2" },
-    { key: "DONE", value: "3" },
+    { key: "TODO", value: 1 },
+    { key: "DOING", value: 2 },
+    { key: "DONE", value: 3 },
   ];
 
-  const { values, setSubmitting, resetForm }: any = formik;
-
-  // console.log("editTaskFormikFormik values:", values);
+  const { initialValues, values, setSubmitting, resetForm }: any = formik;
 
   const handleSubmit = async () => {
+    // Why do I have to convert "values.status" to number? I thought it's supposed to be a number by default
+    if (initialValues?.status === parseInt(values?.status)) {
+      softUpdateTask();
+    } else {
+      // ** Like with DnD between Columns, if I change status, I need to do a transaction (Read, Write, Delete)
+      hardUpdateTask();
+    }
+  };
+
+  // U
+  const softUpdateTask = async () => {
     setSubmitting(true);
+
     const taskDocRef = doc(
       db,
       "users",
@@ -57,15 +68,106 @@ const FormikForm = ({
       `${taskId}`
     );
 
-    await setDoc(taskDocRef, {
+    await updateDoc(taskDocRef, {
       // Using type guard to ensure that we're always spreading an object
       ...(typeof values === "object" ? values : {}),
+      // Otherwise, status will be stored as an string
+      status: parseInt(values?.status),
       updatedAt: Timestamp.fromDate(new Date()),
     });
+
     toast.success("Task Updated");
     setSubmitting(false);
     resetForm();
     setShowEditTaskModal(false);
+  };
+
+  // CRUD
+  const hardUpdateTask = async () => {
+    setSubmitting(true);
+
+    console.log("hardUpdateTask ran");
+
+    try {
+      await runTransaction(db, async (transaction) => {
+        // ** Handling affected Task
+        const taskDocRef = doc(
+          db,
+          "users",
+          `${user?.uid}`,
+          "boards",
+          `${boardId}`,
+          "columns",
+          `${initialValues?.status}`,
+          "tasks",
+          `${taskId}`
+        );
+        // READ
+        const affectedTaskRaw = await transaction.get(taskDocRef);
+        if (!affectedTaskRaw.exists()) {
+          throw "Task does not exist!";
+        }
+        const affectedTask = affectedTaskRaw.data();
+
+        const newTaskDocRef = doc(
+          db,
+          "users",
+          `${user?.uid}`,
+          "boards",
+          `${boardId}`,
+          "columns",
+          `${values?.status}`,
+          "tasks",
+          `${taskId}`
+        );
+
+        const destinationTasks = tasks?.filter(
+          (task: any) => task?.status === parseInt(values?.status)
+        );
+
+        // CREATE
+        transaction.set(newTaskDocRef, {
+          ...(typeof affectedTask === "object" ? affectedTask : {}),
+          status: parseInt(values?.status),
+          index: destinationTasks?.length,
+          updatedAt: Timestamp.fromDate(new Date()),
+        });
+
+        // DELETE
+        transaction.delete(taskDocRef);
+
+        // ** Handling affected Column
+        // Decrement Tasks that came after the affected Task in the affected Column
+        const sourceColumnTasks = tasks?.filter(
+          (task: any) => task?.status === initialValues?.status
+        );
+
+        sourceColumnTasks?.map((task: any) => {
+          if (task?.index >= affectedTask?.index) {
+            if (task?.uid === affectedTask?.uid) return;
+            console.log("task that will be decremented:", task);
+            const taskDocRef = doc(
+              db,
+              "users",
+              `${user?.uid}`,
+              "boards",
+              `${boardId}`,
+              "columns",
+              `${initialValues?.status}`,
+              "tasks",
+              `${task?.uid}`
+            );
+            transaction.update(taskDocRef, { index: increment(-1) });
+          }
+        });
+      });
+      toast.success("Task Updated");
+      setSubmitting(false);
+      resetForm();
+      setShowEditTaskModal(false);
+    } catch (err) {
+      console.log("transaction failed:", err);
+    }
   };
 
   const deleteTask = async () => {

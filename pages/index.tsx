@@ -1,4 +1,4 @@
-import { doc, FieldValue, updateDoc } from "firebase/firestore";
+import { doc, updateDoc } from "firebase/firestore";
 import type { NextPage } from "next";
 import React, { useContext, useEffect, useState } from "react";
 import AddNewTaskModal from "../components/AddNewTaskModal";
@@ -12,7 +12,6 @@ import useFetchTasksCollectionGroup from "../lib/hooks/useFetchFsTasks";
 import { BoardSchema } from "../lib/types";
 
 const Home: NextPage = () => {
-  // ** Fetching Data
   const user = useContext(UserContext);
   const fsBoards = useFetchFsBoards(user?.uid);
 
@@ -79,7 +78,6 @@ const Home: NextPage = () => {
         setBoardId={setBoardId}
         updateBoardName={updateBoardName}
       />
-      {/* Main */}
       <Main
         activeBoard={activeBoard}
         boards={boards}

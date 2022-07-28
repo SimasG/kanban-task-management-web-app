@@ -1,13 +1,7 @@
-import { ErrorMessage, Field, FieldArray, Form } from "formik";
+import { ErrorMessage, Field, FieldArray, Form, FormikValues } from "formik";
 import FormikControl from "./FormikControl";
 import { v4 as uuidv4 } from "uuid";
-import {
-  doc,
-  DocumentData,
-  setDoc,
-  Timestamp,
-  updateDoc,
-} from "firebase/firestore";
+import { doc, setDoc, Timestamp, updateDoc } from "firebase/firestore";
 import { db } from "../../lib/firebase";
 import { useContext } from "react";
 import { UserContext } from "../../lib/context";
