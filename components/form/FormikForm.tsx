@@ -25,9 +25,9 @@ const FormikForm = ({
   const dropdownOptions = [
     // "value: ''" will automatically make this option invalid (falsy value) and throw an error
     { key: "Select an option", value: "" },
-    { key: "TODO", value: 1 },
-    { key: "DOING", value: 2 },
-    { key: "DONE", value: 3 },
+    { key: "TODO", value: 0 },
+    { key: "DOING", value: 1 },
+    { key: "DONE", value: 2 },
   ];
 
   // ** Why is formik automatically storing values.status & values.index as strings and not numbers?

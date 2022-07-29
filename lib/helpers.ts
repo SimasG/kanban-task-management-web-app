@@ -1,15 +1,20 @@
+import { v4 as uuidv4 } from "uuid";
+
 // Default 3 Column Structure
 export const defaultColumns = [
   {
-    uid: 1,
+    status: 0,
     title: "todo",
+    uid: uuidv4(),
   },
   {
-    uid: 2,
+    status: 1,
     title: "doing",
+    uid: uuidv4(),
   },
   {
-    uid: 3,
+    status: 2,
     title: "done",
+    uid: uuidv4(),
   },
 ];

@@ -3,13 +3,13 @@ import {
   increment,
   runTransaction,
   Timestamp,
+  updateDoc,
   writeBatch,
 } from "firebase/firestore";
 import { useContext } from "react";
-import { DragDropContext, DropResult } from "react-beautiful-dnd";
+import { DragDropContext, Droppable, DropResult } from "react-beautiful-dnd";
 import { UserContext } from "../../lib/context";
 import { db } from "../../lib/firebase";
-import useFetchFsColumns from "../../lib/hooks/useFetchFsColumns";
 import Column from "./Column";
 import TopSettings from "./TopSettings";
 
@@ -24,6 +24,8 @@ type MainProps = {
   setShowAddTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
   setShowEditTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
   updateBoardName: (uid: string, newName: string) => Promise<void>;
+  columns: any;
+  setColumns: React.Dispatch<any>;
 };
 
 const Main = ({
@@ -37,13 +39,14 @@ const Main = ({
   setShowAddTaskModal,
   setShowEditTaskModal,
   updateBoardName,
+  columns,
+  setColumns,
 }: MainProps) => {
   // ** Fetching Data
   const user = useContext(UserContext);
-  const columns = useFetchFsColumns(boardId);
 
-  const onDragEnd = (result: DropResult) => {
-    const { source, destination } = result;
+  const onDragEnd = async (result: DropResult) => {
+    const { source, destination, type, draggableId } = result;
     if (!destination) return;
     if (
       destination.droppableId === source.droppableId &&
@@ -51,43 +54,122 @@ const Main = ({
     )
       return;
 
-    console.log("onDragEnd ran", result);
+    // Column DnD logic
+    if (type === "column") {
+      console.log("Column DnD detected:", result);
+      let add: any;
+      // Removing Column from array at source.index
+      let newColumns = columns;
+      add = newColumns?.[source.index];
+      newColumns?.splice(source.index, 1);
+      // Adding Column to array at destination.index
+      newColumns?.splice(destination.index, 0, add);
 
-    // Removing Task from array at source.index
-    const { filteredSourceColumnTasks, draggedTask } = removeTaskDnd(
-      parseInt(source.droppableId),
-      source.index
-    );
-
-    // Adding Task to an array at destination.index & extracting updated Task id
-    const { updatedTaskId } = addTaskDnd(
-      parseInt(source.droppableId),
-      parseInt(destination.droppableId),
-      destination.index,
-      draggedTask,
-      filteredSourceColumnTasks
-    );
-
-    // Making changes in Firestore
-    if (source.droppableId === destination.droppableId) {
-      updateTaskWithinColumn(
-        parseInt(source.droppableId),
+      // Updating DB state
+      updateColumnsIndex(
+        newColumns[destination.index].status,
         source.index,
         destination.index,
-        updatedTaskId
+        draggableId
       );
-    } else {
-      updateTaskBetweenColumns(
-        updatedTaskId,
-        source.index,
-        destination.index,
+
+      // Updating Columns state in the UI
+      setColumns(newColumns);
+    }
+    // Task DnD logic
+    else if (type === "task") {
+      // Removing Task from array at source.index
+      const { filteredSourceColumnTasks, draggedTask } = removeTaskDnd(
         parseInt(source.droppableId),
-        parseInt(destination.droppableId)
+        source.index
       );
+
+      // Adding Task to an array at destination.index & extracting updated Task id
+      const { updatedTaskId } = addTaskDnd(
+        parseInt(source.droppableId),
+        parseInt(destination.droppableId),
+        destination.index,
+        draggedTask,
+        filteredSourceColumnTasks
+      );
+
+      // Making changes in Firestore
+      if (source.droppableId === destination.droppableId) {
+        updateTaskWithinColumn(
+          parseInt(source.droppableId),
+          source.index,
+          destination.index,
+          updatedTaskId
+        );
+      } else {
+        updateTaskBetweenColumns(
+          updatedTaskId,
+          source.index,
+          destination.index,
+          parseInt(source.droppableId),
+          parseInt(destination.droppableId)
+        );
+      }
     }
   };
 
-  // onDragEnd Helper Functions
+  // onDragEnd Helpers
+  const updateColumnsIndex = async (
+    updatedColumnStatus: number,
+    sourceIndex: number,
+    destinationIndex: number,
+    draggableId: string
+  ) => {
+    const batch = writeBatch(db);
+    // 1. Updating dragged Column
+    const columnDocRef = doc(
+      db,
+      "users",
+      `${user?.uid}`,
+      "boards",
+      `${boardId}`,
+      "columns",
+      `${draggableId}`
+    );
+    batch.update(columnDocRef, { status: sourceIndex });
+
+    // 2. Updating the indexes of affected Columns
+    columns?.map((column: any) => {
+      if (column.status === updatedColumnStatus) return;
+      if (destinationIndex > sourceIndex) {
+        // Decrement
+        if (column.status > sourceIndex && column.status <= destinationIndex) {
+          const columnDocRef = doc(
+            db,
+            "users",
+            `${user?.uid}`,
+            "boards",
+            `${boardId}`,
+            "columns",
+            `${column.status}`
+          );
+          batch.update(columnDocRef, { status: increment(-1) });
+        }
+      } else if (destinationIndex < sourceIndex) {
+        // Increment
+        if (column.status < sourceIndex && column.status >= destinationIndex) {
+          const columnDocRef = doc(
+            db,
+            "users",
+            `${user?.uid}`,
+            "boards",
+            `${boardId}`,
+            "columns",
+            `${column.status}`
+          );
+          batch.update(columnDocRef, { status: increment(1) });
+        }
+      }
+    });
+
+    await batch.commit();
+  };
+
   const removeTaskDnd = (initialStatus: number, sourceIndex: number) => {
     // Put the dragged Task into a separate variable
     let draggedTask: {};
@@ -330,19 +412,40 @@ const Main = ({
       {/* Main content */}
       <DragDropContext onDragEnd={onDragEnd}>
         {/* overflow-x-auto overflow-hidden */}
-        <section className="h-[90%] bg-darkBlue p-5 flex justify-start items-start gap-6 ">
-          {columns?.map((column: any) => (
-            <Column
-              key={column?.status}
-              setTaskId={setTaskId}
-              setShowEditTaskModal={setShowEditTaskModal}
-              tasks={tasks}
-              columnStatus={column?.status}
-              columnTitle={column?.title}
-              boardId={boardId}
-            />
-          ))}
-          {/* Add New Column btn */}
+        {/* flex justify-start items-start gap-6 */}
+        <section className="h-[90%] bg-darkBlue p-5 flex justify-between gap-6">
+          {/* Current Columns Container */}
+          {/* NEW DROPPABLE */}
+          <Droppable
+            droppableId="allColumns"
+            direction="horizontal"
+            type="column"
+          >
+            {(provided) => (
+              <div
+                {...provided.droppableProps}
+                ref={provided.innerRef}
+                className="flex justify-start items-start gap-6"
+              >
+                {columns?.map((column: any, index: number) => (
+                  // NEW DRAGGABLE
+                  <Column
+                    key={column?.status}
+                    setTaskId={setTaskId}
+                    setShowEditTaskModal={setShowEditTaskModal}
+                    tasks={tasks}
+                    columns={columns}
+                    columnStatus={column?.status}
+                    columnTitle={column?.title}
+                    boardId={boardId}
+                    index={index}
+                  />
+                ))}
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
+          {/* Add New Column Container */}
           <div className="min-w-[250px] bg-veryDarkGray mt-11 h-5/6 flex justify-center items-center cursor-pointer rounded-md hover:bg-opacity-50">
             <h2 className="mb-56 text-2xl text-fontSecondary font-bold">
               + New Column

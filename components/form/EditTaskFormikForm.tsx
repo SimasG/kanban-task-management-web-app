@@ -85,9 +85,6 @@ const FormikForm = ({
   // CRUD
   const hardUpdateTask = async () => {
     setSubmitting(true);
-
-    console.log("hardUpdateTask ran");
-
     try {
       await runTransaction(db, async (transaction) => {
         // ** Handling affected Task

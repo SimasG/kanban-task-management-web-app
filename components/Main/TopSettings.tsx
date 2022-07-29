@@ -58,7 +58,6 @@ const TopSettings = ({
       // Decrement indexes of Boards that come after deleted Board
       boards?.map((board: any) => {
         if (board?.index <= activeBoard?.[0]?.index) return;
-        console.log(`Board to be decremented:`, board);
         const boardDocRef = doc(
           db,
           "users",

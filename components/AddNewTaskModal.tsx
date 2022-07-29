@@ -2,7 +2,6 @@ import { Formik } from "formik";
 import * as Yup from "yup";
 import { v4 as uuidv4 } from "uuid";
 import FormikForm from "./form/FormikForm";
-import { DocumentData } from "firebase/firestore";
 
 type IndexProps = {
   boardId: string | null | undefined;
@@ -47,11 +46,6 @@ const AddNewTaskModal = ({
     ),
     status: Yup.string().required("Status is Required!"),
   });
-
-  // const onSubmit = async (values: any) => {
-  //   console.log("Form submitted!", values);
-  //   const ref = doc(db, `${user?.uid}`, "boards", `${id}`, "tasks", uuidv4());
-  // };
 
   return (
     <Formik initialValues={initialValues} validationSchema={validationSchema}>

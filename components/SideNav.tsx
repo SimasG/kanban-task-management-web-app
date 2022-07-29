@@ -180,7 +180,11 @@ const SideNav = ({
           "columns",
           `${column?.uid}`
         );
-        batch.set(columnRef, { title: column?.title, status: column?.uid });
+        batch.set(columnRef, {
+          title: column?.title,
+          status: column?.status,
+          uid: column?.uid,
+        });
       });
       await batch.commit();
     }
@@ -208,7 +212,7 @@ const SideNav = ({
     newBoards.splice(destination.index, 0, add);
 
     // Reflecting UI changes in Firestore
-    updateBoardIndex(
+    updateBoardsIndex(
       newBoards[destination.index].uid,
       source.index,
       destination.index
@@ -218,7 +222,7 @@ const SideNav = ({
     setBoards(newBoards);
   };
 
-  const updateBoardIndex = async (
+  const updateBoardsIndex = async (
     updatedBoardId: string,
     sourceIndex: number,
     destinationIndex: number
@@ -227,6 +231,7 @@ const SideNav = ({
 
     // ** Changing indexes of Boards affected
     boards?.map((board: any) => {
+      if (board.uid === boardId) return;
       if (destinationIndex > sourceIndex) {
         // Decrement Boards
         if (board.index > sourceIndex && board.index <= destinationIndex) {
@@ -270,7 +275,7 @@ const SideNav = ({
       index: destinationIndex,
       updatedAt: Timestamp.fromDate(new Date()),
     });
-    console.log("end of func");
+
     await batch.commit();
   };
 

@@ -8,6 +8,7 @@ import SideNav from "../components/SideNav";
 import { UserContext } from "../lib/context";
 import { db } from "../lib/firebase";
 import useFetchFsBoards from "../lib/hooks/useFetchFsBoards";
+import useFetchFsColumns from "../lib/hooks/useFetchFsColumns";
 import useFetchTasksCollectionGroup from "../lib/hooks/useFetchFsTasks";
 import { BoardSchema } from "../lib/types";
 
@@ -20,6 +21,7 @@ const Home: NextPage = () => {
     // ** Change "any" later -> change it once the data schema is more clear
     BoardSchema[] | null | any
   >(null);
+  const [columns, setColumns] = useState<any>(null);
   const [tasks, setTasks] = useState<any>(null);
   const [showAddTaskModal, setShowAddTaskModal] = useState(false);
   const [showEditTaskModal, setShowEditTaskModal] = useState(false);
@@ -28,6 +30,7 @@ const Home: NextPage = () => {
 
   // Fetching all Tasks of selected Board
   const fsTasks: any = useFetchTasksCollectionGroup(boardId);
+  const fsColumns = useFetchFsColumns(boardId);
 
   // Setting main state either from localStorage or Firestore
   useEffect(() => {
@@ -46,11 +49,14 @@ const Home: NextPage = () => {
       if (activeBoard === undefined && fsBoards?.length !== 0) {
         setBoardId(fsBoards?.[0]?.id);
       }
+      if (!fsColumns) return;
+      setColumns(fsColumns);
       if (!fsTasks) return;
       setTasks(fsTasks);
-      // console.log("useEffect shit ran");
     }
-  }, [fsBoards, fsTasks, user]);
+  }, [fsBoards, fsColumns, fsTasks, user]);
+
+  console.log("columns state:", columns);
 
   const activeBoard = boards?.filter(
     (board: BoardSchema) => board.uid === boardId
@@ -89,6 +95,8 @@ const Home: NextPage = () => {
         setShowAddTaskModal={setShowAddTaskModal}
         setShowEditTaskModal={setShowEditTaskModal}
         updateBoardName={updateBoardName}
+        columns={columns}
+        setColumns={setColumns}
       />
       {showAddTaskModal && (
         <AddNewTaskModal
