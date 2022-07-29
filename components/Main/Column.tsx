@@ -13,20 +13,20 @@ type ColumnProps = {
   setTaskId: React.Dispatch<React.SetStateAction<string | null | undefined>>;
   setShowEditTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
   tasks: any;
-  columns: any;
   columnStatus: number;
   columnTitle: string;
   boardId: string | null | undefined;
   index: number;
+  columnId: string;
 };
 
 const Column = ({
   setTaskId,
   setShowEditTaskModal,
   tasks,
-  columns,
   columnStatus,
   columnTitle,
+  columnId,
   boardId,
   index,
 }: ColumnProps) => {
@@ -38,11 +38,6 @@ const Column = ({
     (task: any) => task?.status === columnStatus
   ).length;
 
-  // const selectedColumn = columns?.find(
-  //   (column: any) => column.status === columnStatus
-  // );
-  // console.log("selectedColumn:", selectedColumn);
-
   const changeColumnTitle = async (newTitle: string) => {
     const columnDocRef = doc(
       db,
@@ -51,14 +46,14 @@ const Column = ({
       "boards",
       `${boardId}`,
       "columns",
-      // CHANGE PATH HERE
-      `${columnStatus}`
+      `${columnId}`
     );
     await updateDoc(columnDocRef, { title: newTitle });
   };
 
   return (
-    <Draggable draggableId={columnStatus.toString()} index={index}>
+    // ** It's important not to put index # as the draggableId (not sure why)
+    <Draggable key={columnId} draggableId={columnId} index={index}>
       {(provided) => (
         <div
           {...provided.draggableProps}

@@ -191,14 +191,9 @@ const SideNav = ({
   };
 
   const onDragEnd = (result: DropResult) => {
-    const { source, destination, draggableId } = result;
+    const { source, destination } = result;
     if (!destination) return;
-    if (
-      // ** this condition is only required for multi-column dnd
-      //  destination.droppableId === source.droppableId &&
-      destination.index === source.index
-    )
-      return;
+    if (destination.index === source.index) return;
 
     let add;
     let newBoards = boards;
@@ -251,14 +246,14 @@ const SideNav = ({
         if (board.index < sourceIndex && board.index >= destinationIndex) {
           // INCREMENT THE INDEX OF EACH BOARD THAT FITS THIS CRITERIA
           console.log("board to be incremented:", board);
-          const taskDocRef = doc(
+          const boardDocRef = doc(
             db,
             "users",
             `${user?.uid}`,
             "boards",
             `${board?.uid}`
           );
-          batch.update(taskDocRef, { index: increment(1) });
+          batch.update(boardDocRef, { index: increment(1) });
         }
       }
     });
@@ -273,7 +268,6 @@ const SideNav = ({
     );
     batch.update(boardDocRef, {
       index: destinationIndex,
-      updatedAt: Timestamp.fromDate(new Date()),
     });
 
     await batch.commit();

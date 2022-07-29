@@ -56,8 +56,6 @@ const Home: NextPage = () => {
     }
   }, [fsBoards, fsColumns, fsTasks, user]);
 
-  console.log("columns state:", columns);
-
   const activeBoard = boards?.filter(
     (board: BoardSchema) => board.uid === boardId
   );

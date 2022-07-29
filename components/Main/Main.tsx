@@ -46,17 +46,13 @@ const Main = ({
   const user = useContext(UserContext);
 
   const onDragEnd = async (result: DropResult) => {
-    const { source, destination, type, draggableId } = result;
+    const { source, destination, type } = result;
     if (!destination) return;
-    if (
-      destination.droppableId === source.droppableId &&
-      destination.index === source.index
-    )
-      return;
+    if (destination.index === source.index) return;
+    // console.log(result);
 
     // Column DnD logic
     if (type === "column") {
-      console.log("Column DnD detected:", result);
       let add: any;
       // Removing Column from array at source.index
       let newColumns = columns;
@@ -67,10 +63,9 @@ const Main = ({
 
       // Updating DB state
       updateColumnsIndex(
-        newColumns[destination.index].status,
+        newColumns[destination.index].uid,
         source.index,
-        destination.index,
-        draggableId
+        destination.index
       );
 
       // Updating Columns state in the UI
@@ -113,29 +108,19 @@ const Main = ({
     }
   };
 
+  console.log("columns (outside of onDragEnd):", columns);
+
   // onDragEnd Helpers
   const updateColumnsIndex = async (
-    updatedColumnStatus: number,
+    draggedColumnId: string,
     sourceIndex: number,
-    destinationIndex: number,
-    draggableId: string
+    destinationIndex: number
   ) => {
     const batch = writeBatch(db);
-    // 1. Updating dragged Column
-    const columnDocRef = doc(
-      db,
-      "users",
-      `${user?.uid}`,
-      "boards",
-      `${boardId}`,
-      "columns",
-      `${draggableId}`
-    );
-    batch.update(columnDocRef, { status: sourceIndex });
 
-    // 2. Updating the indexes of affected Columns
+    // 1. Updating the indexes of affected Columns
     columns?.map((column: any) => {
-      if (column.status === updatedColumnStatus) return;
+      if (column.uid === draggedColumnId) return;
       if (destinationIndex > sourceIndex) {
         // Decrement
         if (column.status > sourceIndex && column.status <= destinationIndex) {
@@ -146,7 +131,7 @@ const Main = ({
             "boards",
             `${boardId}`,
             "columns",
-            `${column.status}`
+            `${column.uid}`
           );
           batch.update(columnDocRef, { status: increment(-1) });
         }
@@ -160,11 +145,25 @@ const Main = ({
             "boards",
             `${boardId}`,
             "columns",
-            `${column.status}`
+            `${column.uid}`
           );
           batch.update(columnDocRef, { status: increment(1) });
         }
       }
+    });
+
+    // 2. Updating dragged Column
+    const columnDocRef = doc(
+      db,
+      "users",
+      `${user?.uid}`,
+      "boards",
+      `${boardId}`,
+      "columns",
+      `${draggedColumnId}`
+    );
+    batch.update(columnDocRef, {
+      status: destinationIndex,
     });
 
     await batch.commit();
@@ -415,7 +414,6 @@ const Main = ({
         {/* flex justify-start items-start gap-6 */}
         <section className="h-[90%] bg-darkBlue p-5 flex justify-between gap-6">
           {/* Current Columns Container */}
-          {/* NEW DROPPABLE */}
           <Droppable
             droppableId="allColumns"
             direction="horizontal"
@@ -428,15 +426,13 @@ const Main = ({
                 className="flex justify-start items-start gap-6"
               >
                 {columns?.map((column: any, index: number) => (
-                  // NEW DRAGGABLE
                   <Column
-                    key={column?.status}
                     setTaskId={setTaskId}
                     setShowEditTaskModal={setShowEditTaskModal}
                     tasks={tasks}
-                    columns={columns}
                     columnStatus={column?.status}
                     columnTitle={column?.title}
+                    columnId={column?.uid}
                     boardId={boardId}
                     index={index}
                   />
