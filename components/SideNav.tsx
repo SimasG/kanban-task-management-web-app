@@ -169,7 +169,7 @@ const SideNav = ({
       });
       setBoardId(uuid);
 
-      // ** Create 3 default Columns + add title & status to each
+      // Create 3 default Columns
       defaultColumns?.map((column: any) => {
         const columnRef = doc(
           db,
@@ -181,9 +181,10 @@ const SideNav = ({
           `${column?.uid}`
         );
         batch.set(columnRef, {
-          title: column?.title,
-          status: column?.status,
           uid: column?.uid,
+          index: column?.index,
+          status: column?.status,
+          title: column?.title,
         });
       });
       await batch.commit();

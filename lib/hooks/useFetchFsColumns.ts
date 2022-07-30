@@ -16,7 +16,7 @@ const useFetchFsColumns = (boardId: string | null | undefined) => {
     "columns"
   );
 
-  const q = query(columnsCollectionRef, orderBy("status", "asc"));
+  const q = query(columnsCollectionRef, orderBy("index", "asc"));
 
   const columnData = useCollectionData(q)[0];
 

@@ -105,6 +105,8 @@ const Main = ({
     }
   };
 
+  console.log("columns state:", columns);
+
   // onDragEnd Helpers
   const updateColumnsIndex = async (
     draggedColumnId: string,
@@ -118,7 +120,7 @@ const Main = ({
       if (column.uid === draggedColumnId) return;
       if (destinationIndex > sourceIndex) {
         // Decrement
-        if (column.status > sourceIndex && column.status <= destinationIndex) {
+        if (column.index > sourceIndex && column.index <= destinationIndex) {
           const columnDocRef = doc(
             db,
             "users",
@@ -128,11 +130,11 @@ const Main = ({
             "columns",
             `${column.uid}`
           );
-          batch.update(columnDocRef, { status: increment(-1) });
+          batch.update(columnDocRef, { index: increment(-1) });
         }
       } else if (destinationIndex < sourceIndex) {
         // Increment
-        if (column.status < sourceIndex && column.status >= destinationIndex) {
+        if (column.index < sourceIndex && column.index >= destinationIndex) {
           const columnDocRef = doc(
             db,
             "users",
@@ -142,7 +144,7 @@ const Main = ({
             "columns",
             `${column.uid}`
           );
-          batch.update(columnDocRef, { status: increment(1) });
+          batch.update(columnDocRef, { index: increment(1) });
         }
       }
     });
@@ -158,7 +160,7 @@ const Main = ({
       `${draggedColumnId}`
     );
     batch.update(columnDocRef, {
-      status: destinationIndex,
+      index: destinationIndex,
     });
 
     await batch.commit();
