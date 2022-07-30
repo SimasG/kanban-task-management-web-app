@@ -2,6 +2,7 @@ import {
   doc,
   increment,
   runTransaction,
+  setDoc,
   Timestamp,
   writeBatch,
 } from "firebase/firestore";
@@ -11,6 +12,7 @@ import { UserContext } from "../../lib/context";
 import { db } from "../../lib/firebase";
 import Column from "./Column";
 import TopSettings from "./TopSettings";
+import { v4 as uuidv4 } from "uuid";
 
 type MainProps = {
   activeBoard: any;
@@ -104,8 +106,6 @@ const Main = ({
       // ** Firestore and synced up each time (not the most efficient?).
     }
   };
-
-  console.log("columns state:", columns);
 
   // onDragEnd Helpers
   const updateColumnsIndex = async (
@@ -362,6 +362,26 @@ const Main = ({
     console.log("END OF FUNCTION");
   };
 
+  const addNewColumn = async () => {
+    // let updatedColumns = columns;
+    // updatedColumns.push({})
+    const newColumnDocRef = doc(
+      db,
+      "users",
+      `${user?.uid}`,
+      "boards",
+      `${boardId}`,
+      "columns",
+      `${uuidv4()}`
+    );
+    await setDoc(newColumnDocRef, {
+      index: columns?.length,
+      status: columns?.length,
+      title: "todo",
+      uid: uuidv4(),
+    });
+  };
+
   return (
     <main className="w-4/5">
       <TopSettings
@@ -408,7 +428,10 @@ const Main = ({
             )}
           </Droppable>
           {/* Add New Column Container */}
-          <div className="min-w-[250px] bg-veryDarkGray mt-11 h-5/6 flex justify-center items-center cursor-pointer rounded-md hover:bg-opacity-50">
+          <div
+            onClick={addNewColumn}
+            className="min-w-[250px] bg-veryDarkGray mt-11 h-5/6 flex justify-center items-center cursor-pointer rounded-md hover:bg-opacity-50"
+          >
             <h2 className="mb-56 text-2xl text-fontSecondary font-bold">
               + New Column
             </h2>
