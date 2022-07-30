@@ -53,6 +53,8 @@ const Column = ({
 
   return (
     // ** It's important not to put index # as the draggableId (not sure why)
+    // I'm already adding a key to the mapped <Column/> but if I
+    // don't specify the key here, the Column DnD doesn't work. Not sure why.
     <Draggable key={columnId} draggableId={columnId} index={index}>
       {(provided) => (
         <div
@@ -88,7 +90,7 @@ const Column = ({
             <h3 className="text-fontSecondary font-bold">{`(${taskCount})`}</h3>
           </div>
           {/* Task Container */}
-          <Droppable droppableId={columnStatus.toString()} type="task">
+          <Droppable droppableId={columnId} type="task">
             {/* Are we using the render props pattern to display the Droppable component 
     because that's the ideal way to access Droppable's props (provided & snapshot)? */}
             {(provided: DroppableProvided) => {

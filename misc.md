@@ -1349,3 +1349,10 @@ uid: uid,
 createdAt: Timestamp.fromDate(new Date()),
 });
 }
+
+      // If changes were made to Task status, use the new "values" object. Otherwise, "initialValues"
+      `${
+        initialValues?.status !== values?.status
+          ? `${values?.status}`
+          : `${initialValues?.status}`
+      }`,

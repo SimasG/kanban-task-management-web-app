@@ -7,12 +7,14 @@ type IndexProps = {
   boardId: string | null | undefined;
   setShowAddTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
   tasks: any;
+  columns: any;
 };
 
 const AddNewTaskModal = ({
   boardId,
   setShowAddTaskModal,
   tasks,
+  columns,
 }: IndexProps) => {
   type initialValuesProps = {
     title: string;
@@ -32,8 +34,8 @@ const AddNewTaskModal = ({
         checked: false,
       },
     ],
-    status: 0,
-    index: 0,
+    status: -1,
+    index: -1,
   };
 
   const validationSchema = Yup.object({
@@ -56,6 +58,7 @@ const AddNewTaskModal = ({
             setShowAddTaskModal={setShowAddTaskModal}
             tasks={tasks}
             formik={formik}
+            columns={columns}
           />
         );
       }}

@@ -9,6 +9,7 @@ type IndexProps = {
   taskId: string | null | undefined;
   setShowEditTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
   tasks: any;
+  columns: any;
 };
 
 const EditTaskModal = ({
@@ -16,6 +17,7 @@ const EditTaskModal = ({
   taskId,
   setShowEditTaskModal,
   tasks,
+  columns,
 }: IndexProps) => {
   const [data, setData] = useState<any>();
 
@@ -77,6 +79,7 @@ const EditTaskModal = ({
             setShowEditTaskModal={setShowEditTaskModal}
             tasks={tasks}
             formik={formik}
+            columns={columns}
           />
         );
       }}

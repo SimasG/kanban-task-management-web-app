@@ -101,6 +101,7 @@ const Home: NextPage = () => {
           boardId={boardId}
           setShowAddTaskModal={setShowAddTaskModal}
           tasks={tasks}
+          columns={columns}
         />
       )}
       {showEditTaskModal && (
@@ -109,6 +110,7 @@ const Home: NextPage = () => {
           taskId={taskId}
           setShowEditTaskModal={setShowEditTaskModal}
           tasks={tasks}
+          columns={columns}
         />
       )}
     </div>

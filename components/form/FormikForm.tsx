@@ -12,6 +12,7 @@ type IndexProps = {
   setShowAddTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
   tasks: any;
   formik: any;
+  columns: any;
 };
 
 const FormikForm = ({
@@ -19,6 +20,7 @@ const FormikForm = ({
   setShowAddTaskModal,
   tasks,
   formik,
+  columns,
 }: IndexProps) => {
   const user = useContext(UserContext);
 
@@ -34,7 +36,12 @@ const FormikForm = ({
   const { values, setSubmitting, resetForm }: any = formik;
 
   const handleSubmit = async () => {
-    // setSubmitting(true);
+    setSubmitting(true);
+
+    // Identifying Column id, to which the Task should be added.
+    const selectedColumn = columns?.find(
+      (column: any) => column?.status === parseInt(values?.status)
+    );
 
     const uid = uuidv4();
     const taskDocRef = doc(
@@ -44,9 +51,9 @@ const FormikForm = ({
       "boards",
       `${boardId}`,
       "columns",
-      values?.status,
+      `${selectedColumn?.uid}`,
       "tasks",
-      uid
+      `${uid}`
     );
 
     const chosenColumnTasks = tasks?.filter(

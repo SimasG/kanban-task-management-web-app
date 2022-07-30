@@ -21,6 +21,7 @@ type IndexProps = {
   setShowEditTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
   tasks: any;
   formik: any;
+  columns: any;
 };
 
 const FormikForm = ({
@@ -29,18 +30,29 @@ const FormikForm = ({
   setShowEditTaskModal,
   tasks,
   formik,
+  columns,
 }: IndexProps) => {
   const user = useContext(UserContext);
 
   const dropdownOptions = [
     // "value: ''" will automatically make this option invalid and throw an error
     { key: "Select an option", value: "" },
-    { key: "TODO", value: 1 },
-    { key: "DOING", value: 2 },
-    { key: "DONE", value: 3 },
+    { key: "TODO", value: 0 },
+    { key: "DOING", value: 1 },
+    { key: "DONE", value: 2 },
   ];
 
   const { initialValues, values, setSubmitting, resetForm }: any = formik;
+
+  // Identifying source Column id, from which the Task should be removed
+  const sourceColumn = columns?.find(
+    (column: any) => column?.status === parseInt(initialValues?.status)
+  );
+
+  // Identifying destination Column id, to which the Task should be added
+  const destinationColumn = columns?.find(
+    (column: any) => column?.status === parseInt(values?.status)
+  );
 
   const handleSubmit = async () => {
     // Why do I have to convert "values.status" to number? I thought it's supposed to be a number by default
@@ -63,7 +75,7 @@ const FormikForm = ({
       "boards",
       `${boardId}`,
       "columns",
-      `${values?.status}`,
+      `${sourceColumn?.uid}`,
       "tasks",
       `${taskId}`
     );
@@ -95,7 +107,7 @@ const FormikForm = ({
           "boards",
           `${boardId}`,
           "columns",
-          `${initialValues?.status}`,
+          `${sourceColumn?.uid}`,
           "tasks",
           `${taskId}`
         );
@@ -113,7 +125,7 @@ const FormikForm = ({
           "boards",
           `${boardId}`,
           "columns",
-          `${values?.status}`,
+          `${destinationColumn?.uid}`,
           "tasks",
           `${taskId}`
         );
@@ -150,7 +162,7 @@ const FormikForm = ({
               "boards",
               `${boardId}`,
               "columns",
-              `${initialValues?.status}`,
+              `${sourceColumn?.uid}`,
               "tasks",
               `${task?.uid}`
             );
@@ -171,7 +183,7 @@ const FormikForm = ({
     const batch = writeBatch(db);
 
     const selectedColumnTasks = tasks?.filter(
-      (task: any) => task?.status === values?.status
+      (task: any) => task?.status === initialValues?.status
     );
 
     // Delete chosen Task
@@ -182,7 +194,7 @@ const FormikForm = ({
       "boards",
       `${boardId}`,
       "columns",
-      `${values?.status}`,
+      `${sourceColumn?.uid}`,
       "tasks",
       `${taskId}`
     );
@@ -190,8 +202,11 @@ const FormikForm = ({
 
     // Decrement indexes of Tasks that came after the deleted Task
     selectedColumnTasks.map((task: any) => {
-      if (task?.index <= values?.index) return;
-      console.log(`task to be decremented in Column: ${values?.status}:`, task);
+      if (task?.index <= initialValues?.index) return;
+      console.log(
+        `task to be decremented in Column: ${initialValues?.status}:`,
+        task
+      );
       const taskDocRef = doc(
         db,
         "users",
@@ -199,7 +214,7 @@ const FormikForm = ({
         "boards",
         `${boardId}`,
         "columns",
-        `${values?.status}`,
+        `${sourceColumn?.uid}`,
         "tasks",
         `${task?.uid}`
       );

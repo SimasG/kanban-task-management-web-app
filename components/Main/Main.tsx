@@ -3,7 +3,6 @@ import {
   increment,
   runTransaction,
   Timestamp,
-  updateDoc,
   writeBatch,
 } from "firebase/firestore";
 import { useContext } from "react";
@@ -42,73 +41,70 @@ const Main = ({
   columns,
   setColumns,
 }: MainProps) => {
-  // ** Fetching Data
   const user = useContext(UserContext);
 
   const onDragEnd = async (result: DropResult) => {
     const { source, destination, type } = result;
-    if (!destination) return;
-    if (destination.index === source.index) return;
-    // console.log(result);
+    // if (!destination) return;
+    // if (destination.index === source.index) return;
+    console.log(result);
 
     // Column DnD logic
     if (type === "column") {
-      let add: any;
-      // Removing Column from array at source.index
-      let newColumns = columns;
-      add = newColumns?.[source.index];
-      newColumns?.splice(source.index, 1);
-      // Adding Column to array at destination.index
-      newColumns?.splice(destination.index, 0, add);
-
-      // Updating DB state
-      updateColumnsIndex(
-        newColumns[destination.index].uid,
-        source.index,
-        destination.index
-      );
-
-      // Updating Columns state in the UI
-      setColumns(newColumns);
+      // let add: any;
+      // // Removing Column from array at source.index
+      // let newColumns = columns;
+      // add = newColumns?.[source.index];
+      // newColumns?.splice(source.index, 1);
+      // // Adding Column to array at destination.index
+      // newColumns?.splice(destination.index, 0, add);
+      // // Updating DB state
+      // updateColumnsIndex(
+      //   newColumns[destination.index].uid,
+      //   source.index,
+      //   destination.index
+      // );
+      // // Updating Columns state in the UI
+      // setColumns(newColumns);
     }
     // Task DnD logic
     else if (type === "task") {
       // Removing Task from array at source.index
-      const { filteredSourceColumnTasks, draggedTask } = removeTaskDnd(
-        parseInt(source.droppableId),
-        source.index
-      );
+      // const { filteredSourceColumnTasks, draggedTask } = removeTaskDnd(
+      //   parseInt(source.droppableId),
+      //   source.index
+      // );
 
-      // Adding Task to an array at destination.index & extracting updated Task id
-      const { updatedTaskId } = addTaskDnd(
-        parseInt(source.droppableId),
-        parseInt(destination.droppableId),
-        destination.index,
-        draggedTask,
-        filteredSourceColumnTasks
-      );
+      // // Adding Task to an array at destination.index & extracting updated Task id
+      // const { updatedTaskId } = addTaskDnd(
+      //   parseInt(source.droppableId),
+      //   parseInt(destination.droppableId),
+      //   destination.index,
+      //   draggedTask,
+      //   filteredSourceColumnTasks
+      // );
 
       // Making changes in Firestore
       if (source.droppableId === destination.droppableId) {
-        updateTaskWithinColumn(
-          parseInt(source.droppableId),
-          source.index,
-          destination.index,
-          updatedTaskId
-        );
+        // updateTaskWithinColumn(
+        //   parseInt(source.droppableId),
+        //   source.index,
+        //   destination.index,
+        //   updatedTaskId
+        // );
       } else {
-        updateTaskBetweenColumns(
-          updatedTaskId,
-          source.index,
-          destination.index,
-          parseInt(source.droppableId),
-          parseInt(destination.droppableId)
-        );
+        // updateTaskBetweenColumns(
+        //   updatedTaskId,
+        //   source.index,
+        //   destination.index,
+        //   parseInt(source.droppableId),
+        //   parseInt(destination.droppableId)
+        // );
       }
+
+      // ** Should I update my tasks main state here?
     }
   };
-
-  console.log("columns (outside of onDragEnd):", columns);
 
   // onDragEnd Helpers
   const updateColumnsIndex = async (
@@ -219,6 +215,7 @@ const Main = ({
     initialStatus: number,
     // Destination Column Status -> Task's new Column index -> newStatus
     newStatus: number
+    // ** Add sourceColumnId * destinationColumnId
   ) => {
     try {
       await runTransaction(db, async (transaction) => {
@@ -427,6 +424,7 @@ const Main = ({
               >
                 {columns?.map((column: any, index: number) => (
                   <Column
+                    key={column?.uid}
                     setTaskId={setTaskId}
                     setShowEditTaskModal={setShowEditTaskModal}
                     tasks={tasks}
