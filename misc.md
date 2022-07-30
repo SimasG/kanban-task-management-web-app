@@ -1356,3 +1356,94 @@ createdAt: Timestamp.fromDate(new Date()),
           ? `${values?.status}`
           : `${initialValues?.status}`
       }`,
+
+              // const sourceColumnTasks = tasks?.filter(
+        //   (task: any) => task?.status === initialStatus
+        // );
+
+                const destinationColumnTasks = tasks?.filter(
+          (task: any) => task?.status === newStatus
+        );
+
+            // const sourceColumnTasks = tasks?.filter(
+    //   (task: any) => task?.status === initialStatus
+    // );
+
+
+      // Removing Task from array at source.index
+      // const { filteredSourceColumnTasks, draggedTask } = removeTaskDnd(
+      //   source.droppableId,
+      //   source.index
+      // );
+
+            // Adding Task to an array at destination.index & extracting updated Task id
+      // const { updatedTaskId } = addTaskDnd(
+      //   source.droppableId,
+      //   destination.droppableId,
+      //   destination.index,
+      //   draggedTask,
+      //   filteredSourceColumnTasks
+      // );
+
+        const removeTaskDnd = (sourceColumnId: string, sourceIndex: number) => {
+    // Put the dragged Task into a separate variable
+    let draggedTask;
+    let filteredSourceColumnTasks: [];
+
+    const sourceColumn = columns?.find(
+      (column: any) => column?.uid === sourceColumnId
+    );
+    const sourceColumnTasks = tasks?.filter(
+      (task: any) => task?.status === sourceColumn?.status
+    );
+    draggedTask = sourceColumnTasks[sourceIndex];
+
+    // Remove Task from array at source.index
+    sourceColumnTasks.splice(sourceIndex, 1);
+
+    filteredSourceColumnTasks = sourceColumnTasks;
+
+    // return Task array (from the respective Column) without the dragged Task
+    //  (displays un-updated indexes of these Tasks)
+    return { filteredSourceColumnTasks, draggedTask };
+
+};
+
+const addTaskDnd = (
+sourceColumnId: string,
+destinationColumnId: string,
+destinationIndex: number,
+draggedTask: any,
+filteredSourceColumnTasks: any
+) => {
+let updatedTaskId;
+
+    const sourceColumn = columns?.find(
+      (column: any) => column?.uid === sourceColumnId
+    );
+    const destinationColumn = columns?.find(
+      (column: any) => column?.uid === destinationColumnId
+    );
+
+    if (destinationColumn?.status === sourceColumn?.status) {
+      // If Task has been dnd'ed within the same column, use the initial array where draggedTask has been removed
+      filteredSourceColumnTasks.splice(destinationIndex, 0, draggedTask);
+      updatedTaskId = filteredSourceColumnTasks[destinationIndex].uid;
+    } else {
+      // Otherwise, use scalable logic
+      const destinationColumnTasks = tasks?.filter(
+        (task: any) => task?.status === destinationColumn?.status
+      );
+      destinationColumnTasks.splice(destinationIndex, 0, draggedTask);
+      updatedTaskId = destinationColumnTasks[destinationIndex].uid;
+    }
+    return { updatedTaskId };
+
+};
+
+        // READ
+        // const draggedTaskRaw = await transaction.get(taskDocRef);
+        // if (!draggedTaskRaw.exists()) {
+        //   throw "Task does not exist!";
+        // }
+        // const draggedTask = draggedTaskRaw.data();
