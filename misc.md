@@ -1447,3 +1447,11 @@ let updatedTaskId;
         //   throw "Task does not exist!";
         // }
         // const draggedTask = draggedTaskRaw.data();
+
+const dropdownOptions2 = [
+// "value: ''" will automatically make this option invalid (falsy value) and throw an error
+{ key: "Select an option", value: "" },
+{ key: "TODO", value: 0 },
+{ key: "DOING", value: 1 },
+{ key: "DONE", value: 2 },
+];

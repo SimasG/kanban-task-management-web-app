@@ -358,13 +358,10 @@ const Main = ({
     } catch (err) {
       console.log("Transaction failed: ", err);
     }
-
-    console.log("END OF FUNCTION");
   };
 
   const addNewColumn = async () => {
-    // let updatedColumns = columns;
-    // updatedColumns.push({})
+    const uuid = uuidv4();
     const newColumnDocRef = doc(
       db,
       "users",
@@ -372,13 +369,13 @@ const Main = ({
       "boards",
       `${boardId}`,
       "columns",
-      `${uuidv4()}`
+      `${uuid}`
     );
     await setDoc(newColumnDocRef, {
       index: columns?.length,
       status: columns?.length,
       title: "todo",
-      uid: uuidv4(),
+      uid: uuid,
     });
   };
 

@@ -34,13 +34,14 @@ const FormikForm = ({
 }: IndexProps) => {
   const user = useContext(UserContext);
 
-  const dropdownOptions = [
-    // "value: ''" will automatically make this option invalid and throw an error
-    { key: "Select an option", value: "" },
-    { key: "TODO", value: 0 },
-    { key: "DOING", value: 1 },
-    { key: "DONE", value: 2 },
-  ];
+  // "value: ''" will automatically make this option invalid (falsy value) and throw an error
+  let dropdownOptions: any = [{ key: "Select an option", value: "" }];
+  columns?.map((column: any) => {
+    dropdownOptions.push({
+      key: `${column?.title.toUpperCase()}`,
+      value: `${column?.status}`,
+    });
+  });
 
   const { initialValues, values, setSubmitting, resetForm }: any = formik;
 
@@ -64,7 +65,7 @@ const FormikForm = ({
     }
   };
 
-  // U
+  // U (no status changes)
   const softUpdateTask = async () => {
     setSubmitting(true);
 
@@ -94,7 +95,7 @@ const FormikForm = ({
     setShowEditTaskModal(false);
   };
 
-  // CRUD
+  // CRUD (status changes included)
   const hardUpdateTask = async () => {
     setSubmitting(true);
     try {

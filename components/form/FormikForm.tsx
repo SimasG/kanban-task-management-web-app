@@ -24,13 +24,14 @@ const FormikForm = ({
 }: IndexProps) => {
   const user = useContext(UserContext);
 
-  const dropdownOptions = [
-    // "value: ''" will automatically make this option invalid (falsy value) and throw an error
-    { key: "Select an option", value: "" },
-    { key: "TODO", value: 0 },
-    { key: "DOING", value: 1 },
-    { key: "DONE", value: 2 },
-  ];
+  // "value: ''" will automatically make this option invalid (falsy value) and throw an error
+  let dropdownOptions: any = [{ key: "Select an option", value: "" }];
+  columns?.map((column: any) => {
+    dropdownOptions.push({
+      key: `${column?.title.toUpperCase()}`,
+      value: `${column?.status}`,
+    });
+  });
 
   // ** Why is formik automatically storing values.status & values.index as strings and not numbers?
   const { values, setSubmitting, resetForm }: any = formik;
