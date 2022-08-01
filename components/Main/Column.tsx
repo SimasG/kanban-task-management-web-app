@@ -85,37 +85,62 @@ const Column = ({
             {...provided.dragHandleProps}
             onMouseEnter={() => setHover(true)}
             onMouseLeave={() => setHover(false)}
-            className="flex justify-start items-center gap-2 mb-6 text-sm cursor-pointer"
+            className={`flex items-center text-sm cursor-pointer p-2 ${
+              index >= defaultColumns.length
+                ? "justify-between"
+                : "justify-start gap-2 h-[56px]"
+            }`}
           >
-            {/* Colorful circle */}
-
-            <div className={`h-4 w-4 rounded-full bg-[${columnColor}]`}></div>
-            {/* <div className={`h-4 w-4 rounded-full ${columnColor}`}></div> */}
-            {/* Column Title */}
-            <input
-              value={`${columnTitle}`}
-              onChange={(e) => changeColumnTitle(e.target.value)}
-              className="uppercase text-fontSecondary font-bold bg-transparent cursor-pointer outline-none hover:opacity-75 w-16 max-w-fit"
-            />
-            {/* Task Count */}
-            <h3 className="text-fontSecondary font-bold">{`(${taskCount})`}</h3>
-            {index >= defaultColumns.length && (
-              // Delete Column btn
-              <svg
-                onClick={() => deleteColumn()}
-                className="w-10 h-10 p-2 text-fontSecondary rounded cursor-pointer hover:bg-backgroundColorMain hover:dark:bg-darkBlue"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                ></path>
-              </svg>
+            {index >= defaultColumns.length ? (
+              <>
+                <div className="flex justify-start items-center gap-2">
+                  {/* Colorful circle */}
+                  <div
+                    className={`h-4 w-4 rounded-full`}
+                    style={{ backgroundColor: columnColor }}
+                  ></div>
+                  {/* Column Title */}
+                  <input
+                    value={`${columnTitle}`}
+                    onChange={(e) => changeColumnTitle(e.target.value)}
+                    className="uppercase text-fontSecondary font-bold bg-transparent cursor-pointer outline-none hover:opacity-75 w-16 max-w-fit"
+                  />
+                  {/* Task Count */}
+                  <h3 className="text-fontSecondary font-bold">{`(${taskCount})`}</h3>
+                </div>
+                {/* Delete Column btn */}
+                <svg
+                  onClick={() => deleteColumn()}
+                  className="w-10 h-10 p-2 text-fontSecondary rounded cursor-pointer hover:bg-backgroundColorMain hover:dark:bg-darkBlue"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                  ></path>
+                </svg>
+              </>
+            ) : (
+              <>
+                {/* Colorful circle */}
+                <div
+                  className={`h-4 w-4 rounded-full`}
+                  style={{ backgroundColor: columnColor }}
+                ></div>
+                {/* Column Title */}
+                <input
+                  value={`${columnTitle}`}
+                  onChange={(e) => changeColumnTitle(e.target.value)}
+                  className="uppercase text-fontSecondary font-bold bg-transparent cursor-pointer outline-none hover:opacity-75 w-16 max-w-fit"
+                />
+                {/* Task Count */}
+                <h3 className="text-fontSecondary font-bold">{`(${taskCount})`}</h3>
+              </>
             )}
           </div>
           {/* Task Container */}

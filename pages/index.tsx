@@ -67,8 +67,6 @@ const Home: NextPage = () => {
     });
   };
 
-  document.querySelector("html")?.classList.add("dark");
-
   return (
     <div
       onClick={() => {

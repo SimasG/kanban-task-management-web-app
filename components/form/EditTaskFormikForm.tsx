@@ -309,8 +309,8 @@ const FormikForm = ({
                               <Field
                                 className={
                                   subtask.checked
-                                    ? "text-fontPrimary bg-backgroundColorMain dark:bg-darkBlue border-none outline-0 w-full line-through opacity-60"
-                                    : "text-fontPrimary bg-backgroundColorMain dark:bg-darkBlue border-none outline-0 w-full"
+                                    ? "text-fontPrimary dark:text-fontPrimaryDark bg-backgroundColorMain dark:bg-darkBlue border-none outline-0 w-full line-through opacity-60"
+                                    : "text-fontPrimary dark:text-fontPrimaryDark bg-backgroundColorMain dark:bg-darkBlue border-none outline-0 w-full"
                                 }
                                 name={`subtasks[${index}].title`}
                                 id={`subtasks[${index}].title`}

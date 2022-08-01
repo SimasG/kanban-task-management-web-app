@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -16,7 +16,7 @@ body {
 }
 
 .task-title {
-  @apply text-fontPrimary font-bold;
+  @apply dark:text-fontPrimaryDark font-bold;
 }
 
 .task-body {
@@ -24,11 +24,11 @@ body {
 }
 
 .input {
-  @apply border-fontSecondary border-2 bg-transparent opacity-60 rounded py-2 px-3 outline-0;
+  @apply border-fontSecondary border-2 bg-transparent opacity-60 rounded py-2 px-3 outline-0 text-fontPrimary dark:text-fontPrimaryDark;
 }
 
 .textarea {
-  @apply border-fontSecondary border-2 bg-transparent rounded py-2 px-3 opacity-60 outline-0 min-h-[150px];
+  @apply border-fontSecondary border-2 bg-transparent rounded py-2 px-3 opacity-60 outline-0 min-h-[150px] text-fontPrimary dark:text-fontPrimaryDark resize-none;
 }
 
 /* Mantine Checkbox Component */
@@ -45,15 +45,15 @@ body {
 }
 
 .mantine-Checkbox-input {
-  @apply border-none cursor-pointer checked:bg-fontTertiary;
+  @apply border-2 border-fontTertiary dark:border-none cursor-pointer checked:bg-fontTertiary checked:border-none;
 }
 
 .purpleBtn {
-  @apply py-2 bg-fontTertiary text-fontPrimary font-bold rounded-full hover:bg-fontPrimary hover:text-fontTertiary;
+  @apply py-2 bg-fontTertiary dark:text-fontPrimaryDark font-bold rounded-full dark:hover:bg-fontPrimaryDark dark:hover:bg-opacity-100 dark:hover:text-fontTertiary hover:bg-opacity-50;
 }
 
 .whiteBtn {
-  @apply py-2 bg-fontPrimary text-fontTertiary font-bold rounded-full hover:bg-fontTertiary hover:text-fontPrimary;
+  @apply py-2 bg-fontTertiary dark:bg-fontPrimaryDark dark:text-fontTertiary font-bold rounded-full dark:hover:bg-fontTertiary dark:hover:text-fontPrimaryDark;
 }
 
 .subtask {
@@ -61,5 +61,5 @@ body {
 }
 
 .board {
-  @apply pl-4 flex justify-start items-center gap-3 py-2 cursor-pointer hover:bg-fontTertiary hover:text-fontPrimary hover:rounded-r-full;
+  @apply pl-4 flex justify-start items-center gap-3 py-2 cursor-pointer font-medium hover:bg-fontTertiary hover:text-fontPrimaryDark hover:rounded-r-full;
 }

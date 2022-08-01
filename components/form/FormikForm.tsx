@@ -86,7 +86,9 @@ const FormikForm = ({
             onClick={(e) => e.stopPropagation()}
             className="p-6 bg-backgroundColorMenu dark:bg-darkGray rounded-md flex flex-col justify-between gap-8 min-w-[450px]"
           >
-            <h2 className="text-lg font-bold">Add New Task</h2>
+            <h2 className="text-fontPrimary dark:text-fontPrimaryDark text-lg font-bold">
+              Add New Task
+            </h2>
             {/* Title */}
             <FormikControl
               control="input"
@@ -101,7 +103,7 @@ const FormikForm = ({
               name="description"
               placeholder="e.g. The homepage of UReason should be redesigned to fit in with the modern web standards. 
         The homepage of UReason should be redesigned to fit in with the modern web standards."
-              className="resize-none"
+              className="resize-none "
             />
             {/* Subtask Container */}
             <FieldArray name="subtasks">
@@ -111,7 +113,12 @@ const FormikForm = ({
                 const { subtasks } = values;
                 return (
                   <div className="flex flex-col justify-between gap-3">
-                    <label htmlFor="subtasks">Subtasks</label>
+                    <label
+                      className="font-bold text-sm text-fontPrimary dark:text-fontPrimaryDark"
+                      htmlFor="subtasks"
+                    >
+                      Subtasks
+                    </label>
                     {subtasks.map((subtask: any, index: number) => (
                       <div key={subtask?.uid} className="flex flex-col gap-2">
                         <div className="flex justify-between items-center">
@@ -143,14 +150,14 @@ const FormikForm = ({
                         <ErrorMessage
                           name={`subtasks[${index}].title`}
                           component="p"
-                          className="text-red-400"
+                          className="text-red-400 font-medium"
                         />
                       </div>
                     ))}
                     {/* Add Subtask Btn */}
                     <button
                       type="button"
-                      className="whiteBtn text-sm"
+                      className="purpleBtn dark:whiteBtn text-sm"
                       onClick={() =>
                         push({
                           uid: uuidv4(),

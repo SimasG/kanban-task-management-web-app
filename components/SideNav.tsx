@@ -27,22 +27,6 @@ import {
 import { BoardSchema } from "../lib/types";
 import { defaultColumns } from "../lib/helpers";
 
-// type LocalStorageDataProps = {
-//   users: UserProps;
-// };
-
-// type UserProps = {
-//   [key: string]: {
-//     email: string;
-//     id: string;
-//     boards: BoardsProps[];
-//   };
-// };
-
-// type BoardsProps = {
-//   board: BoardProps;
-// };
-
 type LocalStorageBoardSchema = {
   boards: {
     title: string;
@@ -274,12 +258,26 @@ const SideNav = ({
     await batch.commit();
   };
 
+  const toggleTheme = () => {
+    const htmlDoc = document?.querySelector("html");
+    htmlDoc?.classList.contains("dark")
+      ? htmlDoc?.classList.remove("dark")
+      : htmlDoc?.classList.add("dark");
+  };
+
   return (
     <nav className="min-w-[250px] bg-backgroundColorMenu dark:bg-darkGray pr-4 py-4 w-[15%] flex flex-col justify-between">
       {/* Logo container */}
       <a href="/" className="pl-4 flex justify-start items-center gap-2 mb-8">
-        <TbLayoutBoard className="h-7 w-7" />
-        <h1 className="text-3xl">kanban</h1>
+        {/* Logo */}
+        <div className="flex justify-between items-center gap-[2px]">
+          <div className="w-[5px] h-6 bg-fontTertiary rounded-md"></div>
+          <div className="w-[6px] h-6 bg-fontTertiary rounded-md opacity-75"></div>
+          <div className="w-[6px] h-6 bg-fontTertiary rounded-md opacity-50"></div>
+        </div>
+        <h1 className="text-3xl text-fontPrimary dark:text-fontPrimaryDark">
+          kanban
+        </h1>
       </a>
       {/* Boards container */}
       <section className="text-fontSecondary">
@@ -320,9 +318,9 @@ const SideNav = ({
                                     className={`board rounded-r-full ${
                                       board.uid === boardId
                                         ? snapshot.isDragging
-                                          ? " bg-fontTertiary bg-opacity-60 select-none text-fontPrimary"
-                                          : " bg-fontTertiary text-fontPrimary opacity-100"
-                                        : " active:bg-fontTertiary active:bg-opacity-60 active:text-fontPrimary"
+                                          ? " bg-fontTertiary bg-opacity-60 select-none text-fontPrimaryDark"
+                                          : " bg-fontTertiary text-fontPrimaryDark opacity-100"
+                                        : " active:bg-fontTertiary active:bg-opacity-60 active:text-fontPrimaryDark"
                                     }}`}
                                   >
                                     <TbLayoutBoardSplit />
@@ -377,7 +375,7 @@ const SideNav = ({
           </Droppable>
         </DragDropContext>
         {/* Create new Board container */}
-        <div className="pl-4 flex justify-start items-center gap-3 py-1 text-fontTertiary cursor-pointer hover:bg-fontPrimary hover:text-fontTertiary hover:rounded-r-full">
+        <div className="pl-4 flex justify-start items-center gap-3 py-1 text-fontTertiary cursor-pointer dark:hover:bg-fontPrimaryDark hover:bg-fontTertiary hover:bg-opacity-25 hover:rounded-r-full">
           <TbLayoutBoardSplit />
           <button onClick={handleCreateNewBoard}>+ Create New Board</button>
         </div>
@@ -408,7 +406,10 @@ const SideNav = ({
         )}
 
         {/* Theme toggle */}
-        <div className="ml-4 mb-4 flex justify-center items-center gap-4 bg-backgroundColorMain dark:bg-darkBlue p-3 rounded">
+        <div
+          onClick={toggleTheme}
+          className="ml-4 mb-4 flex justify-center items-center gap-4 bg-backgroundColorMain dark:bg-darkBlue p-3 rounded"
+        >
           {/* Toggle light theme icon */}
           <svg
             className="w-5 h-5"

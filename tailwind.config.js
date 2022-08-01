@@ -7,21 +7,27 @@ module.exports = {
     "./components/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
+    fontWeight: {
+      light: 300,
+      normal: 400,
+      medium: 500,
+      bold: 700,
+    },
     extend: {
       colors: {
         // Light Theme
         // ** Change the actual colors here
         // Lesson: Generalize color names so they could be repurposed for either theme
-        fontPrimary: "#fff",
+        // 09081b
+        fontPrimary: "#09081b", //
         fontSecondary: "#82899b",
         fontTertiary: "#645FC6",
         backgroundColorMain: "#F4F7FE", // (prev darkBlue)
         backgroundColorMenu: "#fff", // (prev darkGray)
         backgroundColor2: "#E9F0FA", // (prev veryDarkGray)
         // Dark Theme
-        fontPrimary: "#fff",
+        fontPrimaryDark: "#fff",
         fontSecondary: "#82899b",
-        fontTertiary: "#645FC6",
         darkBlue: "#21212D",
         darkGray: "#2c2c38",
         veryDarkGray: "#22252e",

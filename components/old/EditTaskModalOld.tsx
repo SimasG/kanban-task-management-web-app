@@ -82,7 +82,9 @@ const EditTaskModal = ({
                   }}
                   aria-label="subtask checkbox"
                 />
-                <span className="text-fontPrimary">{subtask?.title}</span>
+                <span className="dark:text-fontPrimaryDark">
+                  {subtask?.title}
+                </span>
               </div>
             );
           })}

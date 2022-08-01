@@ -1486,3 +1486,21 @@ const dropdownOptions2 = [
           </svg>
           <h4>Hide Sidebar</h4>
         </div>
+
+// type LocalStorageDataProps = {
+// users: UserProps;
+// };
+
+// type UserProps = {
+// [key: string]: {
+// email: string;
+// id: string;
+// boards: BoardsProps[];
+// };
+// };
+
+// type BoardsProps = {
+// board: BoardProps;
+// };
+
+        <TbLayoutBoard className="h-7 w-7" />

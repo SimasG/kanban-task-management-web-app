@@ -75,7 +75,7 @@ const TopSettings = ({
   return (
     <section className="h-[10%] min-w-[500px] p-4 flex justify-between items-center bg-backgroundColorMenu dark:bg-darkGray">
       <input
-        className="text-2xl bg-transparent cursor-pointer outline-none"
+        className="text-2xl bg-transparent cursor-pointer outline-none text-fontPrimary dark:text-fontPrimaryDark"
         type="text"
         value={
           (activeBoard && activeBoard?.[0]?.title) || "Future Board Name 🤓"
