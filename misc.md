@@ -1455,3 +1455,12 @@ const dropdownOptions2 = [
 { key: "DOING", value: 1 },
 { key: "DONE", value: 2 },
 ];
+
+            <div
+              className={`h-4 w-4 rounded-full ${
+                // Find a way to remove the hardcoding -> add this to the defaultColumns helper object
+                columnStatus === 0 && "bg-todoColors-brightBlue"
+              } ${columnStatus === 1 && "bg-todoColors-violet"} ${
+                columnStatus === 2 && "bg-todoColors-brightGreen"
+              }`}
+            ></div>

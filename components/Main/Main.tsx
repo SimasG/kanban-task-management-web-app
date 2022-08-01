@@ -13,6 +13,7 @@ import { db } from "../../lib/firebase";
 import Column from "./Column";
 import TopSettings from "./TopSettings";
 import { v4 as uuidv4 } from "uuid";
+import { colorArray } from "../../lib/helpers";
 
 type MainProps = {
   activeBoard: any;
@@ -44,6 +45,8 @@ const Main = ({
   setColumns,
 }: MainProps) => {
   const user = useContext(UserContext);
+
+  // console.log("columns:", columns);
 
   const onDragEnd = async (result: DropResult) => {
     const { source, destination, type, draggableId } = result;
@@ -371,11 +374,14 @@ const Main = ({
       "columns",
       `${uuid}`
     );
+
+    const random = Math.floor(Math.random() * colorArray.length);
     await setDoc(newColumnDocRef, {
       index: columns?.length,
       status: columns?.length,
       title: "todo",
       uid: uuid,
+      color: colorArray[random],
     });
   };
 
@@ -416,6 +422,7 @@ const Main = ({
                     columnStatus={column?.status}
                     columnTitle={column?.title}
                     columnId={column?.uid}
+                    columnColor={column?.color}
                     boardId={boardId}
                     index={index}
                   />

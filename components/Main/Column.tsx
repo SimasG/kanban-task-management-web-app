@@ -1,4 +1,4 @@
-import { doc, updateDoc } from "firebase/firestore";
+import { deleteDoc, doc, updateDoc } from "firebase/firestore";
 import { useContext, useState } from "react";
 import {
   Draggable,
@@ -8,6 +8,7 @@ import {
 } from "react-beautiful-dnd";
 import { UserContext } from "../../lib/context";
 import { db } from "../../lib/firebase";
+import { defaultColumns } from "../../lib/helpers";
 
 type ColumnProps = {
   setTaskId: React.Dispatch<React.SetStateAction<string | null | undefined>>;
@@ -18,6 +19,7 @@ type ColumnProps = {
   boardId: string | null | undefined;
   index: number;
   columnId: string;
+  columnColor: string;
 };
 
 const Column = ({
@@ -29,6 +31,7 @@ const Column = ({
   columnId,
   boardId,
   index,
+  columnColor,
 }: ColumnProps) => {
   const user = useContext(UserContext);
 
@@ -49,6 +52,19 @@ const Column = ({
       `${columnId}`
     );
     await updateDoc(columnDocRef, { title: newTitle });
+  };
+
+  const deleteColumn = async () => {
+    const columnDocRef = doc(
+      db,
+      "users",
+      `${user?.uid}`,
+      "boards",
+      `${boardId}`,
+      "columns",
+      `${columnId}`
+    );
+    await deleteDoc(columnDocRef);
   };
 
   return (
@@ -72,14 +88,9 @@ const Column = ({
             className="flex justify-start items-center gap-2 mb-6 text-sm cursor-pointer"
           >
             {/* Colorful circle */}
-            <div
-              className={`h-4 w-4 rounded-full ${
-                // Find a way to remove the hardcoding -> add this to the defaultColumns helper object
-                columnStatus === 0 && "bg-todoColors-brightBlue"
-              } ${columnStatus === 1 && "bg-todoColors-violet"} ${
-                columnStatus === 2 && "bg-todoColors-brightGreen"
-              }`}
-            ></div>
+
+            <div className={`h-4 w-4 rounded-full bg-[${columnColor}]`}></div>
+            {/* <div className={`h-4 w-4 rounded-full ${columnColor}`}></div> */}
             {/* Column Title */}
             <input
               value={`${columnTitle}`}
@@ -88,6 +99,24 @@ const Column = ({
             />
             {/* Task Count */}
             <h3 className="text-fontSecondary font-bold">{`(${taskCount})`}</h3>
+            {index >= defaultColumns.length && (
+              // Delete Column btn
+              <svg
+                onClick={() => deleteColumn()}
+                className="w-10 h-10 p-2 text-fontSecondary rounded cursor-pointer hover:bg-darkBlue"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                ></path>
+              </svg>
+            )}
           </div>
           {/* Task Container */}
           <Droppable droppableId={columnId} type="task">

@@ -171,6 +171,7 @@ const SideNav = ({
 
       // Create 3 default Columns
       defaultColumns?.map((column: any) => {
+        console.log("default column:", column);
         const columnRef = doc(
           db,
           "users",
@@ -185,6 +186,7 @@ const SideNav = ({
           index: column?.index,
           status: column?.status,
           title: column?.title,
+          color: column?.color,
         });
       });
       await batch.commit();

@@ -14,13 +14,18 @@ module.exports = {
         darkBlue: "#21212D",
         darkGray: "#2c2c38",
         veryDarkGray: "#22252e",
+        // Default
         todoColors: {
           brightBlue: "#4fc4ef",
-          violet: "#645FC6",
+          violet: "#645fc6",
           brightGreen: "#67e4ac",
-          yellow: "#FAD201",
-          brightRedOrange: "#F75E25",
-          purpleViolet: "#4A192C",
+          yellow: "#fad201",
+          brightRedOrange: "#f75e25",
+          purpleViolet: "#4a192c",
+          pink: "#a8328f",
+          greenBlue: "#32a8a2",
+          greenYellow: "#89a832",
+          brightOrange: "#a88b32",
         },
       },
       fontFamily: {
