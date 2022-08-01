@@ -73,7 +73,7 @@ const TopSettings = ({
   };
 
   return (
-    <section className="h-[10%] min-w-[500px] p-4 flex justify-between items-center bg-darkGray">
+    <section className="h-[10%] min-w-[500px] p-4 flex justify-between items-center bg-backgroundColorMenu dark:bg-darkGray">
       <input
         className="text-2xl bg-transparent cursor-pointer outline-none"
         type="text"
@@ -115,7 +115,7 @@ const TopSettings = ({
         {/* Delete Board Btn */}
         <svg
           onClick={() => handleDeleteBoard(boardId)}
-          className="w-10 h-10 p-2 text-fontSecondary rounded cursor-pointer hover:bg-darkBlue"
+          className="w-10 h-10 p-2 text-fontSecondary rounded cursor-pointer hover:bg-backgroundColorMain hover:dark:bg-darkBlue"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"

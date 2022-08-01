@@ -1,20 +1,30 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  // Enabling dark mode toggling
+  darkMode: "class",
   content: [
     "./pages/**/*.{js,ts,jsx,tsx}",
     "./components/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
     extend: {
-      // Will need to add colors for the bright theme as well
       colors: {
+        // Light Theme
+        // ** Change the actual colors here
+        // Lesson: Generalize color names so they could be repurposed for either theme
+        fontPrimary: "#fff",
+        fontSecondary: "#82899b",
+        fontTertiary: "#645FC6",
+        backgroundColorMain: "#F4F7FE", // (prev darkBlue)
+        backgroundColorMenu: "#fff", // (prev darkGray)
+        backgroundColor2: "#E9F0FA", // (prev veryDarkGray)
+        // Dark Theme
         fontPrimary: "#fff",
         fontSecondary: "#82899b",
         fontTertiary: "#645FC6",
         darkBlue: "#21212D",
         darkGray: "#2c2c38",
         veryDarkGray: "#22252e",
-        // Default
         todoColors: {
           brightBlue: "#4fc4ef",
           violet: "#645fc6",

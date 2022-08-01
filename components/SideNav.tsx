@@ -5,7 +5,6 @@ import {
   serverTimestamp,
   setDoc,
   Timestamp,
-  updateDoc,
   writeBatch,
 } from "firebase/firestore";
 import Image from "next/image";
@@ -16,7 +15,6 @@ import { TbLayoutBoard, TbLayoutBoardSplit } from "react-icons/tb";
 import { UserContext } from "../lib/context";
 import { auth, db } from "../lib/firebase";
 import { v4 as uuidv4 } from "uuid";
-import useFetchFsBoards from "../lib/hooks/useFetchFsBoards";
 import {
   DragDropContext,
   Draggable,
@@ -277,7 +275,7 @@ const SideNav = ({
   };
 
   return (
-    <nav className="min-w-[250px] bg-darkGray pr-4 py-4 w-1/5 flex flex-col justify-between">
+    <nav className="min-w-[250px] bg-backgroundColorMenu dark:bg-darkGray pr-4 py-4 w-[15%] flex flex-col justify-between">
       {/* Logo container */}
       <a href="/" className="pl-4 flex justify-start items-center gap-2 mb-8">
         <TbLayoutBoard className="h-7 w-7" />
@@ -410,7 +408,7 @@ const SideNav = ({
         )}
 
         {/* Theme toggle */}
-        <div className="ml-4 mb-4 flex justify-center items-center gap-4 bg-darkBlue p-3 rounded">
+        <div className="ml-4 mb-4 flex justify-center items-center gap-4 bg-backgroundColorMain dark:bg-darkBlue p-3 rounded">
           {/* Toggle light theme icon */}
           <svg
             className="w-5 h-5"
@@ -445,25 +443,7 @@ const SideNav = ({
               strokeWidth="2"
               d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
             ></path>
-          </svg>{" "}
-        </div>
-        {/* Hide sidebar container */}
-        <div className="pl-4 flex justify-start items-center gap-3 text-sm py-2 text-fontSecondary cursor-pointer hover:bg-darkBlue hover:text-fontPrimary hover:rounded-r-full">
-          <svg
-            className="w-4 h-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"
-            ></path>
           </svg>
-          <h4>Hide Sidebar</h4>
         </div>
       </section>
     </nav>

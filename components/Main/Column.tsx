@@ -103,7 +103,7 @@ const Column = ({
               // Delete Column btn
               <svg
                 onClick={() => deleteColumn()}
-                className="w-10 h-10 p-2 text-fontSecondary rounded cursor-pointer hover:bg-darkBlue"
+                className="w-10 h-10 p-2 text-fontSecondary rounded cursor-pointer hover:bg-backgroundColorMain hover:dark:bg-darkBlue"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"

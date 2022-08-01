@@ -30,14 +30,14 @@ const EditTaskModal = ({
     <section className="absolute bg-black bg-opacity-50 inset-0 w-full h-screen flex justify-center items-center">
       <form
         onClick={(e) => e.stopPropagation()}
-        className="p-6 bg-darkGray rounded-md flex flex-col justify-between gap-8 min-w-[450px] max-w-[450px]"
+        className="p-6 bg-backgroundColorMenu dark:bg-darkGray rounded-md flex flex-col justify-between gap-8 min-w-[450px] max-w-[450px]"
       >
         {/* Title */}
         <div className="flex justify-between items-center">
           <h2 className="text-lg font-bold">{selectedTask?.title}</h2>
           {/* Delete Task Btn */}
           <svg
-            className="w-16 h-12 p-2 text-fontSecondary rounded cursor-pointer hover:bg-darkBlue"
+            className="w-16 h-12 p-2 text-fontSecondary rounded cursor-pointer hover:bg-backgroundColorMain hover:dark:bg-darkBlue"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"

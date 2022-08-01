@@ -84,7 +84,7 @@ const FormikForm = ({
         <section className="absolute bg-black bg-opacity-50 inset-0 w-full h-screen flex justify-center items-center">
           <Form
             onClick={(e) => e.stopPropagation()}
-            className="p-6 bg-darkGray rounded-md flex flex-col justify-between gap-8 min-w-[450px]"
+            className="p-6 bg-backgroundColorMenu dark:bg-darkGray rounded-md flex flex-col justify-between gap-8 min-w-[450px]"
           >
             <h2 className="text-lg font-bold">Add New Task</h2>
             {/* Title */}

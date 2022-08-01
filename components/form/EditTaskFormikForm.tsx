@@ -233,7 +233,7 @@ const FormikForm = ({
         <section className="absolute bg-black bg-opacity-50 inset-0 w-full h-screen flex justify-center items-center">
           <Form
             onClick={(e) => e.stopPropagation()}
-            className="p-6 bg-darkGray rounded-md flex flex-col justify-between gap-8 min-w-[450px]"
+            className="p-6 bg-backgroundColorMenu dark:bg-darkGray rounded-md flex flex-col justify-between gap-8 min-w-[450px]"
           >
             {/* Title */}
             <div className="flex justify-between items-center">
@@ -252,7 +252,7 @@ const FormikForm = ({
               </div>
               {/* Delete Task Btn */}
               <svg
-                className="w-16 h-12 p-2 text-fontSecondary rounded cursor-pointer hover:bg-darkBlue"
+                className="w-16 h-12 p-2 text-fontSecondary rounded cursor-pointer hover:bg-backgroundColorMain hover:dark:bg-darkBlue"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -294,7 +294,7 @@ const FormikForm = ({
                       return (
                         <div key={subtask?.uid} className="flex flex-col gap-2">
                           <div className="flex justify-between items-center">
-                            <div className="flex justify-between bg-darkBlue rounded py-2 px-3 w-full gap-3">
+                            <div className="flex justify-between bg-backgroundColorMain dark:bg-darkBlue rounded py-2 px-3 w-full gap-3">
                               <Checkbox
                                 name={`subtasks[${index}].checked`}
                                 id={`subtasks[${index}].checked`}
@@ -309,8 +309,8 @@ const FormikForm = ({
                               <Field
                                 className={
                                   subtask.checked
-                                    ? "text-fontPrimary bg-darkBlue border-none outline-0 w-full line-through opacity-60"
-                                    : "text-fontPrimary bg-darkBlue border-none outline-0 w-full"
+                                    ? "text-fontPrimary bg-backgroundColorMain dark:bg-darkBlue border-none outline-0 w-full line-through opacity-60"
+                                    : "text-fontPrimary bg-backgroundColorMain dark:bg-darkBlue border-none outline-0 w-full"
                                 }
                                 name={`subtasks[${index}].title`}
                                 id={`subtasks[${index}].title`}

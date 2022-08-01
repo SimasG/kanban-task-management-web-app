@@ -46,8 +46,6 @@ const Main = ({
 }: MainProps) => {
   const user = useContext(UserContext);
 
-  // console.log("columns:", columns);
-
   const onDragEnd = async (result: DropResult) => {
     const { source, destination, type, draggableId } = result;
     if (!destination) return;
@@ -190,10 +188,10 @@ const Main = ({
         // Decrement Tasks
         if (task.index > sourceIndex && task.index <= destinationIndex) {
           // DECREMENT THE INDEX OF EACH TASK THAT FITS THIS CRITERIA
-          console.log(
-            `task to be decremented in Column: ${sourceColumn?.status}:`,
-            task
-          );
+          // console.log(
+          //   `task to be decremented in Column: ${sourceColumn?.status}:`,
+          //   task
+          // );
           const taskDocRef = doc(
             db,
             "users",
@@ -211,10 +209,10 @@ const Main = ({
         // Increment Tasks
         if (task.index < sourceIndex && task.index >= destinationIndex) {
           // INCREMENT THE INDEX OF EACH TASK THAT FITS THIS CRITERIA
-          console.log(
-            `task to be incremented in Column: ${sourceColumn?.status}:`,
-            task
-          );
+          // console.log(
+          //   `task to be incremented in Column: ${sourceColumn?.status}:`,
+          //   task
+          // );
           const taskDocRef = doc(
             db,
             "users",
@@ -311,10 +309,10 @@ const Main = ({
         sourceColumnTasks?.map((task: any) => {
           if (task.index > sourceIndex) {
             if (task.uid === draggedTaskId) return;
-            console.log(
-              `task to be decremented in Column ${sourceColumn?.status}:`,
-              task
-            );
+            // console.log(
+            //   `task to be decremented in Column ${sourceColumn?.status}:`,
+            //   task
+            // );
             const taskDocRef = doc(
               db,
               "users",
@@ -339,10 +337,10 @@ const Main = ({
           // That's why the Task index at task.index === destinationIndex should still be incremented.
           if (task.index >= destinationIndex) {
             if (task.uid === draggedTaskId) return;
-            console.log(
-              `task to be incremented in Column ${destinationColumn?.status}:`,
-              task
-            );
+            // console.log(
+            //   `task to be incremented in Column ${destinationColumn?.status}:`,
+            //   task
+            // );
             const taskDocRef = doc(
               db,
               "users",
@@ -386,7 +384,7 @@ const Main = ({
   };
 
   return (
-    <main className="w-4/5">
+    <main className="w-[85%]">
       <TopSettings
         activeBoard={activeBoard}
         boards={boards}
@@ -398,9 +396,7 @@ const Main = ({
       />
       {/* Main content */}
       <DragDropContext onDragEnd={onDragEnd}>
-        {/* overflow-x-auto overflow-hidden */}
-        {/* flex justify-start items-start gap-6 */}
-        <section className="h-[90%] bg-darkBlue p-5 flex justify-between gap-6">
+        <section className="h-[90%] bg-backgroundColorMain dark:bg-darkBlue p-5 flex justify-between gap-6 overflow-auto">
           {/* Current Columns Container */}
           <Droppable
             droppableId="allColumns"
@@ -434,7 +430,7 @@ const Main = ({
           {/* Add New Column Container */}
           <div
             onClick={addNewColumn}
-            className="min-w-[250px] bg-veryDarkGray mt-11 h-5/6 flex justify-center items-center cursor-pointer rounded-md hover:bg-opacity-50"
+            className="min-w-[250px] bg-backgroundColor2 dark:bg-veryDarkGray mt-11 h-5/6 flex justify-center items-center cursor-pointer rounded-md hover:bg-opacity-50"
           >
             <h2 className="mb-56 text-2xl text-fontSecondary font-bold">
               + New Column
