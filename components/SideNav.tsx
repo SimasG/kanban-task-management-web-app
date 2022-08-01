@@ -11,7 +11,9 @@ import Image from "next/image";
 import React, { useContext } from "react";
 import toast from "react-hot-toast";
 import { FcGoogle } from "react-icons/fc";
-import { TbLayoutBoard, TbLayoutBoardSplit } from "react-icons/tb";
+import { TbLayoutBoardSplit } from "react-icons/tb";
+import { HiSun } from "react-icons/hi";
+import { IoMdMoon } from "react-icons/io";
 import { UserContext } from "../lib/context";
 import { auth, db } from "../lib/firebase";
 import { v4 as uuidv4 } from "uuid";
@@ -408,43 +410,17 @@ const SideNav = ({
         {/* Theme toggle */}
         <div
           onClick={toggleTheme}
-          className="ml-4 mb-4 flex justify-center items-center gap-4 bg-backgroundColorMain dark:bg-darkBlue p-3 rounded"
+          className="ml-4 mb-4 flex justify-center items-center gap-4 bg-backgroundColor2 dark:bg-darkBlue p-3 rounded"
         >
           {/* Toggle light theme icon */}
-          <svg
-            className="w-5 h-5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0"
-            ></path>
-          </svg>
+          <HiSun className="text-fontPrimary dark:text-fontPrimaryDark w-5 h-5" />
           {/* Rectangle */}
-          <div className="h-5 w-10 bg-fontTertiary rounded-full cursor-pointer">
+          <div className="h-6 w-12 bg-backgroundColorMenu dark:bg-fontTertiary rounded-full cursor-pointer flex justify-start dark:justify-end items-center m-0.5 px-0.5">
             {/* Circle */}
-            <div></div>
+            <div className="bg-fontTertiary dark:bg-fontPrimaryDark w-5 h-5 rounded-full"></div>
           </div>
           {/* Toggle dark theme icon */}
-          <svg
-            className="w-5 h-5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
-            ></path>
-          </svg>
+          <IoMdMoon className="text-fontPrimary dark:text-fontPrimaryDark w-5 h-5" />
         </div>
       </section>
     </nav>

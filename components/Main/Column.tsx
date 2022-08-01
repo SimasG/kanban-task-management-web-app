@@ -77,7 +77,7 @@ const Column = ({
           {...provided.draggableProps}
           ref={provided.innerRef}
           className={`min-w-[250px] max-w-[350px] rounded-md ${
-            hover && "hover:bg-gray-700"
+            hover && "hover:bg-[#e1e9f3] dark:hover:bg-[#232331]"
           }`}
         >
           {/* Column Title Container */}

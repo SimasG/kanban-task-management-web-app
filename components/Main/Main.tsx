@@ -430,7 +430,7 @@ const Main = ({
           {/* Add New Column Container */}
           <div
             onClick={addNewColumn}
-            className="min-w-[250px] bg-backgroundColor2 dark:bg-veryDarkGray mt-11 h-5/6 flex justify-center items-center cursor-pointer rounded-md hover:bg-opacity-50"
+            className="min-w-[250px] bg-backgroundColor2 dark:bg-veryDarkGray hover:bg-[#eff2fa] dark:hover:bg-[#23262f] mt-11 h-5/6 flex justify-center items-center cursor-pointer rounded-md"
           >
             <h2 className="mb-56 text-2xl text-fontSecondary font-bold">
               + New Column

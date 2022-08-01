@@ -242,12 +242,12 @@ const FormikForm = ({
                 <Field
                   id="title"
                   name="title"
-                  className="bg-transparent py-2 px-3 outline-0 text-lg font-bold"
+                  className="text-fontPrimary dark:text-fontPrimaryDark bg-transparent py-2 px-3 outline-0 text-lg font-bold"
                 />
                 <ErrorMessage
                   name="title"
                   component="p"
-                  className="text-red-400"
+                  className="text-red-400 font-medium"
                 />
               </div>
               {/* Delete Task Btn */}
@@ -273,7 +273,7 @@ const FormikForm = ({
                 as="textarea"
                 id="description"
                 name="description"
-                className="bg-transparent py-2 px-3 outline-0 opacity-60 resize-none w-full h-24"
+                className="bg-transparent py-2 px-3 outline-0 opacity-60 resize-none w-full h-24 text-fontPrimary dark:text-fontPrimaryDark"
               />
               <ErrorMessage
                 name="description"
@@ -339,7 +339,7 @@ const FormikForm = ({
                           <ErrorMessage
                             name={`subtasks[${index}].title`}
                             component="p"
-                            className="text-red-400"
+                            className="text-red-400 font-medium"
                           />
                         </div>
                       );

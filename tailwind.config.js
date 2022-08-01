@@ -18,7 +18,6 @@ module.exports = {
         // Light Theme
         // ** Change the actual colors here
         // Lesson: Generalize color names so they could be repurposed for either theme
-        // 09081b
         fontPrimary: "#09081b", //
         fontSecondary: "#82899b",
         fontTertiary: "#645FC6",
@@ -29,6 +28,7 @@ module.exports = {
         fontPrimaryDark: "#fff",
         fontSecondary: "#82899b",
         darkBlue: "#21212D",
+        darkBlue1: "#eff2fa",
         darkGray: "#2c2c38",
         veryDarkGray: "#22252e",
         todoColors: {
