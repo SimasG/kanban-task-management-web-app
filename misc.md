@@ -1536,3 +1536,181 @@ const dropdownOptions2 = [
               d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
             ></path>
           </svg>
+
+// const handleSubmit = async () => {
+// setSubmitting(true);
+
+// // Identifying Column id, to which the Task should be added.
+// const selectedColumn = columns?.find(
+// (column: any) => column?.status === parseInt(values?.status)
+// );
+
+// const uid = uuidv4();
+// const taskDocRef = doc(
+// db,
+// "users",
+// `${user?.uid}`,
+// "boards",
+// `${boardId}`,
+// "columns",
+// `${selectedColumn?.uid}`,
+// "tasks",
+// `${uid}`
+// );
+
+// const chosenColumnTasks = tasks?.filter(
+// (task: any) => task?.status === parseInt(values?.status)
+// );
+
+// await setDoc(taskDocRef, {
+// // Using type guard to ensure that we're always spreading an object
+// ...(typeof values === "object" ? values : {}),
+// index: parseInt(chosenColumnTasks?.length),
+// status: parseInt(values?.status),
+// boardId: boardId,
+// uid: uid,
+// createdAt: Timestamp.fromDate(new Date()),
+// });
+
+// toast.success("New Task Created");
+// setSubmitting(false);
+// resetForm();
+// setShowAddTaskModal(false);
+// };
+
+// Identifying source Column id, from which the Task should be removed
+const sourceColumn = columns?.find(
+(column: any) => column?.status === parseInt(initialValues?.status)
+);
+
+// Identifying destination Column id, to which the Task should be added
+const destinationColumn = columns?.find(
+(column: any) => column?.status === parseInt(values?.status)
+);
+
+const handleSubmit = () => {
+// Why do I have to convert "values.status" to number? I thought it's supposed to be a number by default
+if (initialValues?.status === parseInt(values?.status)) {
+softUpdateTask();
+} else {
+// \*\* Like with DnD between Columns, if I change status, I need to do a transaction (Read, Write, Delete)
+hardUpdateTask();
+}
+};
+
+// U (no status changes)
+const softUpdateTask = async () => {
+setSubmitting(true);
+
+    const taskDocRef = doc(
+      db,
+      "users",
+      `${user?.uid}`,
+      "boards",
+      `${boardId}`,
+      "columns",
+      `${sourceColumn?.uid}`,
+      "tasks",
+      `${taskId}`
+    );
+
+    await updateDoc(taskDocRef, {
+      // Using type guard to ensure that we're always spreading an object
+      ...(typeof values === "object" ? values : {}),
+      // Otherwise, status will be stored as an string
+      status: parseInt(values?.status),
+      updatedAt: Timestamp.fromDate(new Date()),
+    });
+
+    toast.success("Task Updated");
+    setSubmitting(false);
+    resetForm();
+    setShowEditTaskModal(false);
+
+};
+
+// CRUD (status changes included)
+const hardUpdateTask = async () => {
+setSubmitting(true);
+try {
+await runTransaction(db, async (transaction) => {
+// \*\* Handling affected Task
+const taskDocRef = doc(
+db,
+"users",
+`${user?.uid}`,
+"boards",
+`${boardId}`,
+"columns",
+`${sourceColumn?.uid}`,
+"tasks",
+`${taskId}`
+);
+// READ
+const affectedTaskRaw = await transaction.get(taskDocRef);
+if (!affectedTaskRaw.exists()) {
+throw "Task does not exist!";
+}
+const affectedTask = affectedTaskRaw.data();
+
+        const newTaskDocRef = doc(
+          db,
+          "users",
+          `${user?.uid}`,
+          "boards",
+          `${boardId}`,
+          "columns",
+          `${destinationColumn?.uid}`,
+          "tasks",
+          `${taskId}`
+        );
+
+        const destinationTasks = tasks?.filter(
+          (task: any) => task?.status === parseInt(values?.status)
+        );
+
+        // CREATE
+        transaction.set(newTaskDocRef, {
+          ...(typeof affectedTask === "object" ? affectedTask : {}),
+          status: parseInt(values?.status),
+          index: destinationTasks?.length,
+          updatedAt: Timestamp.fromDate(new Date()),
+        });
+
+        // DELETE
+        transaction.delete(taskDocRef);
+
+        // ** Handling affected Column
+        // Decrement Tasks that came after the affected Task in the affected Column
+        const sourceColumnTasks = tasks?.filter(
+          (task: any) => task?.status === initialValues?.status
+        );
+
+        sourceColumnTasks?.map((task: any) => {
+          if (task?.index >= affectedTask?.index) {
+            if (task?.uid === affectedTask?.uid) return;
+            console.log("task that will be decremented:", task);
+            const taskDocRef = doc(
+              db,
+              "users",
+              `${user?.uid}`,
+              "boards",
+              `${boardId}`,
+              "columns",
+              `${sourceColumn?.uid}`,
+              "tasks",
+              `${task?.uid}`
+            );
+            transaction.update(taskDocRef, { index: increment(-1) });
+          }
+        });
+      });
+      toast.success("Task Updated");
+      setSubmitting(false);
+      resetForm();
+      setShowEditTaskModal(false);
+    } catch (err) {
+      console.log("transaction failed:", err);
+    }
+
+};

@@ -1,11 +1,6 @@
-import { ErrorMessage, Field, FieldArray, Form, FormikValues } from "formik";
+import { ErrorMessage, Field, FieldArray, Form } from "formik";
 import FormikControl from "./FormikControl";
 import { v4 as uuidv4 } from "uuid";
-import { doc, setDoc, Timestamp, updateDoc } from "firebase/firestore";
-import { db } from "../../lib/firebase";
-import { useContext } from "react";
-import { UserContext } from "../../lib/context";
-import toast from "react-hot-toast";
 
 type IndexProps = {
   boardId: string | null | undefined;
@@ -22,8 +17,6 @@ const FormikForm = ({
   formik,
   columns,
 }: IndexProps) => {
-  const user = useContext(UserContext);
-
   // "value: ''" will automatically make this option invalid (falsy value) and throw an error
   let dropdownOptions: any = [{ key: "Select an option", value: "" }];
   columns?.map((column: any) => {
@@ -34,48 +27,7 @@ const FormikForm = ({
   });
 
   // ** Why is formik automatically storing values.status & values.index as strings and not numbers?
-  const { values, setSubmitting, resetForm }: any = formik;
-
-  const handleSubmit = async () => {
-    setSubmitting(true);
-
-    // Identifying Column id, to which the Task should be added.
-    const selectedColumn = columns?.find(
-      (column: any) => column?.status === parseInt(values?.status)
-    );
-
-    const uid = uuidv4();
-    const taskDocRef = doc(
-      db,
-      "users",
-      `${user?.uid}`,
-      "boards",
-      `${boardId}`,
-      "columns",
-      `${selectedColumn?.uid}`,
-      "tasks",
-      `${uid}`
-    );
-
-    const chosenColumnTasks = tasks?.filter(
-      (task: any) => task?.status === parseInt(values?.status)
-    );
-
-    await setDoc(taskDocRef, {
-      // Using type guard to ensure that we're always spreading an object
-      ...(typeof values === "object" ? values : {}),
-      index: parseInt(chosenColumnTasks?.length),
-      status: parseInt(values?.status),
-      boardId: boardId,
-      uid: uid,
-      createdAt: Timestamp.fromDate(new Date()),
-    });
-
-    toast.success("New Task Created");
-    setSubmitting(false);
-    resetForm();
-    setShowAddTaskModal(false);
-  };
+  const { values }: any = formik;
 
   return (
     <>
@@ -181,11 +133,7 @@ const FormikForm = ({
               options={dropdownOptions}
             />
             {/* Create Task Btn */}
-            <button
-              type="submit"
-              className="purpleBtn"
-              onClick={() => handleSubmit()}
-            >
+            <button type="submit" className="purpleBtn">
               Create Task
             </button>
           </Form>

@@ -1,14 +1,7 @@
 import { ErrorMessage, Field, FieldArray, Form } from "formik";
 import FormikControl from "./FormikControl";
 import { v4 as uuidv4 } from "uuid";
-import {
-  doc,
-  increment,
-  runTransaction,
-  Timestamp,
-  updateDoc,
-  writeBatch,
-} from "firebase/firestore";
+import { doc, increment, writeBatch } from "firebase/firestore";
 import { db } from "../../lib/firebase";
 import { useContext } from "react";
 import { UserContext } from "../../lib/context";
@@ -43,142 +36,12 @@ const FormikForm = ({
     });
   });
 
-  const { initialValues, values, setSubmitting, resetForm }: any = formik;
+  const { initialValues, values }: any = formik;
 
   // Identifying source Column id, from which the Task should be removed
   const sourceColumn = columns?.find(
     (column: any) => column?.status === parseInt(initialValues?.status)
   );
-
-  // Identifying destination Column id, to which the Task should be added
-  const destinationColumn = columns?.find(
-    (column: any) => column?.status === parseInt(values?.status)
-  );
-
-  const handleSubmit = async () => {
-    // Why do I have to convert "values.status" to number? I thought it's supposed to be a number by default
-    if (initialValues?.status === parseInt(values?.status)) {
-      softUpdateTask();
-    } else {
-      // ** Like with DnD between Columns, if I change status, I need to do a transaction (Read, Write, Delete)
-      hardUpdateTask();
-    }
-  };
-
-  // U (no status changes)
-  const softUpdateTask = async () => {
-    setSubmitting(true);
-
-    const taskDocRef = doc(
-      db,
-      "users",
-      `${user?.uid}`,
-      "boards",
-      `${boardId}`,
-      "columns",
-      `${sourceColumn?.uid}`,
-      "tasks",
-      `${taskId}`
-    );
-
-    await updateDoc(taskDocRef, {
-      // Using type guard to ensure that we're always spreading an object
-      ...(typeof values === "object" ? values : {}),
-      // Otherwise, status will be stored as an string
-      status: parseInt(values?.status),
-      updatedAt: Timestamp.fromDate(new Date()),
-    });
-
-    toast.success("Task Updated");
-    setSubmitting(false);
-    resetForm();
-    setShowEditTaskModal(false);
-  };
-
-  // CRUD (status changes included)
-  const hardUpdateTask = async () => {
-    setSubmitting(true);
-    try {
-      await runTransaction(db, async (transaction) => {
-        // ** Handling affected Task
-        const taskDocRef = doc(
-          db,
-          "users",
-          `${user?.uid}`,
-          "boards",
-          `${boardId}`,
-          "columns",
-          `${sourceColumn?.uid}`,
-          "tasks",
-          `${taskId}`
-        );
-        // READ
-        const affectedTaskRaw = await transaction.get(taskDocRef);
-        if (!affectedTaskRaw.exists()) {
-          throw "Task does not exist!";
-        }
-        const affectedTask = affectedTaskRaw.data();
-
-        const newTaskDocRef = doc(
-          db,
-          "users",
-          `${user?.uid}`,
-          "boards",
-          `${boardId}`,
-          "columns",
-          `${destinationColumn?.uid}`,
-          "tasks",
-          `${taskId}`
-        );
-
-        const destinationTasks = tasks?.filter(
-          (task: any) => task?.status === parseInt(values?.status)
-        );
-
-        // CREATE
-        transaction.set(newTaskDocRef, {
-          ...(typeof affectedTask === "object" ? affectedTask : {}),
-          status: parseInt(values?.status),
-          index: destinationTasks?.length,
-          updatedAt: Timestamp.fromDate(new Date()),
-        });
-
-        // DELETE
-        transaction.delete(taskDocRef);
-
-        // ** Handling affected Column
-        // Decrement Tasks that came after the affected Task in the affected Column
-        const sourceColumnTasks = tasks?.filter(
-          (task: any) => task?.status === initialValues?.status
-        );
-
-        sourceColumnTasks?.map((task: any) => {
-          if (task?.index >= affectedTask?.index) {
-            if (task?.uid === affectedTask?.uid) return;
-            console.log("task that will be decremented:", task);
-            const taskDocRef = doc(
-              db,
-              "users",
-              `${user?.uid}`,
-              "boards",
-              `${boardId}`,
-              "columns",
-              `${sourceColumn?.uid}`,
-              "tasks",
-              `${task?.uid}`
-            );
-            transaction.update(taskDocRef, { index: increment(-1) });
-          }
-        });
-      });
-      toast.success("Task Updated");
-      setSubmitting(false);
-      resetForm();
-      setShowEditTaskModal(false);
-    } catch (err) {
-      console.log("transaction failed:", err);
-    }
-  };
 
   const deleteTask = async () => {
     const batch = writeBatch(db);
@@ -289,7 +152,12 @@ const FormikForm = ({
                 const { subtasks } = values;
                 return (
                   <div className="flex flex-col justify-between gap-3">
-                    <label htmlFor="subtasks">Subtasks</label>
+                    <label
+                      className="font-bold text-sm text-fontPrimary dark:text-fontPrimaryDark"
+                      htmlFor="subtasks"
+                    >
+                      Subtasks
+                    </label>
                     {subtasks.map((subtask: any, index: number) => {
                       return (
                         <div key={subtask?.uid} className="flex flex-col gap-2">
@@ -370,11 +238,7 @@ const FormikForm = ({
               options={dropdownOptions}
             />
             {/* Create Task Btn */}
-            <button
-              type="submit"
-              className="purpleBtn"
-              onClick={() => handleSubmit()}
-            >
+            <button type="submit" className="purpleBtn">
               Edit Task
             </button>
           </Form>

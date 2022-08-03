@@ -28,6 +28,7 @@ import {
 } from "react-beautiful-dnd";
 import { BoardSchema } from "../lib/types";
 import { defaultColumns } from "../lib/helpers";
+import Link from "next/link";
 
 type LocalStorageBoardSchema = {
   boards: {
@@ -274,17 +275,19 @@ const SideNav = ({
   return (
     <nav className="min-w-[250px] bg-backgroundColorMenu dark:bg-darkGray pr-4 py-4 w-[15%] flex flex-col justify-between">
       {/* Logo container */}
-      <a href="/" className="pl-4 flex justify-start items-center gap-2 mb-8">
-        {/* Logo */}
-        <div className="flex justify-between items-center gap-[2px]">
-          <div className="w-[5px] h-6 bg-fontTertiary rounded-md"></div>
-          <div className="w-[6px] h-6 bg-fontTertiary rounded-md opacity-75"></div>
-          <div className="w-[6px] h-6 bg-fontTertiary rounded-md opacity-50"></div>
-        </div>
-        <h1 className="text-3xl text-fontPrimary dark:text-fontPrimaryDark">
-          kanban
-        </h1>
-      </a>
+      <Link href="/">
+        <a className="pl-4 flex justify-start items-center gap-2 mb-8">
+          {/* Logo */}
+          <div className="flex justify-between items-center gap-[2px]">
+            <div className="w-[5px] h-6 bg-fontTertiary rounded-md"></div>
+            <div className="w-[6px] h-6 bg-fontTertiary rounded-md opacity-75"></div>
+            <div className="w-[6px] h-6 bg-fontTertiary rounded-md opacity-50"></div>
+          </div>
+          <h1 className="text-3xl text-fontPrimary dark:text-fontPrimaryDark">
+            kanban
+          </h1>
+        </a>
+      </Link>
       {/* Boards container */}
       <section className="text-fontSecondary">
         {/* All Boards title */}
