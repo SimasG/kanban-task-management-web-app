@@ -391,8 +391,8 @@ const Main = ({
     <main
       className={`${
         isOpen
-          ? "w-[60%] lg:w-[75%] xl:w-[80%]"
-          : "w-[85%] lg:w-[90%] xl:w-[92%]"
+          ? "w-[40%] sm:w-[50%] md:w-[60%] lg:w-[75%] xl:w-[80%]"
+          : "w-[88%] sm:w-[92%] lg:w-[92%] xl:w-[92%]"
       }`}
     >
       <TopSettings
