@@ -280,7 +280,7 @@ const SideNav = ({
   return (
     <>
       {isOpen ? (
-        <nav className="w-[25%] xl:w-[15%] bg-backgroundColorMenu dark:bg-darkGray pr-4 py-4 flex flex-col justify-between">
+        <nav className="w-[40%] lg:w-[25%] xl:w-[20%] bg-backgroundColorMenu dark:bg-darkGray pr-4 py-4 flex flex-col justify-between">
           {/* Logo container */}
           <Link href="/">
             <a className="pl-4 flex justify-start items-center gap-2 mb-8 h-[52px]">
@@ -450,7 +450,7 @@ const SideNav = ({
         </nav>
       ) : (
         <Link href="/">
-          <a className="w-[10%] xl:w-[8%] h-[88px] bg-backgroundColorMenu dark:bg-darkGray p-4 flex justify-between items-center">
+          <a className="w-[15%] lg:w-[10%] xl:w-[8%] h-[88px] bg-backgroundColorMenu dark:bg-darkGray p-4 flex justify-between items-center">
             <div className="flex justify-between items-center gap-[2px]">
               <div className="w-[5px] h-6 bg-fontTertiary rounded-md"></div>
               <div className="w-[6px] h-6 bg-fontTertiary rounded-md opacity-75"></div>

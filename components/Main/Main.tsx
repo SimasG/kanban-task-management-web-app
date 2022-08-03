@@ -388,7 +388,13 @@ const Main = ({
   };
 
   return (
-    <main className={`${isOpen ? "w-[75%] xl:w-[85%]" : "w-[90%] xl:w-[92%]"}`}>
+    <main
+      className={`${
+        isOpen
+          ? "w-[60%] lg:w-[75%] xl:w-[80%]"
+          : "w-[85%] lg:w-[90%] xl:w-[92%]"
+      }`}
+    >
       <TopSettings
         activeBoard={activeBoard}
         boards={boards}
