@@ -56,6 +56,20 @@ const Home: NextPage = () => {
     }
   }, [fsBoards, fsColumns, fsTasks, user]);
 
+  // ** How can I fix the "ReferenceError: localStorage is not defined" error?
+  // useEffect(() => {
+  //   if (!localStorage.theme) return;
+  //   if (
+  //     localStorage.theme === "dark" ||
+  //     (!("theme" in localStorage) &&
+  //       window.matchMedia("(prefers-color-scheme: dark)").matches)
+  //   ) {
+  //     document.documentElement.classList.add("dark");
+  //   } else {
+  //     document.documentElement.classList.remove("dark");
+  //   }
+  // }, [localStorage.theme]);
+
   const activeBoard = boards?.filter(
     (board: BoardSchema) => board.uid === boardId
   );
@@ -73,7 +87,8 @@ const Home: NextPage = () => {
         setShowAddTaskModal(false);
         setShowEditTaskModal(false);
       }}
-      className="flex justify-center text-white h-screen overflow-auto"
+      //       className="flex justify-center h-screen overflow-auto"
+      className="flex justify-center h-screen"
     >
       <SideNav
         boards={boards}

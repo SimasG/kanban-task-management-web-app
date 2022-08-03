@@ -262,9 +262,13 @@ const SideNav = ({
 
   const toggleTheme = () => {
     const htmlDoc = document?.querySelector("html");
-    htmlDoc?.classList.contains("dark")
-      ? htmlDoc?.classList.remove("dark")
-      : htmlDoc?.classList.add("dark");
+    if (htmlDoc?.classList.contains("dark")) {
+      htmlDoc?.classList.remove("dark");
+      localStorage.theme = "light";
+    } else {
+      htmlDoc?.classList.add("dark");
+      localStorage.theme = "dark";
+    }
   };
 
   return (
@@ -408,14 +412,14 @@ const SideNav = ({
         )}
 
         {/* Theme toggle */}
-        <div
-          onClick={toggleTheme}
-          className="ml-4 mb-4 flex justify-center items-center gap-4 bg-backgroundColor2 dark:bg-darkBlue p-3 rounded"
-        >
+        <div className="ml-4 mb-4 flex justify-center items-center gap-4 bg-backgroundColor2 dark:bg-darkBlue p-3 rounded">
           {/* Toggle light theme icon */}
           <HiSun className="text-fontPrimary dark:text-fontPrimaryDark w-5 h-5" />
           {/* Rectangle */}
-          <div className="h-6 w-12 bg-backgroundColorMenu dark:bg-fontTertiary rounded-full cursor-pointer flex justify-start dark:justify-end items-center m-0.5 px-0.5">
+          <div
+            onClick={toggleTheme}
+            className="h-6 w-12 bg-backgroundColorMenu dark:bg-fontTertiary rounded-full cursor-pointer flex justify-start dark:justify-end items-center m-0.5 px-0.5"
+          >
             {/* Circle */}
             <div className="bg-fontTertiary dark:bg-fontPrimaryDark w-5 h-5 rounded-full"></div>
           </div>

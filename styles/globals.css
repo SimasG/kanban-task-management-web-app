@@ -49,7 +49,7 @@ body {
 }
 
 .purpleBtn {
-  @apply py-2 bg-fontTertiary dark:text-fontPrimaryDark font-bold rounded-full dark:hover:bg-fontPrimaryDark dark:hover:bg-opacity-100 dark:hover:text-fontTertiary hover:bg-opacity-50;
+  @apply py-2 bg-fontTertiary text-backgroundColorMenu dark:text-fontPrimaryDark font-bold rounded-full dark:hover:bg-fontPrimaryDark dark:hover:bg-opacity-100 dark:hover:text-fontTertiary hover:bg-opacity-50;
 }
 
 .whiteBtn {
