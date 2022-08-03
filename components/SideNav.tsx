@@ -8,10 +8,11 @@ import {
   writeBatch,
 } from "firebase/firestore";
 import Image from "next/image";
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import toast from "react-hot-toast";
 import { FcGoogle } from "react-icons/fc";
 import { TbLayoutBoardSplit } from "react-icons/tb";
+import { BiRightArrowAlt, BiLeftArrowAlt } from "react-icons/bi";
 import { HiSun } from "react-icons/hi";
 import { IoMdMoon } from "react-icons/io";
 import { UserContext } from "../lib/context";
@@ -44,6 +45,8 @@ type SideNavProps = {
   boardId: string | null | undefined;
   setBoardId: React.Dispatch<React.SetStateAction<string | null | undefined>>;
   updateBoardName: (uid: string, newName: string) => Promise<void>;
+  isOpen: boolean;
+  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const SideNav = ({
@@ -52,6 +55,8 @@ const SideNav = ({
   boardId,
   setBoardId,
   updateBoardName,
+  isOpen,
+  setIsOpen,
 }: SideNavProps) => {
   const user = useContext(UserContext);
 
@@ -273,164 +278,192 @@ const SideNav = ({
   };
 
   return (
-    <nav className="min-w-[250px] bg-backgroundColorMenu dark:bg-darkGray pr-4 py-4 w-[15%] flex flex-col justify-between">
-      {/* Logo container */}
-      <Link href="/">
-        <a className="pl-4 flex justify-start items-center gap-2 mb-8">
-          {/* Logo */}
-          <div className="flex justify-between items-center gap-[2px]">
-            <div className="w-[5px] h-6 bg-fontTertiary rounded-md"></div>
-            <div className="w-[6px] h-6 bg-fontTertiary rounded-md opacity-75"></div>
-            <div className="w-[6px] h-6 bg-fontTertiary rounded-md opacity-50"></div>
-          </div>
-          <h1 className="text-3xl text-fontPrimary dark:text-fontPrimaryDark">
-            kanban
-          </h1>
-        </a>
-      </Link>
-      {/* Boards container */}
-      <section className="text-fontSecondary">
-        {/* All Boards title */}
-        <h3 className="pl-4 uppercase font-bold text-xs mb-4">
-          {/* Would like to change the initial "undefined" value of "localStorageBoards?.boards?.length" */}
-          {boards?.length !== 0
-            ? `All Boards (${boards?.length})`
-            : "No Boards!"}
-        </h3>
-        {/* Boards subcontainer */}
-        <DragDropContext onDragEnd={onDragEnd}>
-          <Droppable droppableId="boardsSideNav">
-            {(provided: DroppableProvided, snapshot: any) => {
-              return (
-                // ref allows react-beautiful-dnd to control the div
-                <div {...provided.droppableProps} ref={provided.innerRef}>
-                  {boards
-                    ? boards.map(
-                        // ** Re-assign board type later
-                        (board: any, index: number) => {
-                          return (
-                            <Draggable
-                              key={board.uid}
-                              draggableId={board.uid}
-                              index={index}
-                            >
-                              {(provided: DraggableProvided, snapshot: any) => {
-                                return (
-                                  // Single Board
-                                  <div
-                                    onClick={() => {
-                                      setBoardId(board.uid);
-                                    }}
-                                    ref={provided.innerRef}
-                                    {...provided.draggableProps}
-                                    {...provided.dragHandleProps}
-                                    className={`board rounded-r-full ${
-                                      board.uid === boardId
-                                        ? snapshot.isDragging
-                                          ? " bg-fontTertiary bg-opacity-60 select-none text-fontPrimaryDark"
-                                          : " bg-fontTertiary text-fontPrimaryDark opacity-100"
-                                        : " active:bg-fontTertiary active:bg-opacity-60 active:text-fontPrimaryDark"
-                                    }}`}
-                                  >
-                                    <TbLayoutBoardSplit />
-                                    <input
-                                      className="bg-transparent cursor-pointer outline-none"
-                                      type="text"
-                                      value={board.title}
-                                      // ** Having trouble refactoring the logic in a separate func
-                                      onChange={
-                                        user
-                                          ? // If user is authenticated, update Firestore
-                                            (e) => {
-                                              updateBoardName(
-                                                board.uid,
-                                                e.target.value
-                                              );
-                                              // setLocalStorageBoards(newBoardList);
-                                              // setBoardId(board?.id);
-                                            }
-                                          : // If user is not authenticated, update localStorage
-                                            (e) => {
-                                              const newBoardList: {}[] = [];
-                                              boards.map((b: BoardSchema) => {
-                                                b.uid === board.uid
-                                                  ? newBoardList.push({
-                                                      ...board,
-                                                      title: e.target.value,
-                                                    })
-                                                  : newBoardList.push(b);
-                                              });
-                                              localStorage.setItem(
-                                                "boards",
-                                                JSON.stringify(newBoardList)
-                                              );
-                                              setBoards(newBoardList);
-                                              setBoardId(board.uid);
-                                            }
-                                      }
-                                    />
-                                  </div>
-                                );
-                              }}
-                            </Draggable>
-                          );
-                        }
-                      )
-                    : "There is nothing bro :(!"}
-                  {provided.placeholder}
-                </div>
-              );
-            }}
-          </Droppable>
-        </DragDropContext>
-        {/* Create new Board container */}
-        <div className="pl-4 flex justify-start items-center gap-3 py-1 text-fontTertiary cursor-pointer dark:hover:bg-fontPrimaryDark hover:bg-fontTertiary hover:bg-opacity-25 hover:rounded-r-full">
-          <TbLayoutBoardSplit />
-          <button onClick={handleCreateNewBoard}>+ Create New Board</button>
-        </div>
-      </section>
-      {/* Log in/out btn + theme toggle + hide sidebar section */}
-      <section className="mt-auto flex flex-col">
-        {user ? (
-          <div className="flex justify-center items-center gap-4 mb-6">
-            <button onClick={signOutUser} className="purpleBtn w-fit px-6">
-              Log Out
-            </button>
-            <Image
-              className="w-8 h-8 rounded-full"
-              src={user?.photoURL || "hacker.png"}
-              height={32}
-              width={32}
-              alt="user photo"
-            />
-          </div>
-        ) : (
-          <button
-            onClick={handleGoogleLogin}
-            className="purpleBtn w-fit mx-auto mb-6 px-6 flex justify-center items-center gap-4"
-          >
-            <span>Log In</span>
-            <FcGoogle className="w-6 h-6" />
-          </button>
-        )}
+    <>
+      {isOpen ? (
+        <nav className="w-[25%] xl:w-[15%] bg-backgroundColorMenu dark:bg-darkGray pr-4 py-4 flex flex-col justify-between">
+          {/* Logo container */}
+          <Link href="/">
+            <a className="pl-4 flex justify-start items-center gap-2 mb-8 h-[52px]">
+              {/* Logo */}
+              <div className="flex justify-between items-center gap-[2px]">
+                <div className="w-[5px] h-6 bg-fontTertiary rounded-md"></div>
+                <div className="w-[6px] h-6 bg-fontTertiary rounded-md opacity-75"></div>
+                <div className="w-[6px] h-6 bg-fontTertiary rounded-md opacity-50"></div>
+              </div>
+              <h1 className="text-3xl text-fontPrimary dark:text-fontPrimaryDark">
+                kanban
+              </h1>
+              <BiLeftArrowAlt
+                onClick={() => setIsOpen(false)}
+                className="h-10 w-10 ml-auto rounded text-darkBlue dark:text-backgroundColorMain hover:bg-backgroundColorMain hover:dark:bg-darkBlue"
+              />
+            </a>
+          </Link>
+          {/* Boards container */}
+          <section className="text-fontSecondary">
+            {/* All Boards title */}
+            <h3 className="pl-4 uppercase font-bold text-xs mb-4">
+              {/* Would like to change the initial "undefined" value of "localStorageBoards?.boards?.length" */}
+              {boards?.length !== 0
+                ? `All Boards (${boards?.length})`
+                : "No Boards!"}
+            </h3>
+            {/* Boards subcontainer */}
+            <DragDropContext onDragEnd={onDragEnd}>
+              <Droppable droppableId="boardsSideNav">
+                {(provided: DroppableProvided, snapshot: any) => {
+                  return (
+                    // ref allows react-beautiful-dnd to control the div
+                    <div {...provided.droppableProps} ref={provided.innerRef}>
+                      {boards
+                        ? boards.map(
+                            // ** Re-assign board type later
+                            (board: any, index: number) => {
+                              return (
+                                <Draggable
+                                  key={board.uid}
+                                  draggableId={board.uid}
+                                  index={index}
+                                >
+                                  {(
+                                    provided: DraggableProvided,
+                                    snapshot: any
+                                  ) => {
+                                    return (
+                                      // Single Board
+                                      <div
+                                        onClick={() => {
+                                          setBoardId(board.uid);
+                                        }}
+                                        ref={provided.innerRef}
+                                        {...provided.draggableProps}
+                                        {...provided.dragHandleProps}
+                                        className={`board rounded-r-full ${
+                                          board.uid === boardId
+                                            ? snapshot.isDragging
+                                              ? " bg-fontTertiary bg-opacity-60 select-none text-fontPrimaryDark"
+                                              : " bg-fontTertiary text-fontPrimaryDark opacity-100"
+                                            : " active:bg-fontTertiary active:bg-opacity-60 active:text-fontPrimaryDark"
+                                        }}`}
+                                      >
+                                        <TbLayoutBoardSplit />
+                                        <input
+                                          className="bg-transparent cursor-pointer outline-none"
+                                          type="text"
+                                          value={board.title}
+                                          // ** Having trouble refactoring the logic in a separate func
+                                          onChange={
+                                            user
+                                              ? // If user is authenticated, update Firestore
+                                                (e) => {
+                                                  updateBoardName(
+                                                    board.uid,
+                                                    e.target.value
+                                                  );
+                                                  // setLocalStorageBoards(newBoardList);
+                                                  // setBoardId(board?.id);
+                                                }
+                                              : // If user is not authenticated, update localStorage
+                                                (e) => {
+                                                  const newBoardList: {}[] = [];
+                                                  boards.map(
+                                                    (b: BoardSchema) => {
+                                                      b.uid === board.uid
+                                                        ? newBoardList.push({
+                                                            ...board,
+                                                            title:
+                                                              e.target.value,
+                                                          })
+                                                        : newBoardList.push(b);
+                                                    }
+                                                  );
+                                                  localStorage.setItem(
+                                                    "boards",
+                                                    JSON.stringify(newBoardList)
+                                                  );
+                                                  setBoards(newBoardList);
+                                                  setBoardId(board.uid);
+                                                }
+                                          }
+                                        />
+                                      </div>
+                                    );
+                                  }}
+                                </Draggable>
+                              );
+                            }
+                          )
+                        : "There is nothing bro :(!"}
+                      {provided.placeholder}
+                    </div>
+                  );
+                }}
+              </Droppable>
+            </DragDropContext>
+            {/* Create new Board container */}
+            <div className="pl-4 flex justify-start items-center gap-3 py-1 text-fontTertiary cursor-pointer dark:hover:bg-fontPrimaryDark hover:bg-fontTertiary hover:bg-opacity-25 hover:rounded-r-full">
+              <TbLayoutBoardSplit />
+              <button onClick={handleCreateNewBoard}>+ Create New Board</button>
+            </div>
+          </section>
+          {/* Log in/out btn + theme toggle + hide sidebar section */}
+          <section className="mt-auto flex flex-col">
+            {user ? (
+              <div className="flex justify-center items-center gap-4 mb-6">
+                <button onClick={signOutUser} className="purpleBtn w-fit px-6">
+                  Log Out
+                </button>
+                <Image
+                  className="w-8 h-8 rounded-full"
+                  src={user?.photoURL || "hacker.png"}
+                  height={32}
+                  width={32}
+                  alt="user photo"
+                />
+              </div>
+            ) : (
+              <button
+                onClick={handleGoogleLogin}
+                className="purpleBtn w-fit mx-auto mb-6 px-6 flex justify-center items-center gap-4"
+              >
+                <span>Log In</span>
+                <FcGoogle className="w-6 h-6" />
+              </button>
+            )}
 
-        {/* Theme toggle */}
-        <div className="ml-4 mb-4 flex justify-center items-center gap-4 bg-backgroundColor2 dark:bg-darkBlue p-3 rounded">
-          {/* Toggle light theme icon */}
-          <HiSun className="text-fontPrimary dark:text-fontPrimaryDark w-5 h-5" />
-          {/* Rectangle */}
-          <div
-            onClick={toggleTheme}
-            className="h-6 w-12 bg-backgroundColorMenu dark:bg-fontTertiary rounded-full cursor-pointer flex justify-start dark:justify-end items-center m-0.5 px-0.5"
-          >
-            {/* Circle */}
-            <div className="bg-fontTertiary dark:bg-fontPrimaryDark w-5 h-5 rounded-full"></div>
-          </div>
-          {/* Toggle dark theme icon */}
-          <IoMdMoon className="text-fontPrimary dark:text-fontPrimaryDark w-5 h-5" />
-        </div>
-      </section>
-    </nav>
+            {/* Theme toggle */}
+            <div className="ml-4 mb-4 flex justify-center items-center gap-4 bg-backgroundColor2 dark:bg-darkBlue p-3 rounded">
+              {/* Toggle light theme icon */}
+              <HiSun className="text-fontPrimary dark:text-fontPrimaryDark w-5 h-5" />
+              {/* Rectangle */}
+              <div
+                onClick={toggleTheme}
+                className="h-6 w-12 bg-backgroundColorMenu dark:bg-fontTertiary rounded-full cursor-pointer flex justify-start dark:justify-end items-center m-0.5 px-0.5"
+              >
+                {/* Circle */}
+                <div className="bg-fontTertiary dark:bg-fontPrimaryDark w-5 h-5 rounded-full"></div>
+              </div>
+              {/* Toggle dark theme icon */}
+              <IoMdMoon className="text-fontPrimary dark:text-fontPrimaryDark w-5 h-5" />
+            </div>
+          </section>
+        </nav>
+      ) : (
+        <Link href="/">
+          <a className="w-[10%] xl:w-[8%] h-[88px] bg-backgroundColorMenu dark:bg-darkGray p-4 flex justify-between items-center">
+            <div className="flex justify-between items-center gap-[2px]">
+              <div className="w-[5px] h-6 bg-fontTertiary rounded-md"></div>
+              <div className="w-[6px] h-6 bg-fontTertiary rounded-md opacity-75"></div>
+              <div className="w-[6px] h-6 bg-fontTertiary rounded-md opacity-50"></div>
+            </div>
+            <BiRightArrowAlt
+              onClick={() => setIsOpen(true)}
+              className="h-10 w-10 rounded text-darkBlue dark:text-backgroundColorMain hover:bg-backgroundColorMain hover:dark:bg-darkBlue"
+            />
+          </a>
+        </Link>
+      )}
+    </>
   );
 };
 

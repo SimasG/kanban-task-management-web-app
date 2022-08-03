@@ -27,6 +27,8 @@ const Home: NextPage = () => {
   const [showEditTaskModal, setShowEditTaskModal] = useState(false);
   const [boardId, setBoardId] = useState<string | null | undefined>(null);
   const [taskId, setTaskId] = useState<string | null | undefined>(null);
+  // SideNav
+  const [isOpen, setIsOpen] = useState(false);
 
   // Fetching all Tasks of selected Board
   const fsTasks: any = useFetchTasksCollectionGroup(boardId);
@@ -88,7 +90,7 @@ const Home: NextPage = () => {
         setShowEditTaskModal(false);
       }}
       //       className="flex justify-center h-screen overflow-auto"
-      className="flex justify-center h-screen"
+      className="flex justify-center h-screen w-screen"
     >
       <SideNav
         boards={boards}
@@ -96,6 +98,8 @@ const Home: NextPage = () => {
         boardId={boardId}
         setBoardId={setBoardId}
         updateBoardName={updateBoardName}
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
       />
       <Main
         activeBoard={activeBoard}
@@ -110,6 +114,8 @@ const Home: NextPage = () => {
         updateBoardName={updateBoardName}
         columns={columns}
         setColumns={setColumns}
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
       />
       {showAddTaskModal && (
         <AddNewTaskModal

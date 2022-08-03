@@ -28,6 +28,8 @@ type MainProps = {
   updateBoardName: (uid: string, newName: string) => Promise<void>;
   columns: any;
   setColumns: React.Dispatch<any>;
+  isOpen: boolean;
+  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const Main = ({
@@ -43,6 +45,8 @@ const Main = ({
   updateBoardName,
   columns,
   setColumns,
+  isOpen,
+  setIsOpen,
 }: MainProps) => {
   const user = useContext(UserContext);
 
@@ -384,7 +388,7 @@ const Main = ({
   };
 
   return (
-    <main className="w-[85%]">
+    <main className={`${isOpen ? "w-[75%] xl:w-[85%]" : "w-[90%] xl:w-[92%]"}`}>
       <TopSettings
         activeBoard={activeBoard}
         boards={boards}
