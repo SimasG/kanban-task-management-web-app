@@ -403,6 +403,8 @@ const Main = ({
         setBoardId={setBoardId}
         setShowAddTaskModal={setShowAddTaskModal}
         updateBoardName={updateBoardName}
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
       />
       {/* Main content */}
       <DragDropContext onDragEnd={onDragEnd}>

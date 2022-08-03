@@ -12,6 +12,8 @@ type TopSettingsProps = {
   setBoardId: React.Dispatch<React.SetStateAction<string | null | undefined>>;
   setShowAddTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
   updateBoardName: (uid: string, newName: string) => Promise<void>;
+  isOpen: boolean;
+  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const TopSettings = ({
@@ -22,6 +24,8 @@ const TopSettings = ({
   setBoardId,
   setShowAddTaskModal,
   updateBoardName,
+  isOpen,
+  setIsOpen,
 }: TopSettingsProps) => {
   // ** Fetching Data
   const user = useContext(UserContext);
@@ -73,9 +77,18 @@ const TopSettings = ({
   };
 
   return (
-    <section className="h-[10%] min-w-[500px] p-4 flex justify-between items-center bg-backgroundColorMenu dark:bg-darkGray">
+    <section
+      className={`
+       h-[10%] lg:min-w-[500px] p-4 flex justify-between items-center bg-backgroundColorMenu dark:bg-darkGray`}
+
+      // ${
+      //   isOpen
+      //     ? "w-[40%] sm:w-[50%] md:w-[60%] lg:w-[75%] xl:w-[80%]"
+      //     : "w-[88%] sm:w-[92%] lg:w-[92%] xl:w-[100%]"
+      // }
+    >
       <input
-        className="text-2xl bg-transparent cursor-pointer outline-none text-fontPrimary dark:text-fontPrimaryDark"
+        className="text-xl sm:text-2xl bg-transparent cursor-pointer outline-none text-fontPrimary dark:text-fontPrimaryDark"
         type="text"
         value={
           (activeBoard && activeBoard?.[0]?.title) || "Future Board Name 🤓"
@@ -108,9 +121,17 @@ const TopSettings = ({
           onClick={(e) => {
             handleAddNewTaskBtn(e);
           }}
-          className="px-4 purpleBtn"
+          className="purpleBtn hidden sm:block text-sm sm:text-md px-4"
         >
           + Add New Task
+        </button>
+        <button
+          onClick={(e) => {
+            handleAddNewTaskBtn(e);
+          }}
+          className="absolute right-4 bottom-4 purpleBtn text-6xl h-20 w-20 p-0 flex justify-center items-center sm:hidden sm:text z-50"
+        >
+          <span className="relative bottom-[3px]">+</span>
         </button>
         {/* Delete Board Btn */}
         <svg
