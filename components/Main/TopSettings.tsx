@@ -78,9 +78,7 @@ const TopSettings = ({
 
   return (
     <section
-      className={`
-       h-[10%] lg:min-w-[500px] p-4 flex justify-between items-center bg-backgroundColorMenu dark:bg-darkGray`}
-
+      className={`h-[10%] w-[100%] p-4 flex justify-between items-center bg-backgroundColorMenu dark:bg-darkGray`}
       // ${
       //   isOpen
       //     ? "w-[40%] sm:w-[50%] md:w-[60%] lg:w-[75%] xl:w-[80%]"
@@ -117,6 +115,7 @@ const TopSettings = ({
         }
       />
       <div className="flex justify-center items-center gap-4">
+        {/* Desktop Add New Task Btn */}
         <button
           onClick={(e) => {
             handleAddNewTaskBtn(e);
@@ -125,6 +124,7 @@ const TopSettings = ({
         >
           + Add New Task
         </button>
+        {/* Mobile Add New Task Btn */}
         <button
           onClick={(e) => {
             handleAddNewTaskBtn(e);

@@ -389,9 +389,10 @@ const Main = ({
 
   return (
     <main
+      // className="w-[90%]"
       className={`${
         isOpen
-          ? "w-[40%] sm:w-[50%] md:w-[60%] lg:w-[75%] xl:w-[80%]"
+          ? "w-[40%] sm:w-[60%] md:w-[65%] lg:w-[75%] xl:w-[80%]"
           : "w-[88%] sm:w-[92%] lg:w-[92%] xl:w-[92%]"
       }`}
     >
