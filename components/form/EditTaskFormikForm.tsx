@@ -93,10 +93,10 @@ const FormikForm = ({
   return (
     <>
       {values && (
-        <section className="absolute bg-black bg-opacity-50 inset-0 w-full h-screen flex justify-center items-center">
+        <section className="absolute bg-black bg-opacity-50 inset-0 w-full h-screen flex justify-center items-center z-[100]">
           <Form
             onClick={(e) => e.stopPropagation()}
-            className="p-6 bg-backgroundColorMenu dark:bg-darkGray rounded-md flex flex-col justify-between gap-8 min-w-[450px]"
+            className="p-6 bg-backgroundColorMenu dark:bg-darkGray rounded-md flex flex-col justify-between gap-8 w-[95%] sm:w-[70%] md:w-[60%] lg:w-[50%] xl:w-[40%] 2xl:w-[35%]"
           >
             {/* Title */}
             <div className="flex justify-between items-center">
@@ -115,7 +115,7 @@ const FormikForm = ({
               </div>
               {/* Delete Task Btn */}
               <svg
-                className="w-16 h-12 p-2 text-fontSecondary rounded cursor-pointer hover:bg-backgroundColorMain hover:dark:bg-darkBlue"
+                className="w-12 h-12 p-2 text-fontSecondary rounded cursor-pointer hover:bg-backgroundColorMain hover:dark:bg-darkBlue"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -215,7 +215,7 @@ const FormikForm = ({
                     {/* Add Subtask Btn */}
                     <button
                       type="button"
-                      className="whiteBtn text-sm"
+                      className="purpleBtn dark:whiteBtn text-sm"
                       onClick={() =>
                         push({
                           uid: uuidv4(),

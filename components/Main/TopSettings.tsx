@@ -86,7 +86,7 @@ const TopSettings = ({
       // }
     >
       <input
-        className="text-xl sm:text-2xl bg-transparent cursor-pointer outline-none text-fontPrimary dark:text-fontPrimaryDark"
+        className="text-xl sm:text-2xl bg-transparent cursor-pointer outline-none text-fontPrimary dark:text-fontPrimaryDark sm:w-[160px] md:w-[60%]"
         type="text"
         value={
           (activeBoard && activeBoard?.[0]?.title) || "Future Board Name 🤓"
@@ -120,7 +120,7 @@ const TopSettings = ({
           onClick={(e) => {
             handleAddNewTaskBtn(e);
           }}
-          className="purpleBtn hidden sm:block text-sm sm:text-md px-4"
+          className="purpleBtn hidden text-xs px-4 sm:block md:text-sm"
         >
           + Add New Task
         </button>

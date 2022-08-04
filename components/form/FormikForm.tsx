@@ -35,7 +35,7 @@ const FormikForm = ({ formik, columns, setShowAddTaskModal }: IndexProps) => {
               <h2 className="text-fontPrimary dark:text-fontPrimaryDark text-lg font-bold">
                 Add New Task
               </h2>
-              {/* Delete Subtask Btn */}
+              {/* Leave Modal Btn */}
               <button type="button" onClick={() => setShowAddTaskModal(false)}>
                 <svg
                   className="w-12 h-12 p-1 text-fontSecondary hover:bg-fontSecondary hover:bg-opacity-25 hover:rounded"
@@ -53,7 +53,6 @@ const FormikForm = ({ formik, columns, setShowAddTaskModal }: IndexProps) => {
                 </svg>
               </button>
             </div>
-
             {/* Title */}
             <FormikControl
               control="input"

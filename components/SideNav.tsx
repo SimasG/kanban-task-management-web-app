@@ -286,28 +286,31 @@ const SideNav = ({
         >
           <nav
             onClick={(e) => e.stopPropagation()}
-            className="fixed h-screen top-0 left-0 w-[60%] sm:w-[40%] md:w-[35%] lg:w-[25%] xl:w-[20%] bg-backgroundColorMenu dark:bg-darkGray pr-4 py-4 flex flex-col justify-between rounded-r"
+            className="fixed h-screen top-0 left-0 w-[60%] sm:w-[40%] md:w-[35%] lg:w-[25%] xl:w-[20%] bg-backgroundColorMenu dark:bg-darkGray pr-4 py-4 flex flex-col justify-between items-center"
           >
             {/* Logo container */}
             <Link href="/">
-              <a className="pl-4 flex justify-start items-center gap-2 mb-8 h-[52px]">
-                {/* Logo */}
-                <div className="flex justify-between items-center gap-[2px]">
-                  <div className="w-[5px] h-6 bg-fontTertiary rounded-md"></div>
-                  <div className="w-[6px] h-6 bg-fontTertiary rounded-md opacity-75"></div>
-                  <div className="w-[6px] h-6 bg-fontTertiary rounded-md opacity-50"></div>
+              <a className="pl-4 flex justify-between items-center gap-2 mb-8 h-[52px] w-[100%]">
+                {/* Logo + Logo Title Container */}
+                <div className="flex justify-center items-center gap-2">
+                  <div className="flex justify-between items-center gap-[2px]">
+                    <div className="w-[5px] h-6 bg-fontTertiary rounded-md"></div>
+                    <div className="w-[6px] h-6 bg-fontTertiary rounded-md opacity-75"></div>
+                    <div className="w-[6px] h-6 bg-fontTertiary rounded-md opacity-50"></div>
+                  </div>
+                  <h1 className="text-3xl text-fontPrimary dark:text-fontPrimaryDark">
+                    kanban
+                  </h1>
                 </div>
-                <h1 className="text-3xl text-fontPrimary dark:text-fontPrimaryDark">
-                  kanban
-                </h1>
+                {/* Logo */}
                 <BiLeftArrowAlt
                   onClick={() => setIsOpen(false)}
-                  className="h-10 w-10 ml-auto rounded text-darkBlue dark:text-backgroundColorMain hover:bg-backgroundColorMain hover:dark:bg-darkBlue"
+                  className="h-10 w-10 ml-auto rounded text-darkBlue dark:text-backgroundColorMain hover:bg-backgroundColorMain hover:dark:bg-darkBlue "
                 />
               </a>
             </Link>
             {/* Boards container */}
-            <section className="text-fontSecondary">
+            <section className="text-fontSecondary w-[100%]">
               {/* All Boards title */}
               <h3 className="pl-4 uppercase font-bold text-xs mb-4">
                 {/* Would like to change the initial "undefined" value of "localStorageBoards?.boards?.length" */}
@@ -421,7 +424,7 @@ const SideNav = ({
               </div>
             </section>
             {/* Log in/out btn + theme toggle + hide sidebar section */}
-            <section className="mt-auto flex flex-col">
+            <section className="mt-auto flex flex-col w-[100%]">
               {user ? (
                 <div className="flex justify-center items-center gap-4 mb-6">
                   <button
@@ -468,17 +471,19 @@ const SideNav = ({
         </div>
       ) : (
         <Link href="/">
-          <a className="w-[12%] sm:w-[8%] lg:w-[8%] xl:w-[8%] h-20 md:h-[88px] bg-backgroundColorMenu dark:bg-darkGray p-2 md:p-3 xl:p-4 flex justify-between items-center">
-            <div className="hidden lg:flex justify-between items-center gap-[2px]">
-              <div className="w-[5px] h-6 bg-fontTertiary rounded-md"></div>
-              <div className="w-[6px] h-6 bg-fontTertiary rounded-md opacity-75"></div>
-              <div className="w-[6px] h-6 bg-fontTertiary rounded-md opacity-50"></div>
-            </div>
-            <BiRightArrowAlt
-              onClick={() => setIsOpen(true)}
-              className="h-10 w-10 rounded text-darkBlue dark:text-backgroundColorMain hover:bg-backgroundColorMain hover:dark:bg-darkBlue"
-            />
-          </a>
+          <nav className="h-full w-[12%] sm:w-[8%] lg:w-[8%] xl:w-[8%] bg-backgroundColorMenu dark:bg-darkGray">
+            <a className="w-[100%] h-20 md:h-[88px] bg-backgroundColorMenu dark:bg-darkGray p-2 md:p-3 xl:p-4 flex justify-between items-center">
+              <div className="hidden lg:flex justify-between items-center gap-[2px]">
+                <div className="w-[5px] h-6 bg-fontTertiary rounded-md"></div>
+                <div className="w-[6px] h-6 bg-fontTertiary rounded-md opacity-75"></div>
+                <div className="w-[6px] h-6 bg-fontTertiary rounded-md opacity-50"></div>
+              </div>
+              <BiRightArrowAlt
+                onClick={() => setIsOpen(true)}
+                className="h-10 w-10 rounded text-darkBlue dark:text-backgroundColorMain hover:bg-backgroundColorMain hover:dark:bg-darkBlue cursor-pointer"
+              />
+            </a>
+          </nav>
         </Link>
       )}
     </>
