@@ -25,8 +25,8 @@ const AddNewTaskModal = ({
     title: string;
     description?: string;
     subtasks?: {}[];
-    status: number;
-    index: number;
+    status: number | undefined;
+    index: number | undefined;
   };
 
   const user = useContext(UserContext);
@@ -41,8 +41,8 @@ const AddNewTaskModal = ({
         checked: false,
       },
     ],
-    status: -1,
-    index: -1,
+    status: undefined,
+    index: undefined,
   };
 
   const validationSchema = Yup.object({

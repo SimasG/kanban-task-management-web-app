@@ -160,7 +160,6 @@ const SideNav = ({
 
       // Create 3 default Columns
       defaultColumns?.map((column: any) => {
-        console.log("default column:", column);
         const columnRef = doc(
           db,
           "users",
@@ -223,7 +222,6 @@ const SideNav = ({
         // Decrement Boards
         if (board.index > sourceIndex && board.index <= destinationIndex) {
           // DECREMENT THE INDEX OF EACH BOARD THAT FITS THIS CRITERIA
-          console.log("board to be decremented:", board);
           const boardDocRef = doc(
             db,
             "users",
@@ -237,7 +235,6 @@ const SideNav = ({
         // Increment Boards
         if (board.index < sourceIndex && board.index >= destinationIndex) {
           // INCREMENT THE INDEX OF EACH BOARD THAT FITS THIS CRITERIA
-          console.log("board to be incremented:", board);
           const boardDocRef = doc(
             db,
             "users",

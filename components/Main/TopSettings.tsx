@@ -86,7 +86,7 @@ const TopSettings = ({
       // }
     >
       <input
-        className="text-xl sm:text-2xl bg-transparent cursor-pointer outline-none text-fontPrimary dark:text-fontPrimaryDark sm:w-[160px] md:w-[60%]"
+        className="text-xl sm:text-2xl bg-transparent cursor-pointer outline-none text-fontPrimary dark:text-fontPrimaryDark sm:w-[160px] md:w-[57%]"
         type="text"
         value={
           (activeBoard && activeBoard?.[0]?.title) || "Future Board Name 🤓"

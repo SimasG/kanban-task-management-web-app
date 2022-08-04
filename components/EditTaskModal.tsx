@@ -38,8 +38,8 @@ const EditTaskModal = ({
     title: string;
     description?: string;
     subtasks?: {}[];
-    status: number;
-    index: number;
+    status: number | undefined;
+    index: number | undefined;
   };
 
   // Populating the state with the selected Task data
@@ -57,12 +57,11 @@ const EditTaskModal = ({
       {
         uid: uuidv4(),
         title: "",
-        // checked: []; ?
         checked: false,
       },
     ],
-    status: -1,
-    index: -1,
+    status: undefined,
+    index: undefined,
   };
 
   const validationSchema = Yup.object({
