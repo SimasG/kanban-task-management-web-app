@@ -1,4 +1,4 @@
-import { deleteDoc, doc, updateDoc } from "firebase/firestore";
+import { deleteDoc, doc, updateDoc, writeBatch } from "firebase/firestore";
 import { useContext, useState } from "react";
 import {
   Draggable,
@@ -55,6 +55,9 @@ const Column = ({
   };
 
   const deleteColumn = async () => {
+    // Deleting the Column & Tasks that are in the Column
+    const batch = writeBatch(db);
+
     const columnDocRef = doc(
       db,
       "users",
@@ -64,7 +67,26 @@ const Column = ({
       "columns",
       `${columnId}`
     );
-    await deleteDoc(columnDocRef);
+    batch.delete(columnDocRef);
+
+    const tasksToDelete = tasks?.filter(
+      (task: any) => task?.status === columnStatus
+    );
+    tasksToDelete.map((task: any) => {
+      const taskDocRef = doc(
+        db,
+        "users",
+        `${user?.uid}`,
+        "boards",
+        `${boardId}`,
+        "columns",
+        `${columnId}`,
+        "tasks",
+        `${task?.uid}`
+      );
+      batch.delete(taskDocRef);
+    });
+    await batch.commit();
   };
 
   return (
