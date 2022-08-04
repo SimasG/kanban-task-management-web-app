@@ -3,20 +3,12 @@ import FormikControl from "./FormikControl";
 import { v4 as uuidv4 } from "uuid";
 
 type IndexProps = {
-  boardId: string | null | undefined;
-  setShowAddTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
-  tasks: any;
   formik: any;
   columns: any;
+  setShowAddTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const FormikForm = ({
-  boardId,
-  setShowAddTaskModal,
-  tasks,
-  formik,
-  columns,
-}: IndexProps) => {
+const FormikForm = ({ formik, columns, setShowAddTaskModal }: IndexProps) => {
   // "value: ''" will automatically make this option invalid (falsy value) and throw an error
   let dropdownOptions: any = [{ key: "Select an option", value: "" }];
   columns?.map((column: any) => {
@@ -33,14 +25,35 @@ const FormikForm = ({
     <>
       {/* Still confused why I have to render the component once the values are declared */}
       {values && (
-        <section className="absolute bg-black bg-opacity-50 inset-0 w-full h-screen flex justify-center items-center">
+        <section className="absolute bg-black bg-opacity-50 inset-0 w-full h-screen flex justify-center items-center z-[100]">
           <Form
             onClick={(e) => e.stopPropagation()}
-            className="p-6 bg-backgroundColorMenu dark:bg-darkGray rounded-md flex flex-col justify-between gap-8 min-w-[450px]"
+            className="p-6 bg-backgroundColorMenu dark:bg-darkGray rounded-md flex flex-col justify-between gap-8 w-[95%] sm:w-[70%] md:w-[60%] lg:w-[50%] xl:w-[40%] 2xl:w-[35%]"
           >
-            <h2 className="text-fontPrimary dark:text-fontPrimaryDark text-lg font-bold">
-              Add New Task
-            </h2>
+            {/* Add New Task Container */}
+            <div className="flex justify-between items-center">
+              <h2 className="text-fontPrimary dark:text-fontPrimaryDark text-lg font-bold">
+                Add New Task
+              </h2>
+              {/* Delete Subtask Btn */}
+              <button type="button" onClick={() => setShowAddTaskModal(false)}>
+                <svg
+                  className="w-12 h-12 p-1 text-fontSecondary hover:bg-fontSecondary hover:bg-opacity-25 hover:rounded"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="3"
+                    d="M6 18L18 6M6 6l12 12"
+                  ></path>
+                </svg>
+              </button>
+            </div>
+
             {/* Title */}
             <FormikControl
               control="input"

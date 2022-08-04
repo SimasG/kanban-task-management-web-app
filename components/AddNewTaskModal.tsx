@@ -106,11 +106,9 @@ const AddNewTaskModal = ({
       {(formik) => {
         return (
           <FormikForm
-            boardId={boardId}
-            setShowAddTaskModal={setShowAddTaskModal}
-            tasks={tasks}
             formik={formik}
             columns={columns}
+            setShowAddTaskModal={setShowAddTaskModal}
           />
         );
       }}

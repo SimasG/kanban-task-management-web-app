@@ -280,8 +280,14 @@ const SideNav = ({
     <>
       {isOpen ? (
         // <nav className="w-[60%] sm:w-[50%] md:w-[40%] lg:w-[25%] xl:w-[20%] bg-backgroundColorMenu dark:bg-darkGray pr-4 py-4 flex flex-col justify-between">
-        <div className="absolute bg-black bg-opacity-50 top-0 left-0 w-full h-screen flex justify-center items-center sm:static sm:bg-transparent sm:bg-opacity-100 sm:inset-auto sm:block sm:w-[40%] md:w-[35%] lg:w-[25%] xl:w-[20%]">
-          <nav className="fixed h-screen top-0 left-0 w-[60%] sm:w-[40%] md:w-[35%] lg:w-[25%] xl:w-[20%] bg-backgroundColorMenu dark:bg-darkGray pr-4 py-4 flex flex-col justify-between">
+        <div
+          onClick={() => setIsOpen(false)}
+          className="absolute bg-black bg-opacity-50 top-0 left-0 w-full h-screen flex justify-center items-center rounded-r sm:static sm:bg-transparent sm:bg-opacity-100 sm:inset-auto sm:block sm:w-[40%] md:w-[35%] lg:w-[25%] xl:w-[20%]"
+        >
+          <nav
+            onClick={(e) => e.stopPropagation()}
+            className="fixed h-screen top-0 left-0 w-[60%] sm:w-[40%] md:w-[35%] lg:w-[25%] xl:w-[20%] bg-backgroundColorMenu dark:bg-darkGray pr-4 py-4 flex flex-col justify-between rounded-r"
+          >
             {/* Logo container */}
             <Link href="/">
               <a className="pl-4 flex justify-start items-center gap-2 mb-8 h-[52px]">
