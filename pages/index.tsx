@@ -11,6 +11,7 @@ import useFetchFsBoards from "../lib/hooks/useFetchFsBoards";
 import useFetchFsColumns from "../lib/hooks/useFetchFsColumns";
 import useFetchTasksCollectionGroup from "../lib/hooks/useFetchFsTasks";
 import { BoardSchema } from "../lib/types";
+import Login from "./login";
 
 const Home: NextPage = () => {
   const user = useContext(UserContext);
@@ -84,57 +85,63 @@ const Home: NextPage = () => {
   };
 
   return (
-    <div
-      onClick={() => {
-        setShowAddTaskModal(false);
-        setShowEditTaskModal(false);
-      }}
-      //       className="flex justify-center h-screen overflow-auto"
-      className="flex justify-center h-screen w-screen"
-    >
-      <SideNav
-        boards={boards}
-        setBoards={setBoards}
-        boardId={boardId}
-        setBoardId={setBoardId}
-        updateBoardName={updateBoardName}
-        isOpen={isOpen}
-        setIsOpen={setIsOpen}
-      />
-      <Main
-        activeBoard={activeBoard}
-        boards={boards}
-        setBoards={setBoards}
-        boardId={boardId}
-        setBoardId={setBoardId}
-        tasks={tasks}
-        setTaskId={setTaskId}
-        setShowAddTaskModal={setShowAddTaskModal}
-        setShowEditTaskModal={setShowEditTaskModal}
-        updateBoardName={updateBoardName}
-        columns={columns}
-        setColumns={setColumns}
-        isOpen={isOpen}
-        setIsOpen={setIsOpen}
-      />
-      {showAddTaskModal && (
-        <AddNewTaskModal
-          boardId={boardId}
-          setShowAddTaskModal={setShowAddTaskModal}
-          tasks={tasks}
-          columns={columns}
-        />
+    <>
+      {user ? (
+        <div
+          onClick={() => {
+            setShowAddTaskModal(false);
+            setShowEditTaskModal(false);
+          }}
+          //       className="flex justify-center h-screen overflow-auto"
+          className="flex justify-center h-screen w-screen"
+        >
+          <SideNav
+            boards={boards}
+            setBoards={setBoards}
+            boardId={boardId}
+            setBoardId={setBoardId}
+            updateBoardName={updateBoardName}
+            isOpen={isOpen}
+            setIsOpen={setIsOpen}
+          />
+          <Main
+            activeBoard={activeBoard}
+            boards={boards}
+            setBoards={setBoards}
+            boardId={boardId}
+            setBoardId={setBoardId}
+            tasks={tasks}
+            setTaskId={setTaskId}
+            setShowAddTaskModal={setShowAddTaskModal}
+            setShowEditTaskModal={setShowEditTaskModal}
+            updateBoardName={updateBoardName}
+            columns={columns}
+            setColumns={setColumns}
+            isOpen={isOpen}
+            setIsOpen={setIsOpen}
+          />
+          {showAddTaskModal && (
+            <AddNewTaskModal
+              boardId={boardId}
+              setShowAddTaskModal={setShowAddTaskModal}
+              tasks={tasks}
+              columns={columns}
+            />
+          )}
+          {showEditTaskModal && (
+            <EditTaskModal
+              boardId={boardId}
+              taskId={taskId}
+              setShowEditTaskModal={setShowEditTaskModal}
+              tasks={tasks}
+              columns={columns}
+            />
+          )}
+        </div>
+      ) : (
+        <Login />
       )}
-      {showEditTaskModal && (
-        <EditTaskModal
-          boardId={boardId}
-          taskId={taskId}
-          setShowEditTaskModal={setShowEditTaskModal}
-          tasks={tasks}
-          columns={columns}
-        />
-      )}
-    </div>
+    </>
   );
 };
 

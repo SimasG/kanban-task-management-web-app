@@ -8,9 +8,8 @@ import {
   writeBatch,
 } from "firebase/firestore";
 import Image from "next/image";
-import React, { useContext, useState } from "react";
+import React, { useContext } from "react";
 import toast from "react-hot-toast";
-import { FcGoogle } from "react-icons/fc";
 import { TbLayoutBoardSplit } from "react-icons/tb";
 import { BiRightArrowAlt, BiLeftArrowAlt } from "react-icons/bi";
 import { HiSun } from "react-icons/hi";
@@ -422,7 +421,7 @@ const SideNav = ({
             </section>
             {/* Log in/out btn + theme toggle + hide sidebar section */}
             <section className="mt-auto flex flex-col w-[100%]">
-              {user ? (
+              {user && (
                 <div className="flex justify-center items-center gap-4 mb-6">
                   <button
                     onClick={signOutUser}
@@ -438,16 +437,7 @@ const SideNav = ({
                     alt="user photo"
                   />
                 </div>
-              ) : (
-                <button
-                  onClick={handleGoogleLogin}
-                  className="purpleBtn w-fit mx-auto mb-6 px-6 flex justify-center items-center gap-4"
-                >
-                  <span>Log In</span>
-                  <FcGoogle className="w-6 h-6" />
-                </button>
               )}
-
               {/* Theme toggle */}
               <div className="ml-4 mb-4 flex justify-center items-center gap-4 bg-backgroundColor2 dark:bg-darkBlue p-3 rounded">
                 {/* Toggle light theme icon */}
