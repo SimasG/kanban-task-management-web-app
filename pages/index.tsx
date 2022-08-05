@@ -35,29 +35,21 @@ const Home: NextPage = () => {
   const fsTasks: any = useFetchTasksCollectionGroup(boardId);
   const fsColumns = useFetchFsColumns(boardId);
 
+  let activeBoard: any;
+
   // Setting main state either from localStorage or Firestore
   useEffect(() => {
-    if (!user) {
-      // If localStorage is empty, do not try to set the main state from it
-      if (localStorage.getItem("boards") || "" !== "") {
-        setBoards(JSON.parse(localStorage.getItem("boards") || ""));
-        setBoardId(JSON.parse(localStorage.getItem("boards") || "")?.[0]?.id);
-      }
-      // get "tasks" (& "subtasks"?) as well later..
-      return;
-    } else {
-      // Ensuring that I only set the main state from Firestore once the data has been fetched (async protection)
-      if (!fsBoards) return;
-      setBoards(fsBoards);
-      if (activeBoard === undefined && fsBoards?.length !== 0) {
-        setBoardId(fsBoards?.[0]?.id);
-      }
-      if (!fsColumns) return;
-      setColumns(fsColumns);
-      if (!fsTasks) return;
-      setTasks(fsTasks);
+    // Ensuring that I only set the main state from Firestore once the data has been fetched (async protection)
+    if (!fsBoards) return;
+    setBoards(fsBoards);
+    if (!activeBoard && fsBoards?.length !== 0) {
+      setBoardId(fsBoards?.[0]?.uid);
     }
-  }, [fsBoards, fsColumns, fsTasks, user]);
+    if (!fsColumns) return;
+    setColumns(fsColumns);
+    if (!fsTasks) return;
+    setTasks(fsTasks);
+  }, [activeBoard, fsBoards, fsColumns, fsTasks]);
 
   // ** How can I fix the "ReferenceError: localStorage is not defined" error?
   // useEffect(() => {
@@ -73,9 +65,7 @@ const Home: NextPage = () => {
   //   }
   // }, [localStorage.theme]);
 
-  const activeBoard = boards?.filter(
-    (board: BoardSchema) => board.uid === boardId
-  );
+  activeBoard = boards?.filter((board: BoardSchema) => board.uid === boardId);
 
   const updateBoardName = async (uid: string, newName: string) => {
     const ref = doc(db, "users", `${user?.uid}`, "boards", uid);

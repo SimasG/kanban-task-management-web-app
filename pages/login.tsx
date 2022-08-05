@@ -45,7 +45,7 @@ const Login = () => {
 
   return (
     <div className="inset-0 h-screen w-full bg-black bg-opacity-25 flex justify-center items-center">
-      <section className="w-[90%] sm:w-[60%] md:w-[50%] lg:w-[35%] h-[40%] bg-backgroundColorMenu rounded p-8">
+      <section className="w-[90%] sm:w-[60%] md:w-[50%] lg:w-[35%] h-[40%] bg-backgroundColorMenu rounded p-6 md:p-8">
         <a className="w-[100%] mx-auto">
           {/* Logo + Logo Title Container */}
           <div className="flex justify-center items-center gap-3 mb-10">
@@ -61,7 +61,7 @@ const Login = () => {
         </a>
         <button
           onClick={handleGoogleLogin}
-          className="purpleBtn w-[55%] mx-auto px-6 flex justify-center items-center gap-4"
+          className="purpleBtn w-[55%] mx-auto flex justify-center items-center gap-4"
           type="button"
         >
           <span className="text-2xl">Log In</span>

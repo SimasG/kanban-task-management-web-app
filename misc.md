@@ -1714,3 +1714,27 @@ const affectedTask = affectedTaskRaw.data();
     }
 
 };
+
+// Setting main state either from localStorage or Firestore
+useEffect(() => {
+if (!user) {
+// If localStorage is empty, do not try to set the main state from it
+if (localStorage.getItem("boards") || "" !== "") {
+setBoards(JSON.parse(localStorage.getItem("boards") || ""));
+setBoardId(JSON.parse(localStorage.getItem("boards") || "")?.[0]?.id);
+}
+// get "tasks" (& "subtasks"?) as well later..
+return;
+} else {
+// Ensuring that I only set the main state from Firestore once the data has been fetched (async protection)
+if (!fsBoards) return;
+setBoards(fsBoards);
+if (activeBoard === undefined && fsBoards?.length !== 0) {
+setBoardId(fsBoards?.[0]?.id);
+}
+if (!fsColumns) return;
+setColumns(fsColumns);
+if (!fsTasks) return;
+setTasks(fsTasks);
+}
+}, [fsBoards, fsColumns, fsTasks, user]);
