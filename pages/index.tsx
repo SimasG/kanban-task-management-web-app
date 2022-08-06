@@ -29,7 +29,7 @@ const Home: NextPage = () => {
   const [boardId, setBoardId] = useState<string | null | undefined>(null);
   const [taskId, setTaskId] = useState<string | null | undefined>(null);
   // SideNav
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
 
   // Fetching all Tasks of selected Board
   const fsTasks: any = useFetchTasksCollectionGroup(boardId);
@@ -37,19 +37,30 @@ const Home: NextPage = () => {
 
   let activeBoard: any;
 
-  // Setting main state either from localStorage or Firestore
   useEffect(() => {
-    // Ensuring that I only set the main state from Firestore once the data has been fetched (async protection)
+    console.log("pre-useEffect func ran");
     if (!fsBoards) return;
     setBoards(fsBoards);
+  }, [fsBoards]);
+
+  useEffect(() => {
+    console.log("pre-useEffect func ran");
     if (!activeBoard && fsBoards?.length !== 0) {
       setBoardId(fsBoards?.[0]?.uid);
     }
+  }, [activeBoard, fsBoards]);
+
+  useEffect(() => {
+    console.log("pre-useEffect func ran");
     if (!fsColumns) return;
     setColumns(fsColumns);
+  }, [fsColumns]);
+
+  useEffect(() => {
+    console.log("pre-useEffect func ran");
     if (!fsTasks) return;
     setTasks(fsTasks);
-  }, [activeBoard, fsBoards, fsColumns, fsTasks]);
+  }, [fsTasks]);
 
   // ** How can I fix the "ReferenceError: localStorage is not defined" error?
   // useEffect(() => {
@@ -82,7 +93,6 @@ const Home: NextPage = () => {
             setShowAddTaskModal(false);
             setShowEditTaskModal(false);
           }}
-          //       className="flex justify-center h-screen overflow-auto"
           className="flex justify-center h-screen w-screen"
         >
           <SideNav

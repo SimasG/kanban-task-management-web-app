@@ -11,33 +11,12 @@ const Login = () => {
     signInWithPopup(auth, provider)
       .then(async (result) => {
         const user = result.user;
-        // Creating user doc if it doesn't exist already
         await setDoc(doc(db, "users", user.uid), {
           uid: user.uid,
           email: user.email,
           timeStamp: serverTimestamp(),
         });
 
-        //
-        // if (localStorage.getItem("boards") || "" !== "") {
-        if (
-          localStorage.getItem("boards") !== "[]" ||
-          localStorage.getItem("boards") !== null
-        ) {
-          const lsData = JSON.parse(localStorage.getItem("boards") || "");
-          lsData?.forEach(async (board: BoardSchema) => {
-            const ref = doc(
-              db,
-              "users",
-              `${user.uid}`,
-              "boards",
-              `${board.uid}`
-            );
-            await setDoc(ref, board);
-          });
-        }
-        // Clearing localStorage as soon as user is authed. LS is designed to be a temporary DB only.
-        localStorage.clear();
         toast.success(`Welcome ${user.displayName}!`);
       })
       .catch((err) => console.log(err));

@@ -1738,3 +1738,267 @@ if (!fsTasks) return;
 setTasks(fsTasks);
 }
 }, [fsBoards, fsColumns, fsTasks, user]);
+
+          //       className="flex justify-center h-screen overflow-auto"
+
+// Setting main state either from localStorage or Firestore
+useEffect(() => {
+// Ensuring that I only set the main state from Firestore once the data has been fetched (async protection)
+if (!fsBoards) return;
+setBoards(fsBoards);
+if (!activeBoard && fsBoards?.length !== 0) {
+setBoardId(fsBoards?.[0]?.uid);
+}
+if (!fsColumns || !fsTasks) return;
+setColumns(fsColumns);
+setTasks(fsTasks);
+}, [activeBoard, fsBoards, fsColumns, fsTasks]);
+
+type LocalStorageBoardSchema = {
+boards: {
+title: string;
+uid: string;
+createdAt: any;
+}[];
+};
+
+const handleCreateNewBoard = async () => {
+// Creating new Board in localStorage
+if (!user) {
+// If LS isn't empty (empty array OR empty string OR null)
+if (
+localStorage.getItem("boards") !== "[]" &&
+localStorage.getItem("boards") !== null
+) {
+const oldData = JSON.parse(localStorage.getItem("boards") || "");
+const newData = [
+...oldData,
+{
+uid: uuidv4(),
+title: "New Board",
+createdAt: Date.now(),
+// Add index (similar to "index: parseInt(oldData?.length)")
+},
+];
+localStorage.setItem("boards", JSON.stringify(newData));
+if (
+JSON.parse(localStorage.getItem("boards") || "")?.[0]?.createdAt <
+JSON.parse(localStorage.getItem("boards") || "")?.[1]?.createdAt
+) {
+setBoards(newData);
+} else {
+setBoards(newData);
+}
+
+        setBoardId(newData?.[0]?.uid);
+      }
+      // If LS is empty
+      else {
+        const newData = [
+          {
+            uid: uuidv4(),
+            title: "New Board",
+            createdAt: Date.now(),
+            // Add index (similar to "index: parseInt(oldData?.length)")
+          },
+        ];
+        localStorage.setItem("boards", JSON.stringify(newData));
+        setBoards(newData);
+        setBoardId(newData?.[0]?.uid);
+      }
+    } else {
+      // Creating new Board in Firestore
+      const batch = writeBatch(db);
+      const uuid = uuidv4();
+      const boardRef = doc(db, "users", `${user?.uid}`, "boards", `${uuid}`);
+      batch.set(boardRef, {
+        title: "New Board",
+        uid: uuid,
+        createdAt: Timestamp.fromDate(new Date()),
+        index: boards?.length,
+      });
+      setBoardId(uuid);
+
+      // Create 3 default Columns
+      defaultColumns?.map((column: any) => {
+        const columnRef = doc(
+          db,
+          "users",
+          `${user?.uid}`,
+          "boards",
+          `${uuid}`,
+          "columns",
+          `${column?.uid}`
+        );
+        batch.set(columnRef, {
+          uid: column?.uid,
+          index: column?.index,
+          status: column?.status,
+          title: column?.title,
+          color: column?.color,
+        });
+      });
+      await batch.commit();
+    }
+
+};
+
+                                          <input
+                                            className="bg-transparent cursor-pointer outline-none"
+                                            type="text"
+                                            value={board.title}
+                                            // ** Having trouble refactoring the logic in a separate func
+                                            onChange={
+                                              user
+                                                ? // If user is authenticated, update Firestore
+                                                  (e) => {
+                                                    updateBoardName(
+                                                      board.uid,
+                                                      e.target.value
+                                                    );
+                                                  }
+                                                : // If user is not authenticated, update localStorage
+                                                  (e) => {
+                                                    const newBoardList: {}[] =
+                                                      [];
+                                                    boards.map(
+                                                      (b: BoardSchema) => {
+                                                        b.uid === board.uid
+                                                          ? newBoardList.push({
+                                                              ...board,
+                                                              title:
+                                                                e.target.value,
+                                                            })
+                                                          : newBoardList.push(
+                                                              b
+                                                            );
+                                                      }
+                                                    );
+                                                    localStorage.setItem(
+                                                      "boards",
+                                                      JSON.stringify(
+                                                        newBoardList
+                                                      )
+                                                    );
+                                                    setBoards(newBoardList);
+                                                    setBoardId(board.uid);
+                                                  }
+                                            }
+                                          />
+
+const handleDeleteBoard = async (uid: string | null | undefined) => {
+// Deleting Board from localStorage
+if (!user) {
+const lsData = JSON.parse(localStorage.getItem("boards") || "");
+const newData = lsData.filter((board: BoardSchema) => board.uid !== uid);
+localStorage.setItem("boards", JSON.stringify(newData));
+setBoards(newData);
+setBoardId(newData?.[0]?.uid);
+} else {
+const batch = writeBatch(db);
+
+      const activeBoard = boards?.filter(
+        (board: any) => board?.uid === boardId
+      );
+
+      // Delete Board
+      const boardDocRef = doc(db, "users", `${user?.uid}`, "boards", `${uid}`);
+      // If the first Board in the array is deleted, setId to the second Board (which will become the
+      // first once the first one is removed from FS). Else, remove the first Board in the array.
+      boards?.[0]?.uid === uid
+        ? setBoardId(boards?.[1]?.uid)
+        : setBoardId(boards?.[0]?.uid);
+      batch.delete(boardDocRef);
+
+      // Decrement indexes of Boards that come after deleted Board
+      boards?.map((board: any) => {
+        if (board?.index <= activeBoard?.[0]?.index) return;
+        const boardDocRef = doc(
+          db,
+          "users",
+          `${user?.uid}`,
+          "boards",
+          `${board?.uid}`
+        );
+        batch.update(boardDocRef, { index: increment(-1) });
+      });
+
+      await batch.commit();
+    }
+
+};
+
+      <input
+        className="text-xl sm:text-2xl bg-transparent cursor-pointer outline-none text-fontPrimary dark:text-fontPrimaryDark sm:w-[160px] md:w-[57%]"
+        type="text"
+        value={
+          (activeBoard && activeBoard?.[0]?.title) || "Future Board Name 🤓"
+        }
+        onChange={
+          user
+            ? // If user is authenticated, update Firestore
+              (e) => {
+                updateBoardName(activeBoard?.[0]?.uid, e.target.value);
+              }
+            : // If user is not authenticated, update localStorage
+              (e) => {
+                const newBoardList: {}[] = [];
+                boards.map((b: BoardSchema) => {
+                  b.uid === activeBoard?.[0]?.id
+                    ? newBoardList.push({
+                        ...activeBoard?.[0],
+                        title: e.target.value,
+                      })
+                    : newBoardList.push(b);
+                });
+                localStorage.setItem("boards", JSON.stringify(newBoardList));
+                setBoards(newBoardList);
+                setBoardId(activeBoard?.[0]?.id);
+              }
+        }
+      />
+
+const useFetchLocalStorageData = () => {
+if (typeof window !== undefined) {
+const data = JSON.parse(localStorage?.getItem("boards") || "");
+return data;
+}
+};
+
+export default useFetchLocalStorageData;
+
+const handleGoogleLogin = () => {
+const provider = new GoogleAuthProvider();
+signInWithPopup(auth, provider)
+.then(async (result) => {
+const user = result.user;
+// Creating user doc if it doesn't exist already
+await setDoc(doc(db, "users", user.uid), {
+uid: user.uid,
+email: user.email,
+timeStamp: serverTimestamp(),
+});
+
+        if (
+          localStorage.getItem("boards") !== "[]" ||
+          localStorage.getItem("boards") !== null
+        ) {
+          const lsData = JSON.parse(localStorage.getItem("boards") || "");
+          lsData?.forEach(async (board: BoardSchema) => {
+            const ref = doc(
+              db,
+              "users",
+              `${user.uid}`,
+              "boards",
+              `${board.uid}`
+            );
+            await setDoc(ref, board);
+          });
+        }
+        // Clearing localStorage as soon as user is authed. LS is designed to be a temporary DB only.
+        localStorage.clear();
+        toast.success(`Welcome ${user.displayName}!`);
+      })
+      .catch((err) => console.log(err));
+
+};

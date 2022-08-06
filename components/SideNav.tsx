@@ -1,12 +1,5 @@
-import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
-import {
-  doc,
-  increment,
-  serverTimestamp,
-  setDoc,
-  Timestamp,
-  writeBatch,
-} from "firebase/firestore";
+import { signOut } from "firebase/auth";
+import { doc, increment, Timestamp, writeBatch } from "firebase/firestore";
 import Image from "next/image";
 import React, { useContext } from "react";
 import toast from "react-hot-toast";
@@ -29,14 +22,6 @@ import { BoardSchema } from "../lib/types";
 import { defaultColumns } from "../lib/helpers";
 import Link from "next/link";
 
-type LocalStorageBoardSchema = {
-  boards: {
-    title: string;
-    uid: string;
-    createdAt: any;
-  }[];
-};
-
 type SideNavProps = {
   boards: any;
   setBoards: React.Dispatch<React.SetStateAction<any>>;
@@ -58,126 +43,44 @@ const SideNav = ({
 }: SideNavProps) => {
   const user = useContext(UserContext);
 
-  const handleGoogleLogin = () => {
-    const provider = new GoogleAuthProvider();
-    signInWithPopup(auth, provider)
-      .then(async (result) => {
-        const user = result.user;
-        // Creating user doc if it doesn't exist already
-        await setDoc(doc(db, "users", user.uid), {
-          uid: user.uid,
-          email: user.email,
-          timeStamp: serverTimestamp(),
-        });
-
-        //
-        // if (localStorage.getItem("boards") || "" !== "") {
-        if (
-          localStorage.getItem("boards") !== "[]" ||
-          localStorage.getItem("boards") !== null
-        ) {
-          const lsData = JSON.parse(localStorage.getItem("boards") || "");
-          lsData?.forEach(async (board: BoardSchema) => {
-            const ref = doc(
-              db,
-              "users",
-              `${user.uid}`,
-              "boards",
-              `${board.uid}`
-            );
-            await setDoc(ref, board);
-          });
-        }
-        // Clearing localStorage as soon as user is authed. LS is designed to be a temporary DB only.
-        localStorage.clear();
-        toast.success(`Welcome ${user.displayName}!`);
-      })
-      .catch((err) => console.log(err));
-  };
-
   const signOutUser = () => {
     setBoards(null);
     signOut(auth).then(() => toast.success("Logged out!"));
   };
 
   const handleCreateNewBoard = async () => {
-    // Creating new Board in localStorage
-    if (!user) {
-      // If LS isn't empty (empty array OR empty string OR null)
-      if (
-        localStorage.getItem("boards") !== "[]" &&
-        localStorage.getItem("boards") !== null
-      ) {
-        const oldData = JSON.parse(localStorage.getItem("boards") || "");
-        const newData = [
-          ...oldData,
-          {
-            uid: uuidv4(),
-            title: "New Board",
-            createdAt: Date.now(),
-            // Add index (similar to "index: parseInt(oldData?.length)")
-          },
-        ];
-        localStorage.setItem("boards", JSON.stringify(newData));
-        if (
-          JSON.parse(localStorage.getItem("boards") || "")?.[0]?.createdAt <
-          JSON.parse(localStorage.getItem("boards") || "")?.[1]?.createdAt
-        ) {
-          setBoards(newData);
-        } else {
-          setBoards(newData);
-        }
+    // Creating new Board in Firestore
+    const batch = writeBatch(db);
+    const uuid = uuidv4();
+    const boardRef = doc(db, "users", `${user?.uid}`, "boards", `${uuid}`);
+    batch.set(boardRef, {
+      title: "New Board",
+      uid: uuid,
+      createdAt: Timestamp.fromDate(new Date()),
+      index: boards?.length,
+    });
+    setBoardId(uuid);
 
-        setBoardId(newData?.[0]?.uid);
-      }
-      // If LS is empty
-      else {
-        const newData = [
-          {
-            uid: uuidv4(),
-            title: "New Board",
-            createdAt: Date.now(),
-            // Add index (similar to "index: parseInt(oldData?.length)")
-          },
-        ];
-        localStorage.setItem("boards", JSON.stringify(newData));
-        setBoards(newData);
-        setBoardId(newData?.[0]?.uid);
-      }
-    } else {
-      // Creating new Board in Firestore
-      const batch = writeBatch(db);
-      const uuid = uuidv4();
-      const boardRef = doc(db, "users", `${user?.uid}`, "boards", `${uuid}`);
-      batch.set(boardRef, {
-        title: "New Board",
-        uid: uuid,
-        createdAt: Timestamp.fromDate(new Date()),
-        index: boards?.length,
+    // Create 3 default Columns
+    defaultColumns?.map((column: any) => {
+      const columnRef = doc(
+        db,
+        "users",
+        `${user?.uid}`,
+        "boards",
+        `${uuid}`,
+        "columns",
+        `${column?.uid}`
+      );
+      batch.set(columnRef, {
+        uid: column?.uid,
+        index: column?.index,
+        status: column?.status,
+        title: column?.title,
+        color: column?.color,
       });
-      setBoardId(uuid);
-
-      // Create 3 default Columns
-      defaultColumns?.map((column: any) => {
-        const columnRef = doc(
-          db,
-          "users",
-          `${user?.uid}`,
-          "boards",
-          `${uuid}`,
-          "columns",
-          `${column?.uid}`
-        );
-        batch.set(columnRef, {
-          uid: column?.uid,
-          index: column?.index,
-          status: column?.status,
-          title: column?.title,
-          color: column?.color,
-        });
-      });
-      await batch.commit();
-    }
+    });
+    await batch.commit();
   };
 
   const onDragEnd = (result: DropResult) => {
@@ -309,7 +212,6 @@ const SideNav = ({
             <section className="text-fontSecondary w-[100%]">
               {/* All Boards title */}
               <h3 className="pl-4 uppercase font-bold text-xs mb-4">
-                {/* Would like to change the initial "undefined" value of "localStorageBoards?.boards?.length" */}
                 {boards?.length !== 0
                   ? `All Boards (${boards?.length})`
                   : "No Boards!"}
@@ -358,44 +260,12 @@ const SideNav = ({
                                             type="text"
                                             value={board.title}
                                             // ** Having trouble refactoring the logic in a separate func
-                                            onChange={
-                                              user
-                                                ? // If user is authenticated, update Firestore
-                                                  (e) => {
-                                                    updateBoardName(
-                                                      board.uid,
-                                                      e.target.value
-                                                    );
-                                                    // setLocalStorageBoards(newBoardList);
-                                                    // setBoardId(board?.id);
-                                                  }
-                                                : // If user is not authenticated, update localStorage
-                                                  (e) => {
-                                                    const newBoardList: {}[] =
-                                                      [];
-                                                    boards.map(
-                                                      (b: BoardSchema) => {
-                                                        b.uid === board.uid
-                                                          ? newBoardList.push({
-                                                              ...board,
-                                                              title:
-                                                                e.target.value,
-                                                            })
-                                                          : newBoardList.push(
-                                                              b
-                                                            );
-                                                      }
-                                                    );
-                                                    localStorage.setItem(
-                                                      "boards",
-                                                      JSON.stringify(
-                                                        newBoardList
-                                                      )
-                                                    );
-                                                    setBoards(newBoardList);
-                                                    setBoardId(board.uid);
-                                                  }
-                                            }
+                                            onChange={(e) => {
+                                              updateBoardName(
+                                                board.uid,
+                                                e.target.value
+                                              );
+                                            }}
                                           />
                                         </div>
                                       );
