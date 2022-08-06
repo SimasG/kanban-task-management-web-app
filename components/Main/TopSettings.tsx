@@ -1,33 +1,25 @@
-import { deleteDoc, doc, increment, writeBatch } from "firebase/firestore";
+import { doc, increment, writeBatch } from "firebase/firestore";
 import { useContext } from "react";
 import { UserContext } from "../../lib/context";
 import { db } from "../../lib/firebase";
-import { BoardSchema } from "../../lib/types";
 
 type TopSettingsProps = {
   activeBoard: any;
   boards: any;
-  setBoards: React.Dispatch<any>;
   boardId: string | null | undefined;
   setBoardId: React.Dispatch<React.SetStateAction<string | null | undefined>>;
   setShowAddTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
   updateBoardName: (uid: string, newName: string) => Promise<void>;
-  isOpen: boolean;
-  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const TopSettings = ({
   activeBoard,
   boards,
-  setBoards,
   boardId,
   setBoardId,
   setShowAddTaskModal,
   updateBoardName,
-  isOpen,
-  setIsOpen,
 }: TopSettingsProps) => {
-  // ** Fetching Data
   const user = useContext(UserContext);
 
   const handleAddNewTaskBtn = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -38,9 +30,6 @@ const TopSettings = ({
   const handleDeleteBoard = async (uid: string | null | undefined) => {
     const batch = writeBatch(db);
 
-    const activeBoard = boards?.filter((board: any) => board?.uid === boardId);
-
-    // Delete Board
     const boardDocRef = doc(db, "users", `${user?.uid}`, "boards", `${uid}`);
     // If the first Board in the array is deleted, setId to the second Board (which will become the
     // first once the first one is removed from FS). Else, remove the first Board in the array.
@@ -68,18 +57,11 @@ const TopSettings = ({
   return (
     <section
       className={`h-[10%] w-[100%] p-4 flex justify-between items-center bg-backgroundColorMenu dark:bg-darkGray`}
-      // ${
-      //   isOpen
-      //     ? "w-[40%] sm:w-[50%] md:w-[60%] lg:w-[75%] xl:w-[80%]"
-      //     : "w-[88%] sm:w-[92%] lg:w-[92%] xl:w-[100%]"
-      // }
     >
       <input
         className="text-xl sm:text-2xl bg-transparent cursor-pointer outline-none text-fontPrimary dark:text-fontPrimaryDark sm:w-[160px] md:w-[57%]"
         type="text"
-        value={
-          (activeBoard && activeBoard?.[0]?.title) || "Future Board Name 🤓"
-        }
+        value={activeBoard?.[0]?.title || "Future Board Name 🤓"}
         onChange={(e) => {
           updateBoardName(activeBoard?.[0]?.uid, e.target.value);
         }}

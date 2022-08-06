@@ -24,7 +24,6 @@ import Link from "next/link";
 
 type SideNavProps = {
   boards: any;
-  setBoards: React.Dispatch<React.SetStateAction<any>>;
   boardId: string | null | undefined;
   setBoardId: React.Dispatch<React.SetStateAction<string | null | undefined>>;
   updateBoardName: (uid: string, newName: string) => Promise<void>;
@@ -34,7 +33,6 @@ type SideNavProps = {
 
 const SideNav = ({
   boards,
-  setBoards,
   boardId,
   setBoardId,
   updateBoardName,
@@ -44,7 +42,6 @@ const SideNav = ({
   const user = useContext(UserContext);
 
   const signOutUser = () => {
-    setBoards(null);
     signOut(auth).then(() => toast.success("Logged out!"));
   };
 
@@ -105,9 +102,6 @@ const SideNav = ({
       source.index,
       destination.index
     );
-
-    // Changing the main Boards state
-    setBoards(newBoards);
   };
 
   const updateBoardsIndex = async (
@@ -178,7 +172,6 @@ const SideNav = ({
   return (
     <>
       {isOpen ? (
-        // <nav className="w-[60%] sm:w-[50%] md:w-[40%] lg:w-[25%] xl:w-[20%] bg-backgroundColorMenu dark:bg-darkGray pr-4 py-4 flex flex-col justify-between">
         <div
           onClick={() => setIsOpen(false)}
           className="absolute bg-black bg-opacity-50 top-0 left-0 w-full h-screen flex justify-center items-center rounded-r sm:static sm:bg-transparent sm:bg-opacity-100 sm:inset-auto sm:block sm:w-[40%] md:w-[35%] lg:w-[25%] xl:w-[20%]"

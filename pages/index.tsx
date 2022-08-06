@@ -10,20 +10,13 @@ import { db } from "../lib/firebase";
 import useFetchFsBoards from "../lib/hooks/useFetchFsBoards";
 import useFetchFsColumns from "../lib/hooks/useFetchFsColumns";
 import useFetchTasksCollectionGroup from "../lib/hooks/useFetchFsTasks";
-import { BoardSchema } from "../lib/types";
 import Login from "./login";
 
 const Home: NextPage = () => {
   const user = useContext(UserContext);
-  const fsBoards = useFetchFsBoards(user?.uid);
+  const boards = useFetchFsBoards(user?.uid);
 
   // ** STATES
-  const [boards, setBoards] = useState<
-    // ** Change "any" later -> change it once the data schema is more clear
-    BoardSchema[] | null | any
-  >(null);
-  const [columns, setColumns] = useState<any>(null);
-  const [tasks, setTasks] = useState<any>(null);
   const [showAddTaskModal, setShowAddTaskModal] = useState(false);
   const [showEditTaskModal, setShowEditTaskModal] = useState(false);
   const [boardId, setBoardId] = useState<string | null | undefined>(null);
@@ -31,36 +24,17 @@ const Home: NextPage = () => {
   // SideNav
   const [isOpen, setIsOpen] = useState(true);
 
-  // Fetching all Tasks of selected Board
-  const fsTasks: any = useFetchTasksCollectionGroup(boardId);
-  const fsColumns = useFetchFsColumns(boardId);
+  const tasks: any = useFetchTasksCollectionGroup(boardId);
+  const columns = useFetchFsColumns(boardId);
 
   let activeBoard: any;
 
   useEffect(() => {
-    console.log("pre-useEffect func ran");
-    if (!fsBoards) return;
-    setBoards(fsBoards);
-  }, [fsBoards]);
+    if (activeBoard?.length !== 0 && boards?.length !== 0) return;
+    setBoardId(boards?.[0]?.uid);
+  }, [activeBoard, boards]);
 
-  useEffect(() => {
-    console.log("pre-useEffect func ran");
-    if (!activeBoard && fsBoards?.length !== 0) {
-      setBoardId(fsBoards?.[0]?.uid);
-    }
-  }, [activeBoard, fsBoards]);
-
-  useEffect(() => {
-    console.log("pre-useEffect func ran");
-    if (!fsColumns) return;
-    setColumns(fsColumns);
-  }, [fsColumns]);
-
-  useEffect(() => {
-    console.log("pre-useEffect func ran");
-    if (!fsTasks) return;
-    setTasks(fsTasks);
-  }, [fsTasks]);
+  // console.log("activeBoard:", activeBoard, "boards:", boards);
 
   // ** How can I fix the "ReferenceError: localStorage is not defined" error?
   // useEffect(() => {
@@ -76,7 +50,8 @@ const Home: NextPage = () => {
   //   }
   // }, [localStorage.theme]);
 
-  activeBoard = boards?.filter((board: BoardSchema) => board.uid === boardId);
+  // board: BoardSchema
+  activeBoard = boards?.filter((board: any) => board?.uid === boardId);
 
   const updateBoardName = async (uid: string, newName: string) => {
     const ref = doc(db, "users", `${user?.uid}`, "boards", uid);
@@ -97,7 +72,6 @@ const Home: NextPage = () => {
         >
           <SideNav
             boards={boards}
-            setBoards={setBoards}
             boardId={boardId}
             setBoardId={setBoardId}
             updateBoardName={updateBoardName}
@@ -107,7 +81,6 @@ const Home: NextPage = () => {
           <Main
             activeBoard={activeBoard}
             boards={boards}
-            setBoards={setBoards}
             boardId={boardId}
             setBoardId={setBoardId}
             tasks={tasks}
@@ -116,7 +89,6 @@ const Home: NextPage = () => {
             setShowEditTaskModal={setShowEditTaskModal}
             updateBoardName={updateBoardName}
             columns={columns}
-            setColumns={setColumns}
             isOpen={isOpen}
             setIsOpen={setIsOpen}
           />

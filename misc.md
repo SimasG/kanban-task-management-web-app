@@ -2002,3 +2002,11 @@ timeStamp: serverTimestamp(),
       .catch((err) => console.log(err));
 
 };
+
+        // <nav className="w-[60%] sm:w-[50%] md:w-[40%] lg:w-[25%] xl:w-[20%] bg-backgroundColorMenu dark:bg-darkGray pr-4 py-4 flex flex-col justify-between">
+
+      // ${
+      //   isOpen
+      //     ? "w-[40%] sm:w-[50%] md:w-[60%] lg:w-[75%] xl:w-[80%]"
+      //     : "w-[88%] sm:w-[92%] lg:w-[92%] xl:w-[100%]"
+      // }

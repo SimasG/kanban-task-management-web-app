@@ -18,7 +18,6 @@ import { colorArray } from "../../lib/helpers";
 type MainProps = {
   activeBoard: any;
   boards: any;
-  setBoards: React.Dispatch<any>;
   boardId: string | null | undefined;
   setBoardId: React.Dispatch<React.SetStateAction<string | null | undefined>>;
   tasks: any;
@@ -27,7 +26,7 @@ type MainProps = {
   setShowEditTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
   updateBoardName: (uid: string, newName: string) => Promise<void>;
   columns: any;
-  setColumns: React.Dispatch<any>;
+  // setColumns: React.Dispatch<any>;
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
@@ -35,7 +34,6 @@ type MainProps = {
 const Main = ({
   activeBoard,
   boards,
-  setBoards,
   boardId,
   setBoardId,
   tasks,
@@ -44,7 +42,7 @@ const Main = ({
   setShowEditTaskModal,
   updateBoardName,
   columns,
-  setColumns,
+  // setColumns,
   isOpen,
   setIsOpen,
 }: MainProps) => {
@@ -77,7 +75,7 @@ const Main = ({
       );
       // Updating Columns state in the UI. Probably don't need that since the Columns are directly synced
       // up with Firestore
-      setColumns(newColumns);
+      // setColumns(newColumns);
     }
     // Task DnD logic
     else if (type === "task") {
@@ -389,7 +387,6 @@ const Main = ({
 
   return (
     <main
-      // className="w-[90%]"
       className={`${
         isOpen
           ? "w-[100%] sm:w-[60%] md:w-[65%] lg:w-[75%] xl:w-[80%]"
@@ -399,13 +396,10 @@ const Main = ({
       <TopSettings
         activeBoard={activeBoard}
         boards={boards}
-        setBoards={setBoards}
         boardId={boardId}
         setBoardId={setBoardId}
         setShowAddTaskModal={setShowAddTaskModal}
         updateBoardName={updateBoardName}
-        isOpen={isOpen}
-        setIsOpen={setIsOpen}
       />
       {/* Main content */}
       <DragDropContext onDragEnd={onDragEnd}>
