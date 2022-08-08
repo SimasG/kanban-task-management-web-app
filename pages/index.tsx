@@ -34,28 +34,14 @@ const Home: NextPage = () => {
     setBoardId(boards?.[0]?.uid);
   }, [activeBoard, boards]);
 
-  // console.log("activeBoard:", activeBoard, "boards:", boards);
-
-  // ** How can I fix the "ReferenceError: localStorage is not defined" error?
-  // useEffect(() => {
-  //   if (!localStorage.theme) return;
-  //   if (
-  //     localStorage.theme === "dark" ||
-  //     (!("theme" in localStorage) &&
-  //       window.matchMedia("(prefers-color-scheme: dark)").matches)
-  //   ) {
-  //     document.documentElement.classList.add("dark");
-  //   } else {
-  //     document.documentElement.classList.remove("dark");
-  //   }
-  // }, [localStorage.theme]);
-
-  // board: BoardSchema
   activeBoard = boards?.filter((board: any) => board?.uid === boardId);
 
+  // console.log("document.activeElement:", document?.activeElement?.tagName);
+
   const updateBoardName = async (uid: string, newName: string) => {
-    const ref = doc(db, "users", `${user?.uid}`, "boards", uid);
-    await updateDoc(ref, {
+    if (newName === "") return;
+    const boardDocRef = doc(db, "users", `${user?.uid}`, "boards", uid);
+    await updateDoc(boardDocRef, {
       title: newName,
     });
   };
@@ -90,7 +76,6 @@ const Home: NextPage = () => {
             updateBoardName={updateBoardName}
             columns={columns}
             isOpen={isOpen}
-            setIsOpen={setIsOpen}
           />
           {showAddTaskModal && (
             <AddNewTaskModal

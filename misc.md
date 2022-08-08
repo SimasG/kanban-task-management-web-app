@@ -2010,3 +2010,21 @@ timeStamp: serverTimestamp(),
       //     ? "w-[40%] sm:w-[50%] md:w-[60%] lg:w-[75%] xl:w-[80%]"
       //     : "w-[88%] sm:w-[92%] lg:w-[92%] xl:w-[100%]"
       // }
+
+            // Updating Columns state in the UI. Probably don't need that since the Columns are directly synced
+      // up with Firestore
+      setColumns(newColumns);
+
+// \*\* How can I fix the "ReferenceError: localStorage is not defined" error?
+// useEffect(() => {
+// if (!localStorage.theme) return;
+// if (
+// localStorage.theme === "dark" ||
+// (!("theme" in localStorage) &&
+// window.matchMedia("(prefers-color-scheme: dark)").matches)
+// ) {
+// document.documentElement.classList.add("dark");
+// } else {
+// document.documentElement.classList.remove("dark");
+// }
+// }, [localStorage.theme]);

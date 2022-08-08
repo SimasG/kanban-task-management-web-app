@@ -26,9 +26,7 @@ type MainProps = {
   setShowEditTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
   updateBoardName: (uid: string, newName: string) => Promise<void>;
   columns: any;
-  // setColumns: React.Dispatch<any>;
   isOpen: boolean;
-  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const Main = ({
@@ -42,9 +40,7 @@ const Main = ({
   setShowEditTaskModal,
   updateBoardName,
   columns,
-  // setColumns,
   isOpen,
-  setIsOpen,
 }: MainProps) => {
   const user = useContext(UserContext);
 
@@ -73,9 +69,6 @@ const Main = ({
         source.index,
         destination.index
       );
-      // Updating Columns state in the UI. Probably don't need that since the Columns are directly synced
-      // up with Firestore
-      // setColumns(newColumns);
     }
     // Task DnD logic
     else if (type === "task") {
@@ -104,9 +97,6 @@ const Main = ({
           destination.droppableId
         );
       }
-
-      // ** Should I update my tasks main state here? I guess not since the fsTasks are being re-fetched from
-      // ** Firestore and synced up each time (not the most efficient?).
     }
   };
 
@@ -122,7 +112,6 @@ const Main = ({
     columns?.map((column: any) => {
       if (column.uid === draggedColumnId) return;
       if (destinationIndex > sourceIndex) {
-        // Decrement
         if (column.index > sourceIndex && column.index <= destinationIndex) {
           const columnDocRef = doc(
             db,
@@ -136,7 +125,6 @@ const Main = ({
           batch.update(columnDocRef, { index: increment(-1) });
         }
       } else if (destinationIndex < sourceIndex) {
-        // Increment
         if (column.index < sourceIndex && column.index >= destinationIndex) {
           const columnDocRef = doc(
             db,
@@ -189,11 +177,6 @@ const Main = ({
       if (destinationIndex > sourceIndex) {
         // Decrement Tasks
         if (task.index > sourceIndex && task.index <= destinationIndex) {
-          // DECREMENT THE INDEX OF EACH TASK THAT FITS THIS CRITERIA
-          // console.log(
-          //   `task to be decremented in Column: ${sourceColumn?.status}:`,
-          //   task
-          // );
           const taskDocRef = doc(
             db,
             "users",
@@ -210,11 +193,6 @@ const Main = ({
       } else if (destinationIndex < sourceIndex) {
         // Increment Tasks
         if (task.index < sourceIndex && task.index >= destinationIndex) {
-          // INCREMENT THE INDEX OF EACH TASK THAT FITS THIS CRITERIA
-          // console.log(
-          //   `task to be incremented in Column: ${sourceColumn?.status}:`,
-          //   task
-          // );
           const taskDocRef = doc(
             db,
             "users",
@@ -289,6 +267,9 @@ const Main = ({
           (column: any) => column?.uid === destinationColumnId
         );
 
+        // DELETE
+        transaction.delete(taskDocRef);
+
         // CREATE
         transaction.set(newTaskDocRef, {
           // Using type guard to ensure that we're always spreading an object
@@ -297,8 +278,6 @@ const Main = ({
           index: destinationIndex,
           updatedAt: Timestamp.fromDate(new Date()),
         });
-        // DELETE
-        transaction.delete(taskDocRef);
 
         // ** 2. Decrement (by 1) the indexes of Tasks that came after dragged Task in source Column
         const sourceColumn = columns?.find(
@@ -311,10 +290,6 @@ const Main = ({
         sourceColumnTasks?.map((task: any) => {
           if (task.index > sourceIndex) {
             if (task.uid === draggedTaskId) return;
-            // console.log(
-            //   `task to be decremented in Column ${sourceColumn?.status}:`,
-            //   task
-            // );
             const taskDocRef = doc(
               db,
               "users",
@@ -339,10 +314,6 @@ const Main = ({
           // That's why the Task index at task.index === destinationIndex should still be incremented.
           if (task.index >= destinationIndex) {
             if (task.uid === draggedTaskId) return;
-            // console.log(
-            //   `task to be incremented in Column ${destinationColumn?.status}:`,
-            //   task
-            // );
             const taskDocRef = doc(
               db,
               "users",
