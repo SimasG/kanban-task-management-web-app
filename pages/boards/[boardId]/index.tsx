@@ -8,6 +8,7 @@ const Index = () => {
   const boards = useFetchFsBoards(user?.uid);
 
   const router = useRouter();
+  console.log("router:", router);
 
   const selectedBoard = boards?.find(
     (board: any) => board?.uid === router.query.boardId

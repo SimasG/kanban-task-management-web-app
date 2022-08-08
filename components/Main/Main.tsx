@@ -371,6 +371,7 @@ const Main = ({
         setBoardId={setBoardId}
         setShowAddTaskModal={setShowAddTaskModal}
         updateBoardName={updateBoardName}
+        columns={columns}
       />
       {/* Main content */}
       <DragDropContext onDragEnd={onDragEnd}>

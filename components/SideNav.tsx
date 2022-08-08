@@ -18,7 +18,6 @@ import {
   DroppableProvided,
   DropResult,
 } from "react-beautiful-dnd";
-import { BoardSchema } from "../lib/types";
 import { defaultColumns } from "../lib/helpers";
 import Link from "next/link";
 
@@ -45,6 +44,7 @@ const SideNav = ({
     signOut(auth).then(() => toast.success("Logged out!"));
   };
 
+  // ** FIXED
   const handleCreateNewBoard = async () => {
     // Creating new Board in Firestore
     const batch = writeBatch(db);
@@ -64,8 +64,6 @@ const SideNav = ({
         db,
         "users",
         `${user?.uid}`,
-        "boards",
-        `${uuid}`,
         "columns",
         `${column?.uid}`
       );
@@ -75,6 +73,7 @@ const SideNav = ({
         status: column?.status,
         title: column?.title,
         color: column?.color,
+        board: uuid,
       });
     });
     await batch.commit();
@@ -215,7 +214,11 @@ const SideNav = ({
                   {(provided: DroppableProvided, snapshot: any) => {
                     return (
                       // ref allows react-beautiful-dnd to control the div
-                      <div {...provided.droppableProps} ref={provided.innerRef}>
+                      <div
+                        {...provided.droppableProps}
+                        ref={provided.innerRef}
+                        className="overflow-auto"
+                      >
                         {boards
                           ? boards.map(
                               // ** Re-assign board type later

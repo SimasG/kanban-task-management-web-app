@@ -1,4 +1,4 @@
-import { collection, orderBy, query } from "firebase/firestore";
+import { collection, query, where } from "firebase/firestore";
 import { useContext } from "react";
 import { useCollectionData } from "react-firebase-hooks/firestore";
 import { UserContext } from "../context";
@@ -11,14 +11,14 @@ const useFetchFsColumns = (boardId: string | null | undefined) => {
     db,
     "users",
     `${user?.uid}`,
-    "boards",
-    `${boardId}`,
     "columns"
   );
 
-  const q = query(columnsCollectionRef, orderBy("index", "asc"));
+  const q = query(columnsCollectionRef, where("board", "==", `${boardId}`));
 
-  const columnData = useCollectionData(q)[0];
+  const columnData = useCollectionData(q)[0]?.sort(
+    (a: any, b: any) => a.index - b.index
+  );
 
   return columnData;
 };

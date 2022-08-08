@@ -10,6 +10,7 @@ type TopSettingsProps = {
   setBoardId: React.Dispatch<React.SetStateAction<string | null | undefined>>;
   setShowAddTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
   updateBoardName: (uid: string, newName: string) => Promise<void>;
+  columns: any;
 };
 
 const TopSettings = ({
@@ -19,6 +20,7 @@ const TopSettings = ({
   setBoardId,
   setShowAddTaskModal,
   updateBoardName,
+  columns,
 }: TopSettingsProps) => {
   const user = useContext(UserContext);
 
@@ -27,9 +29,10 @@ const TopSettings = ({
     setShowAddTaskModal(true);
   };
 
+  // ** FIX
   const handleDeleteBoard = async (uid: string | null | undefined) => {
     const batch = writeBatch(db);
-
+    // Delete Board
     const boardDocRef = doc(db, "users", `${user?.uid}`, "boards", `${uid}`);
     // If the first Board in the array is deleted, setId to the second Board (which will become the
     // first once the first one is removed from FS). Else, remove the first Board in the array.
@@ -37,6 +40,21 @@ const TopSettings = ({
       ? setBoardId(boards?.[1]?.uid)
       : setBoardId(boards?.[0]?.uid);
     batch.delete(boardDocRef);
+
+    // Delete Columns in the Board
+    const selectedColumns = columns?.filter(
+      (column: any) => column?.board === uid
+    );
+    selectedColumns?.map((column: any) => {
+      const columnDocRef = doc(
+        db,
+        "users",
+        `${user?.uid}`,
+        "columns",
+        `${column?.uid}`
+      );
+      batch.delete(columnDocRef);
+    });
 
     // Decrement indexes of Boards that come after deleted Board
     boards?.map((board: any) => {
@@ -50,7 +68,6 @@ const TopSettings = ({
       );
       batch.update(boardDocRef, { index: increment(-1) });
     });
-
     await batch.commit();
   };
 
@@ -61,47 +78,49 @@ const TopSettings = ({
       <input
         className="text-xl sm:text-2xl bg-transparent cursor-pointer outline-none text-fontPrimary dark:text-fontPrimaryDark sm:w-[160px] md:w-[57%]"
         type="text"
-        value={activeBoard?.[0]?.title}
+        value={activeBoard?.[0]?.title || "Future Board Title 🤓"}
         onChange={(e) => {
           updateBoardName(activeBoard?.[0]?.uid, e.target.value);
         }}
       />
-      <div className="flex justify-center items-center gap-4">
-        {/* Desktop Add New Task Btn */}
-        <button
-          onClick={(e) => {
-            handleAddNewTaskBtn(e);
-          }}
-          className="purpleBtn hidden text-xs px-4 sm:block md:text-sm"
-        >
-          + Add New Task
-        </button>
-        {/* Mobile Add New Task Btn */}
-        <button
-          onClick={(e) => {
-            handleAddNewTaskBtn(e);
-          }}
-          className="absolute right-4 bottom-4 purpleBtn text-6xl h-20 w-20 p-0 flex justify-center items-center sm:hidden sm:text z-50"
-        >
-          <span className="relative bottom-[3px]">+</span>
-        </button>
-        {/* Delete Board Btn */}
-        <svg
-          onClick={() => handleDeleteBoard(boardId)}
-          className="w-12 h-12 sm:w-10 sm:h-10 p-2 text-fontSecondary rounded cursor-pointer hover:bg-backgroundColorMain hover:dark:bg-darkBlue"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-          ></path>
-        </svg>
-      </div>
+      {boards?.length > 0 && (
+        <div className="flex justify-center items-center gap-4">
+          {/* Desktop Add New Task Btn */}
+          <button
+            onClick={(e) => {
+              handleAddNewTaskBtn(e);
+            }}
+            className="purpleBtn hidden text-xs px-4 sm:block md:text-sm"
+          >
+            + Add New Task
+          </button>
+          {/* Mobile Add New Task Btn */}
+          <button
+            onClick={(e) => {
+              handleAddNewTaskBtn(e);
+            }}
+            className="absolute right-4 bottom-4 purpleBtn text-6xl h-20 w-20 p-0 flex justify-center items-center sm:hidden sm:text z-50"
+          >
+            <span className="relative bottom-[3px]">+</span>
+          </button>
+          {/* Delete Board Btn */}
+          <svg
+            onClick={() => handleDeleteBoard(boardId)}
+            className="w-12 h-12 sm:w-10 sm:h-10 p-2 text-fontSecondary rounded cursor-pointer hover:bg-backgroundColorMain hover:dark:bg-darkBlue"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+            ></path>
+          </svg>
+        </div>
+      )}
     </section>
   );
 };

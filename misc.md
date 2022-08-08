@@ -2028,3 +2028,43 @@ timeStamp: serverTimestamp(),
 // document.documentElement.classList.remove("dark");
 // }
 // }, [localStorage.theme]);
+
+const router = useRouter();
+
+const routeToActiveBoard = async () => {
+if (router.pathname === "/" && boards?.length !== 0) {
+if (boardId === undefined || boardId === null) return;
+console.log(`redirect to /boards/${boardId}`);
+} else {
+console.log("create new Board");
+}
+};
+
+routeToActiveBoard();
+
+import { collection, orderBy, query } from "firebase/firestore";
+import { useContext } from "react";
+import { useCollectionData } from "react-firebase-hooks/firestore";
+import { UserContext } from "../context";
+import { db } from "../firebase";
+
+const useFetchFsColumns = (boardId: string | null | undefined) => {
+const user = useContext(UserContext);
+
+const columnsCollectionRef = collection(
+db,
+"users",
+`${user?.uid}`,
+"boards",
+`${boardId}`,
+"columns"
+);
+
+const q = query(columnsCollectionRef, orderBy("index", "asc"));
+
+const columnData = useCollectionData(q)[0];
+
+return columnData;
+};
+
+export default useFetchFsColumns;

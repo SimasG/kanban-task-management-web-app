@@ -36,8 +36,6 @@ const Home: NextPage = () => {
 
   activeBoard = boards?.filter((board: any) => board?.uid === boardId);
 
-  // console.log("document.activeElement:", document?.activeElement?.tagName);
-
   const updateBoardName = async (uid: string, newName: string) => {
     if (newName === "") return;
     const boardDocRef = doc(db, "users", `${user?.uid}`, "boards", uid);
