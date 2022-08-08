@@ -46,47 +46,43 @@ const Column = ({
       db,
       "users",
       `${user?.uid}`,
-      "boards",
-      `${boardId}`,
       "columns",
       `${columnId}`
     );
     await updateDoc(columnDocRef, { title: newTitle });
   };
 
+  // ** FIX
   const deleteColumn = async () => {
-    // Deleting the Column & Tasks that are in the Column
-    const batch = writeBatch(db);
-
-    const columnDocRef = doc(
-      db,
-      "users",
-      `${user?.uid}`,
-      "boards",
-      `${boardId}`,
-      "columns",
-      `${columnId}`
-    );
-    batch.delete(columnDocRef);
-
-    const tasksToDelete = tasks?.filter(
-      (task: any) => task?.status === columnStatus
-    );
-    tasksToDelete.map((task: any) => {
-      const taskDocRef = doc(
-        db,
-        "users",
-        `${user?.uid}`,
-        "boards",
-        `${boardId}`,
-        "columns",
-        `${columnId}`,
-        "tasks",
-        `${task?.uid}`
-      );
-      batch.delete(taskDocRef);
-    });
-    await batch.commit();
+    // // Deleting the Column & Tasks that are in the Column
+    // const batch = writeBatch(db);
+    // const columnDocRef = doc(
+    //   db,
+    //   "users",
+    //   `${user?.uid}`,
+    //   "columns",
+    //   `${columnId}`
+    // );
+    // batch.delete(columnDocRef);
+    // // ** FIX
+    // const tasksToDelete = tasks?.filter(
+    //   (task: any) => task?.status === columnStatus
+    // );
+    // tasksToDelete.map((task: any) => {
+    //   const taskDocRef = doc(
+    //     db,
+    //     "users",
+    //     `${user?.uid}`,
+    //     "boards",
+    //     `${boardId}`,
+    //     "columns",
+    //     `${columnId}`,
+    //     "tasks",
+    //     `${task?.uid}`
+    //   );
+    //   batch.delete(taskDocRef);
+    // });
+    // await batch.commit();
   };
 
   return (

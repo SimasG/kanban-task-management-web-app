@@ -16,11 +16,13 @@ const useFetchFsColumns = (boardId: string | null | undefined) => {
 
   const q = query(columnsCollectionRef, where("board", "==", `${boardId}`));
 
-  const columnData = useCollectionData(q)[0]?.sort(
+  const columnData = useCollectionData(q)[0];
+
+  const sortedColumnData = columnData?.sort(
     (a: any, b: any) => a.index - b.index
   );
 
-  return columnData;
+  return sortedColumnData;
 };
 
 export default useFetchFsColumns;

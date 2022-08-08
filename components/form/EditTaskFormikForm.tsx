@@ -43,6 +43,7 @@ const FormikForm = ({
     (column: any) => column?.status === parseInt(initialValues?.status)
   );
 
+  // ** FIXING
   const deleteTask = async () => {
     const batch = writeBatch(db);
 
@@ -51,34 +52,16 @@ const FormikForm = ({
     );
 
     // Delete chosen Task
-    const taskRef = doc(
-      db,
-      "users",
-      `${user?.uid}`,
-      "boards",
-      `${boardId}`,
-      "columns",
-      `${sourceColumn?.uid}`,
-      "tasks",
-      `${taskId}`
-    );
+    const taskRef = doc(db, "users", `${user?.uid}`, "tasks", `${taskId}`);
     batch.delete(taskRef);
 
     // Decrement indexes of Tasks that came after the deleted Task
     selectedColumnTasks.map((task: any) => {
       if (task?.index <= initialValues?.index) return;
-      console.log(
-        `task to be decremented in Column: ${initialValues?.status}:`,
-        task
-      );
       const taskDocRef = doc(
         db,
         "users",
         `${user?.uid}`,
-        "boards",
-        `${boardId}`,
-        "columns",
-        `${sourceColumn?.uid}`,
         "tasks",
         `${task?.uid}`
       );

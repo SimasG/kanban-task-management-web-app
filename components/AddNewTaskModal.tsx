@@ -56,6 +56,7 @@ const AddNewTaskModal = ({
     status: Yup.string().required("Status is Required!"),
   });
 
+  // Add New Task
   const onSubmit = async (values: any, actions: any) => {
     const { setSubmitting, resetForm } = actions;
     setSubmitting(true);
@@ -65,17 +66,7 @@ const AddNewTaskModal = ({
     );
 
     const uid = uuidv4();
-    const taskDocRef = doc(
-      db,
-      "users",
-      `${user?.uid}`,
-      "boards",
-      `${boardId}`,
-      "columns",
-      `${selectedColumn?.uid}`,
-      "tasks",
-      `${uid}`
-    );
+    const taskDocRef = doc(db, "users", `${user?.uid}`, "tasks", `${uid}`);
 
     const chosenColumnTasks = tasks?.filter(
       (task: any) => task?.status === parseInt(values?.status)
@@ -86,9 +77,10 @@ const AddNewTaskModal = ({
       ...(typeof values === "object" ? values : {}),
       index: parseInt(chosenColumnTasks?.length),
       status: parseInt(values?.status),
-      boardId: boardId,
       uid: uid,
       createdAt: Timestamp.fromDate(new Date()),
+      board: boardId,
+      column: selectedColumn?.uid,
     });
 
     toast.success("New Task Created");

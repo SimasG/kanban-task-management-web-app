@@ -29,7 +29,7 @@ const TopSettings = ({
     setShowAddTaskModal(true);
   };
 
-  // ** FIX
+  // ** FIXED
   const handleDeleteBoard = async (uid: string | null | undefined) => {
     const batch = writeBatch(db);
     // Delete Board
@@ -42,10 +42,10 @@ const TopSettings = ({
     batch.delete(boardDocRef);
 
     // Delete Columns in the Board
-    const selectedColumns = columns?.filter(
+    const columnsToDelete = columns?.filter(
       (column: any) => column?.board === uid
     );
-    selectedColumns?.map((column: any) => {
+    columnsToDelete?.map((column: any) => {
       const columnDocRef = doc(
         db,
         "users",

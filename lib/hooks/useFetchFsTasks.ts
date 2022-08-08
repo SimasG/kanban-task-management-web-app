@@ -1,36 +1,24 @@
-import { collectionGroup, onSnapshot, query, where } from "firebase/firestore";
-import { useEffect, useState } from "react";
+import { collection, query, where } from "firebase/firestore";
+import { useContext } from "react";
+import { useCollectionData } from "react-firebase-hooks/firestore";
+import { UserContext } from "../context";
 import { db } from "../firebase";
 
-const useFetchTasksCollectionGroup = (boardId: string | null | undefined) => {
-  const [data, setData] = useState<any>();
+const useFetchFsColumns = (boardId: string | null | undefined) => {
+  const user = useContext(UserContext);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const tasksRef = collectionGroup(db, "tasks");
-        const unsub = onSnapshot(tasksRef, (querySnapshot) => {
-          let list: any = [];
-          querySnapshot.forEach((doc) => {
-            if (doc.data()?.boardId !== boardId) return;
-            list.push(doc.data());
-          });
-          setData(list);
-        });
-        return () => unsub();
-      } catch (err) {
-        console.log(err);
-      }
-    };
-    fetchData();
-  }, [boardId]);
+  const columnsCollectionRef = collection(db, "users", `${user?.uid}`, "tasks");
 
-  const indexSortedData = data?.sort((a: any, b: any) => a.index - b.index);
-  const statusIndexSortedData = indexSortedData?.sort(
+  const q = query(columnsCollectionRef, where("board", "==", `${boardId}`));
+
+  const tasks = useCollectionData(q)[0];
+
+  const indexSortedTasks = tasks?.sort((a: any, b: any) => a.index - b.index);
+  const statusIndexSortedTasks = indexSortedTasks?.sort(
     (a: any, b: any) => a.status - b.status
   );
 
-  // console.log("refetching shit from useFetchTasksCollectionGroup");
-  return statusIndexSortedData;
+  return statusIndexSortedTasks;
 };
-export default useFetchTasksCollectionGroup;
+
+export default useFetchFsColumns;

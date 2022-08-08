@@ -340,8 +340,6 @@ const Main = ({
       db,
       "users",
       `${user?.uid}`,
-      "boards",
-      `${boardId}`,
       "columns",
       `${uuid}`
     );
@@ -353,6 +351,7 @@ const Main = ({
       title: "todo",
       uid: uuid,
       color: colorArray[random],
+      board: boardId,
     });
   };
 
