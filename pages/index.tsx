@@ -4,6 +4,7 @@ import React, { useContext, useEffect, useState } from "react";
 import AddNewTaskModal from "../components/AddNewTaskModal";
 import EditTaskModal from "../components/EditTaskModal";
 import Main from "../components/Main/Main";
+import ShareModal from "../components/ShareModal";
 import SideNav from "../components/SideNav";
 import { UserContext } from "../lib/context";
 import { db } from "../lib/firebase";
@@ -19,6 +20,7 @@ const Home: NextPage = () => {
   // ** STATES
   const [showAddTaskModal, setShowAddTaskModal] = useState(false);
   const [showEditTaskModal, setShowEditTaskModal] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
   const [boardId, setBoardId] = useState<string | null | undefined>(null);
   const [taskId, setTaskId] = useState<string | null | undefined>(null);
   // SideNav
@@ -74,6 +76,7 @@ const Home: NextPage = () => {
             updateBoardName={updateBoardName}
             columns={columns}
             isOpen={isOpen}
+            setShowShareModal={setShowShareModal}
           />
           {showAddTaskModal && (
             <AddNewTaskModal
@@ -91,6 +94,9 @@ const Home: NextPage = () => {
               tasks={tasks}
               columns={columns}
             />
+          )}
+          {showShareModal && (
+            <ShareModal setShowShareModal={setShowShareModal} />
           )}
         </div>
       ) : (

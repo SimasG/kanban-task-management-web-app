@@ -6,3 +6,6 @@ export type BoardSchema = {
   title: string;
   uid: string | null | undefined;
 };
+export type EmailFormErrorsSchema = {
+  email: string;
+};

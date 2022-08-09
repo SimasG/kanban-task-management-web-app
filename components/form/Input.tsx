@@ -1,15 +1,15 @@
 import { Field, ErrorMessage } from "formik";
 
-const Input = ({ label, name, ...rest }: any) => {
+const Input = ({ label, name, type, ...rest }: any) => {
   return (
     <div key={name} className="flex flex-col justify-between gap-2">
       <label
         htmlFor={name}
-        className="font-bold text-sm text-fontPrimary dark:text-fontPrimaryDark"
+        className="font-bold text-sm md:text-base text-fontPrimary dark:text-fontPrimaryDark"
       >
         {label}
       </label>
-      <Field id={name} name={name} {...rest} className="input" />
+      <Field id={name} name={name} type={type} {...rest} className="input" />
       <ErrorMessage
         name={name}
         component="p"

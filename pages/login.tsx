@@ -3,7 +3,6 @@ import { doc, serverTimestamp, setDoc } from "firebase/firestore";
 import toast from "react-hot-toast";
 import { FcGoogle } from "react-icons/fc";
 import { auth, db } from "../lib/firebase";
-import { BoardSchema } from "../lib/types";
 
 const Login = () => {
   const handleGoogleLogin = () => {

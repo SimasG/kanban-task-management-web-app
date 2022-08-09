@@ -27,6 +27,7 @@ type MainProps = {
   updateBoardName: (uid: string, newName: string) => Promise<void>;
   columns: any;
   isOpen: boolean;
+  setShowShareModal: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const Main = ({
@@ -41,6 +42,7 @@ const Main = ({
   updateBoardName,
   columns,
   isOpen,
+  setShowShareModal,
 }: MainProps) => {
   const user = useContext(UserContext);
 
@@ -324,6 +326,7 @@ const Main = ({
         setShowAddTaskModal={setShowAddTaskModal}
         updateBoardName={updateBoardName}
         columns={columns}
+        setShowShareModal={setShowShareModal}
       />
       {/* Main content */}
       <DragDropContext onDragEnd={onDragEnd}>

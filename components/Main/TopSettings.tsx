@@ -12,6 +12,7 @@ type TopSettingsProps = {
   setShowAddTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
   updateBoardName: (uid: string, newName: string) => Promise<void>;
   columns: any;
+  setShowShareModal: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const TopSettings = ({
@@ -22,12 +23,18 @@ const TopSettings = ({
   setShowAddTaskModal,
   updateBoardName,
   columns,
+  setShowShareModal,
 }: TopSettingsProps) => {
   const user = useContext(UserContext);
 
   const handleAddNewTaskBtn = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     setShowAddTaskModal(true);
+  };
+
+  const handleShareBtn = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    setShowShareModal(true);
   };
 
   // ** FIXED
@@ -96,7 +103,10 @@ const TopSettings = ({
             + New Task
           </button>
           {/* Share Btn */}
-          <button className="bg-fontPrimaryDark dark:hover:bg-fontTertiary text-fontTertiary dark:hover:text-fontPrimaryDark font-bold rounded-full py-2 px-2 md:px-3 lg:px-4 drop-shadow-lg hover:drop-shadow-xl flex justify-between items-center gap-1 text-xs md:text-sm lg:text-base">
+          <button
+            onClick={(e) => handleShareBtn(e)}
+            className="bg-fontPrimaryDark dark:hover:bg-fontTertiary text-fontTertiary dark:hover:text-fontPrimaryDark font-bold rounded-full py-2 px-2 md:px-3 lg:px-4 drop-shadow-lg hover:drop-shadow-xl flex justify-between items-center gap-1 text-xs md:text-sm lg:text-base"
+          >
             <AiOutlineUserAdd />
             <p>Share</p>
           </button>

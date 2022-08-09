@@ -1,9 +1,4 @@
-import { User } from "firebase/auth";
-import { doc, DocumentData, Timestamp, writeBatch } from "firebase/firestore";
-import { useContext } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { UserContext } from "./context";
-import { db } from "./firebase";
 
 export const colorArray = [
   "#fad201",
@@ -39,41 +34,3 @@ export const defaultColumns = [
     color: "#67e4ac",
   },
 ];
-
-export const handleCreateNewBoardHelper = async (
-  user: User | null | undefined,
-  setBoardId: React.Dispatch<React.SetStateAction<string | null | undefined>>
-) => {
-  // Creating new Board in Firestore
-  const batch = writeBatch(db);
-  const uuid = uuidv4();
-  const boardRef = doc(db, "users", `${user?.uid}`, "boards", `${uuid}`);
-  batch.set(boardRef, {
-    title: "New Board",
-    uid: uuid,
-    createdAt: Timestamp.fromDate(new Date()),
-    index: 0,
-  });
-  setBoardId(uuid);
-
-  // Create 3 default Columns
-  defaultColumns?.map((column: any) => {
-    const columnRef = doc(
-      db,
-      "users",
-      `${user?.uid}`,
-      "boards",
-      `${uuid}`,
-      "columns",
-      `${column?.uid}`
-    );
-    batch.set(columnRef, {
-      uid: column?.uid,
-      index: column?.index,
-      status: column?.status,
-      title: column?.title,
-      color: column?.color,
-    });
-  });
-  await batch.commit();
-};

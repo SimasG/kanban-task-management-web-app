@@ -2366,3 +2366,123 @@ db,
     }
 
 };
+
+export const handleCreateNewBoardHelper = async (
+user: User | null | undefined,
+setBoardId: React.Dispatch<React.SetStateAction<string | null | undefined>>
+) => {
+// Creating new Board in Firestore
+const batch = writeBatch(db);
+const uuid = uuidv4();
+const boardRef = doc(db, "users", `${user?.uid}`, "boards", `${uuid}`);
+batch.set(boardRef, {
+title: "New Board",
+uid: uuid,
+createdAt: Timestamp.fromDate(new Date()),
+index: 0,
+});
+setBoardId(uuid);
+
+// Create 3 default Columns
+defaultColumns?.map((column: any) => {
+const columnRef = doc(
+db,
+"users",
+`${user?.uid}`,
+"boards",
+`${uuid}`,
+"columns",
+`${column?.uid}`
+);
+batch.set(columnRef, {
+uid: column?.uid,
+index: column?.index,
+status: column?.status,
+title: column?.title,
+color: column?.color,
+});
+});
+await batch.commit();
+};
+
+x
+x
+x
+
+    <Formik
+      initialValues={{ email: "" }}
+      validate={(values) => {
+        const errors: EmailFormErrorsSchema = {
+          email: "",
+        };
+        if (!values.email) {
+          errors.email = "Required";
+        } else if (
+          !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(values.email)
+        ) {
+          errors.email = "Invalid email address";
+        }
+        return errors;
+      }}
+      onSubmit={(values) => onSubmit(values)}
+    >
+      {({ isSubmitting }) => (
+        <section
+          onClick={() => setShowShareModal(false)}
+          className="absolute bg-black bg-opacity-50 inset-0 w-full h-screen flex justify-center items-center z-[100]"
+        >
+          <Form
+            onClick={(e) => e.stopPropagation()}
+            className="p-6 bg-backgroundColorMenu dark:bg-darkGray rounded-md flex flex-col justify-between gap-6 w-[95%] sm:w-[70%] md:w-[60%] lg:w-[50%] xl:w-[40%] 2xl:w-[35%]"
+          >
+            {/* Title + Exit Modal Btn Container */}
+            <div className="flex justify-between items-center">
+              <h1 className="text-fontPrimary dark:text-fontPrimaryDark text-xl font-bold">
+                Share Board
+              </h1>
+              {/* Exit Modal Btn */}
+              <svg
+                onClick={() => setShowShareModal(false)}
+                className="w-12 h-12 md:w-10 md:h-10 p-1 cursor-pointer text-fontSecondary hover:bg-fontSecondary hover:bg-opacity-25 hover:rounded"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="3"
+                  d="M6 18L18 6M6 6l12 12"
+                ></path>
+              </svg>
+            </div>
+            <Field
+              className="input"
+              id="email"
+              name="email"
+              type="email"
+              placeholder="Email Address"
+            />
+            <ErrorMessage
+              name="email"
+              component="p"
+              className="text-red-400 font-medium"
+            />
+            {/* <FormikControl
+          control="input"
+          name="email"
+          type="email"
+          placeholder="Email Address"
+        /> */}
+            <button className="purpleBtn" type="submit">
+              Submit
+            </button>
+          </Form>
+        </section>
+      )}
+    </Formik>
+
+    x
+    x
+    x

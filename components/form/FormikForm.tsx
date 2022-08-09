@@ -35,23 +35,22 @@ const FormikForm = ({ formik, columns, setShowAddTaskModal }: IndexProps) => {
               <h2 className="text-fontPrimary dark:text-fontPrimaryDark text-lg font-bold">
                 Add New Task
               </h2>
-              {/* Leave Modal Btn */}
-              <button type="button" onClick={() => setShowAddTaskModal(false)}>
-                <svg
-                  className="w-12 h-12 p-1 text-fontSecondary hover:bg-fontSecondary hover:bg-opacity-25 hover:rounded"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="3"
-                    d="M6 18L18 6M6 6l12 12"
-                  ></path>
-                </svg>
-              </button>
+              {/* Exit Modal Btn */}
+              <svg
+                onClick={() => setShowAddTaskModal(false)}
+                className="w-12 h-12 md:w-10 md:h-10 p-1 cursor-pointer text-fontSecondary hover:bg-fontSecondary hover:bg-opacity-25 hover:rounded"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="3"
+                  d="M6 18L18 6M6 6l12 12"
+                ></path>
+              </svg>
             </div>
             {/* Title */}
             <FormikControl
