@@ -6,6 +6,7 @@ import {
   Droppable,
   DroppableProvided,
 } from "react-beautiful-dnd";
+import toast from "react-hot-toast";
 import { UserContext } from "../../lib/context";
 import { db } from "../../lib/firebase";
 import { defaultColumns } from "../../lib/helpers";
@@ -41,6 +42,7 @@ const Column = ({
     (task: any) => task?.status === columnStatus
   ).length;
 
+  // ** FIXED
   const changeColumnTitle = async (newTitle: string) => {
     const columnDocRef = doc(
       db,
@@ -52,37 +54,34 @@ const Column = ({
     await updateDoc(columnDocRef, { title: newTitle });
   };
 
-  // ** FIX
+  // ** FIXED
   const deleteColumn = async () => {
-    // // Deleting the Column & Tasks that are in the Column
-    // const batch = writeBatch(db);
-    // const columnDocRef = doc(
-    //   db,
-    //   "users",
-    //   `${user?.uid}`,
-    //   "columns",
-    //   `${columnId}`
-    // );
-    // batch.delete(columnDocRef);
-    // // ** FIX
-    // const tasksToDelete = tasks?.filter(
-    //   (task: any) => task?.status === columnStatus
-    // );
-    // tasksToDelete.map((task: any) => {
-    //   const taskDocRef = doc(
-    //     db,
-    //     "users",
-    //     `${user?.uid}`,
-    //     "boards",
-    //     `${boardId}`,
-    //     "columns",
-    //     `${columnId}`,
-    //     "tasks",
-    //     `${task?.uid}`
-    //   );
-    //   batch.delete(taskDocRef);
-    // });
-    // await batch.commit();
+    // Deleting the Column & Tasks that are in the Column
+    const batch = writeBatch(db);
+    const columnDocRef = doc(
+      db,
+      "users",
+      `${user?.uid}`,
+      "columns",
+      `${columnId}`
+    );
+    batch.delete(columnDocRef);
+
+    const tasksToDelete = tasks?.filter(
+      (task: any) => task?.status === columnStatus
+    );
+    tasksToDelete.map((task: any) => {
+      const taskDocRef = doc(
+        db,
+        "users",
+        `${user?.uid}`,
+        "tasks",
+        `${task?.uid}`
+      );
+      batch.delete(taskDocRef);
+    });
+    await batch.commit();
+    toast.success(`${columnTitle} Deleted!`);
   };
 
   return (

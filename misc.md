@@ -2104,3 +2104,265 @@ const statusIndexSortedData = indexSortedData?.sort(
 return statusIndexSortedData;
 };
 export default useFetchTasksCollectionGroup;
+
+const onSubmit = (values: any, actions: any) => {
+// Identifying source Column id, from which the Task should be removed
+const sourceColumn = columns?.find(
+// \*\* Not happy with the initialValues -> data workaround here.
+(column: any) => column?.status === parseInt(data?.status)
+);
+
+    // Identifying destination Column id, to which the Task should be added
+    const destinationColumn = columns?.find(
+      (column: any) => column?.status === parseInt(values?.status)
+    );
+    const { setSubmitting, resetForm } = actions;
+    // Why do I have to convert "values.status" to number? I thought it's supposed to be a number by default
+    if (data?.status === parseInt(values?.status)) {
+      softUpdateTask(values, setSubmitting, sourceColumn, resetForm);
+    } else {
+      hardUpdateTask(
+        values,
+        setSubmitting,
+        sourceColumn,
+        destinationColumn,
+        resetForm
+      );
+    }
+
+};
+
+// U (no status changes)
+const softUpdateTask = async (
+values: any,
+setSubmitting: any,
+sourceColumn: any,
+resetForm: any
+) => {
+setSubmitting(true);
+
+    const taskDocRef = doc(
+      db,
+      "users",
+      `${user?.uid}`,
+      "boards",
+      `${boardId}`,
+      "columns",
+      `${sourceColumn?.uid}`,
+      "tasks",
+      `${taskId}`
+    );
+
+    await updateDoc(taskDocRef, {
+      // Using type guard to ensure that we're always spreading an object
+      ...(typeof values === "object" ? values : {}),
+      // Otherwise, status will be stored as an string
+      status: parseInt(values?.status),
+      updatedAt: Timestamp.fromDate(new Date()),
+    });
+
+    toast.success("Task Updated");
+    setSubmitting(false);
+    resetForm();
+    setShowEditTaskModal(false);
+
+};
+
+// CRUD (status changes included)
+const hardUpdateTask = async (
+values: any,
+setSubmitting: any,
+sourceColumn: any,
+destinationColumn: any,
+resetForm: any
+) => {
+setSubmitting(true);
+try {
+await runTransaction(db, async (transaction) => {
+// \*\* Handling affected Task
+const taskDocRef = doc(
+db,
+"users",
+`${user?.uid}`,
+"boards",
+`${boardId}`,
+"columns",
+`${sourceColumn?.uid}`,
+"tasks",
+`${taskId}`
+);
+// READ
+const affectedTaskRaw = await transaction.get(taskDocRef);
+if (!affectedTaskRaw.exists()) {
+throw "Task does not exist!";
+}
+const affectedTask = affectedTaskRaw.data();
+
+        const newTaskDocRef = doc(
+          db,
+          "users",
+          `${user?.uid}`,
+          "boards",
+          `${boardId}`,
+          "columns",
+          `${destinationColumn?.uid}`,
+          "tasks",
+          `${taskId}`
+        );
+
+        const destinationTasks = tasks?.filter(
+          (task: any) => task?.status === parseInt(values?.status)
+        );
+
+        // CREATE
+        transaction.set(newTaskDocRef, {
+          ...(typeof affectedTask === "object" ? affectedTask : {}),
+          status: parseInt(values?.status),
+          index: destinationTasks?.length,
+          updatedAt: Timestamp.fromDate(new Date()),
+        });
+
+        // DELETE
+        transaction.delete(taskDocRef);
+
+        // ** Handling affected Column
+        // Decrement Tasks that came after the affected Task in the affected Column
+        const sourceColumnTasks = tasks?.filter(
+          (task: any) => task?.status === initialValues?.status
+        );
+
+        sourceColumnTasks?.map((task: any) => {
+          if (task?.index >= affectedTask?.index) {
+            if (task?.uid === affectedTask?.uid) return;
+            console.log("task that will be decremented:", task);
+            const taskDocRef = doc(
+              db,
+              "users",
+              `${user?.uid}`,
+              "boards",
+              `${boardId}`,
+              "columns",
+              `${sourceColumn?.uid}`,
+              "tasks",
+              `${task?.uid}`
+            );
+            transaction.update(taskDocRef, { index: increment(-1) });
+          }
+        });
+      });
+      toast.success("Task Updated");
+      setSubmitting(false);
+      resetForm();
+      setShowEditTaskModal(false);
+    } catch (err) {
+      console.log("transaction failed:", err);
+    }
+
+};
+
+const updateTaskBetweenColumns = async (
+draggedTask: any,
+draggedTaskId: string,
+sourceIndex: number,
+destinationIndex: number,
+sourceColumnId: string,
+destinationColumnId: string
+) => {
+try {
+await runTransaction(db, async (transaction) => {
+// \*\* 1. Change index & status of dragged Task -> Delete, Write
+const taskDocRef = doc(
+db,
+"users",
+`${user?.uid}`,
+"boards",
+`${boardId}`,
+"columns",
+`${sourceColumnId}`,
+"tasks",
+`${draggedTaskId}`
+);
+
+        const newTaskDocRef = doc(
+          db,
+          "users",
+          `${user?.uid}`,
+          "boards",
+          `${boardId}`,
+          "columns",
+          `${destinationColumnId}`,
+          "tasks",
+          `${draggedTaskId}`
+        );
+
+        const destinationColumn = columns?.find(
+          (column: any) => column?.uid === destinationColumnId
+        );
+
+        // DELETE
+        transaction.delete(taskDocRef);
+
+        // CREATE
+        transaction.set(newTaskDocRef, {
+          // Using type guard to ensure that we're always spreading an object
+          ...(typeof draggedTask === "object" ? draggedTask : {}),
+          status: destinationColumn?.status,
+          index: destinationIndex,
+          updatedAt: Timestamp.fromDate(new Date()),
+        });
+
+        // ** 2. Decrement (by 1) the indexes of Tasks that came after dragged Task in source Column
+        const sourceColumn = columns?.find(
+          (column: any) => column?.uid === sourceColumnId
+        );
+        const sourceColumnTasks = tasks?.filter(
+          (task: any) => task?.status === sourceColumn?.status
+        );
+
+        sourceColumnTasks?.map((task: any) => {
+          if (task.index > sourceIndex) {
+            if (task.uid === draggedTaskId) return;
+            const taskDocRef = doc(
+              db,
+              "users",
+              `${user?.uid}`,
+              "boards",
+              `${boardId}`,
+              "columns",
+              `${sourceColumnId}`,
+              "tasks",
+              `${task?.uid}`
+            );
+            transaction.update(taskDocRef, { index: increment(-1) });
+          }
+        });
+
+        // ** 3. Increment (by 1) the indexes of Tasks that came after dragged Task in destination Column
+        const destinationColumnTasks = tasks?.filter(
+          (task: any) => task?.status === destinationColumn?.status
+        );
+        destinationColumnTasks?.map((task: any) => {
+          // |task.index reflects the Tasks' indexes before being updated with the dragged Task.
+          // That's why the Task index at task.index === destinationIndex should still be incremented.
+          if (task.index >= destinationIndex) {
+            if (task.uid === draggedTaskId) return;
+            const taskDocRef = doc(
+              db,
+              "users",
+              `${user?.uid}`,
+              "boards",
+              `${boardId}`,
+              "columns",
+              `${destinationColumnId}`,
+              "tasks",
+              `${task?.uid}`
+            );
+            transaction.update(taskDocRef, { index: increment(1) });
+          }
+        });
+      });
+    } catch (err) {
+      console.log("Transaction failed: ", err);
+    }
+
+};

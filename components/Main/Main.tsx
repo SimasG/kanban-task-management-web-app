@@ -44,6 +44,7 @@ const Main = ({
 }: MainProps) => {
   const user = useContext(UserContext);
 
+  // ** FIXED
   const onDragEnd = async (result: DropResult) => {
     const { source, destination, type, draggableId } = result;
     if (!destination) return;
@@ -83,8 +84,6 @@ const Main = ({
         );
       } else {
         updateTaskBetweenColumns(
-          // Dragged Task
-          draggedTask,
           // Dragged Task's uid -> updatedTaskId
           draggedTask?.uid,
           // Source index -> Task's old index within Column -> sourceIndex
@@ -101,6 +100,7 @@ const Main = ({
   };
 
   // onDragEnd Helpers
+  // ** FIXED
   const updateColumnsIndex = async (
     draggedColumnId: string,
     sourceIndex: number,
@@ -117,8 +117,6 @@ const Main = ({
             db,
             "users",
             `${user?.uid}`,
-            "boards",
-            `${boardId}`,
             "columns",
             `${column.uid}`
           );
@@ -130,8 +128,6 @@ const Main = ({
             db,
             "users",
             `${user?.uid}`,
-            "boards",
-            `${boardId}`,
             "columns",
             `${column.uid}`
           );
@@ -145,8 +141,6 @@ const Main = ({
       db,
       "users",
       `${user?.uid}`,
-      "boards",
-      `${boardId}`,
       "columns",
       `${draggedColumnId}`
     );
@@ -157,6 +151,7 @@ const Main = ({
     await batch.commit();
   };
 
+  // ** FIXED
   const updateTaskWithinColumn = async (
     sourceColumnId: string,
     sourceIndex: number,
@@ -181,10 +176,6 @@ const Main = ({
             db,
             "users",
             `${user?.uid}`,
-            "boards",
-            `${boardId}`,
-            "columns",
-            `${sourceColumnId}`,
             "tasks",
             `${task?.uid}`
           );
@@ -197,10 +188,6 @@ const Main = ({
             db,
             "users",
             `${user?.uid}`,
-            "boards",
-            `${boardId}`,
-            "columns",
-            `${sourceColumnId}`,
             "tasks",
             `${task?.uid}`
           );
@@ -213,10 +200,6 @@ const Main = ({
       db,
       "users",
       `${user?.uid}`,
-      "boards",
-      `${boardId}`,
-      "columns",
-      `${sourceColumnId}`,
       "tasks",
       `${updatedTaskId}`
     );
@@ -228,8 +211,8 @@ const Main = ({
     await batch.commit();
   };
 
+  // ** FIXED
   const updateTaskBetweenColumns = async (
-    draggedTask: any,
     draggedTaskId: string,
     sourceIndex: number,
     destinationIndex: number,
@@ -238,27 +221,11 @@ const Main = ({
   ) => {
     try {
       await runTransaction(db, async (transaction) => {
-        // ** 1. Change index & status of dragged Task -> Delete, Write
+        // ** 1. Update index & status of dragged Task
         const taskDocRef = doc(
           db,
           "users",
           `${user?.uid}`,
-          "boards",
-          `${boardId}`,
-          "columns",
-          `${sourceColumnId}`,
-          "tasks",
-          `${draggedTaskId}`
-        );
-
-        const newTaskDocRef = doc(
-          db,
-          "users",
-          `${user?.uid}`,
-          "boards",
-          `${boardId}`,
-          "columns",
-          `${destinationColumnId}`,
           "tasks",
           `${draggedTaskId}`
         );
@@ -267,16 +234,9 @@ const Main = ({
           (column: any) => column?.uid === destinationColumnId
         );
 
-        // DELETE
-        transaction.delete(taskDocRef);
-
-        // CREATE
-        transaction.set(newTaskDocRef, {
-          // Using type guard to ensure that we're always spreading an object
-          ...(typeof draggedTask === "object" ? draggedTask : {}),
-          status: destinationColumn?.status,
+        transaction.update(taskDocRef, {
           index: destinationIndex,
-          updatedAt: Timestamp.fromDate(new Date()),
+          status: destinationColumn?.status,
         });
 
         // ** 2. Decrement (by 1) the indexes of Tasks that came after dragged Task in source Column
@@ -294,10 +254,6 @@ const Main = ({
               db,
               "users",
               `${user?.uid}`,
-              "boards",
-              `${boardId}`,
-              "columns",
-              `${sourceColumnId}`,
               "tasks",
               `${task?.uid}`
             );
@@ -318,10 +274,6 @@ const Main = ({
               db,
               "users",
               `${user?.uid}`,
-              "boards",
-              `${boardId}`,
-              "columns",
-              `${destinationColumnId}`,
               "tasks",
               `${task?.uid}`
             );
@@ -334,6 +286,7 @@ const Main = ({
     }
   };
 
+  // ** FIXED
   const addNewColumn = async () => {
     const uuid = uuidv4();
     const newColumnDocRef = doc(
