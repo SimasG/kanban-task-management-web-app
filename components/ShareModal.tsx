@@ -20,6 +20,11 @@ const ShareModal = ({ setShowShareModal }: IndexProps) => {
   const onSubmit = async (values: any, actions: any) => {
     const { setSubmitting, resetForm } = actions;
     setSubmitting(true);
+    // Sending a POST request to an API endpoint "api/mail" with a body where the form values are stored
+    fetch("api/mail", {
+      method: "post",
+      body: JSON.stringify(values),
+    });
     toast.success("Invite Sent!");
     setSubmitting(false);
     resetForm();
