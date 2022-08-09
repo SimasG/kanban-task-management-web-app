@@ -103,6 +103,7 @@ const SideNav = ({
     );
   };
 
+  // ** FIXED
   const updateBoardsIndex = async (
     updatedBoardId: string,
     sourceIndex: number,
@@ -173,7 +174,7 @@ const SideNav = ({
       {isOpen ? (
         <div
           onClick={() => setIsOpen(false)}
-          className="absolute bg-black bg-opacity-50 top-0 left-0 w-full h-screen flex justify-center items-center rounded-r sm:static sm:bg-transparent sm:bg-opacity-100 sm:inset-auto sm:block sm:w-[40%] md:w-[35%] lg:w-[25%] xl:w-[20%]"
+          className="z-50 absolute bg-black bg-opacity-50 top-0 left-0 w-full h-screen flex justify-center items-center rounded-r sm:static sm:bg-transparent sm:bg-opacity-100 sm:inset-auto sm:block sm:w-[40%] md:w-[35%] lg:w-[25%] xl:w-[20%]"
         >
           <nav
             onClick={(e) => e.stopPropagation()}

@@ -2,6 +2,7 @@ import { doc, increment, writeBatch } from "firebase/firestore";
 import { useContext } from "react";
 import { UserContext } from "../../lib/context";
 import { db } from "../../lib/firebase";
+import { AiOutlineUserAdd } from "react-icons/ai";
 
 type TopSettingsProps = {
   activeBoard: any;
@@ -76,7 +77,7 @@ const TopSettings = ({
       className={`h-[10%] w-[100%] p-4 flex justify-between items-center bg-backgroundColorMenu dark:bg-darkGray`}
     >
       <input
-        className="text-xl sm:text-2xl bg-transparent cursor-pointer outline-none text-fontPrimary dark:text-fontPrimaryDark sm:w-[160px] md:w-[57%]"
+        className="text-xl bg-transparent cursor-pointer outline-none text-fontPrimary dark:text-fontPrimaryDark sm:w-[140px] md:w-[40%]"
         type="text"
         value={activeBoard?.[0]?.title || "Future Board Title 🤓"}
         onChange={(e) => {
@@ -84,15 +85,20 @@ const TopSettings = ({
         }}
       />
       {boards?.length > 0 && (
-        <div className="flex justify-center items-center gap-4">
+        <div className="flex justify-center items-center gap-2 md:gap-3 lg:gap-4">
           {/* Desktop Add New Task Btn */}
           <button
             onClick={(e) => {
               handleAddNewTaskBtn(e);
             }}
-            className="purpleBtn hidden text-xs px-4 sm:block md:text-sm"
+            className="purpleBtn hidden text-xs px-2 md:px-3 lg:px-4 sm:block md:text-sm lg:text-base"
           >
-            + Add New Task
+            + New Task
+          </button>
+          {/* Share Btn */}
+          <button className="bg-fontPrimaryDark dark:hover:bg-fontTertiary text-fontTertiary dark:hover:text-fontPrimaryDark font-bold rounded-full py-2 px-2 md:px-3 lg:px-4 drop-shadow-lg hover:drop-shadow-xl flex justify-between items-center gap-1 text-xs md:text-sm lg:text-base">
+            <AiOutlineUserAdd />
+            <p>Share</p>
           </button>
           {/* Mobile Add New Task Btn */}
           <button
