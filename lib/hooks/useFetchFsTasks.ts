@@ -4,7 +4,7 @@ import { useCollectionData } from "react-firebase-hooks/firestore";
 import { UserContext } from "../context";
 import { db } from "../firebase";
 
-const useFetchFsColumns = (boardId: string | null | undefined) => {
+const useFetchFsTasks = (boardId: string | null | undefined) => {
   const user = useContext(UserContext);
 
   const columnsCollectionRef = collection(db, "users", `${user?.uid}`, "tasks");
@@ -21,4 +21,4 @@ const useFetchFsColumns = (boardId: string | null | undefined) => {
   return statusIndexSortedTasks;
 };
 
-export default useFetchFsColumns;
+export default useFetchFsTasks;

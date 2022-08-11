@@ -1,4 +1,4 @@
-import { deleteDoc, doc, updateDoc, writeBatch } from "firebase/firestore";
+import { doc, updateDoc, writeBatch } from "firebase/firestore";
 import { useContext, useState } from "react";
 import {
   Draggable,

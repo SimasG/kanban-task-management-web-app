@@ -2486,3 +2486,6 @@ x
     x
     x
     x
+
+Google Log In Btn
+// className="purpleBtn w-[55%] mx-auto flex justify-center items-center gap-4"

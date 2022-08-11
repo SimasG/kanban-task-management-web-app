@@ -10,12 +10,13 @@ import { UserContext } from "../lib/context";
 import { db } from "../lib/firebase";
 import useFetchFsBoards from "../lib/hooks/useFetchFsBoards";
 import useFetchFsColumns from "../lib/hooks/useFetchFsColumns";
-import useFetchTasksCollectionGroup from "../lib/hooks/useFetchFsTasks";
+import useFetchFsTasks from "../lib/hooks/useFetchFsTasks";
 import Login from "./login";
+import { PropagateLoader } from "react-spinners";
 
 const Home: NextPage = () => {
   const user = useContext(UserContext);
-  const boards = useFetchFsBoards(user?.uid);
+  const boards: any = useFetchFsBoards(user?.uid);
 
   // ** STATES
   const [showAddTaskModal, setShowAddTaskModal] = useState(false);
@@ -25,16 +26,20 @@ const Home: NextPage = () => {
   const [taskId, setTaskId] = useState<string | null | undefined>(null);
   // SideNav
   const [isOpen, setIsOpen] = useState(true);
-
-  const tasks: any = useFetchTasksCollectionGroup(boardId);
-  const columns = useFetchFsColumns(boardId);
+  const [fetching, setFetching] = useState(false);
 
   let activeBoard: any;
 
   useEffect(() => {
-    if (activeBoard?.length !== 0 && boards?.length !== 0) return;
+    // setFetching(true);
+    if (activeBoard?.length > 0 && boards?.length > 0) return;
     setBoardId(boards?.[0]?.uid);
+    // setFetching(false);
   }, [activeBoard, boards]);
+
+  // ** Do these hooks re-fetch *all* the documents on each re-render (not just the new/updated ones)?
+  const columns: any = useFetchFsColumns(boardId);
+  const tasks: any = useFetchFsTasks(boardId);
 
   activeBoard = boards?.filter((board: any) => board?.uid === boardId);
 
@@ -49,56 +54,66 @@ const Home: NextPage = () => {
   return (
     <>
       {user ? (
-        <div
-          onClick={() => {
-            setShowAddTaskModal(false);
-            setShowEditTaskModal(false);
-          }}
-          className="flex justify-center h-screen w-screen"
-        >
-          <SideNav
-            boards={boards}
-            boardId={boardId}
-            setBoardId={setBoardId}
-            updateBoardName={updateBoardName}
-            isOpen={isOpen}
-            setIsOpen={setIsOpen}
-          />
-          <Main
-            activeBoard={activeBoard}
-            boards={boards}
-            boardId={boardId}
-            setBoardId={setBoardId}
-            tasks={tasks}
-            setTaskId={setTaskId}
-            setShowAddTaskModal={setShowAddTaskModal}
-            setShowEditTaskModal={setShowEditTaskModal}
-            updateBoardName={updateBoardName}
-            columns={columns}
-            isOpen={isOpen}
-            setShowShareModal={setShowShareModal}
-          />
-          {showAddTaskModal && (
-            <AddNewTaskModal
+        <>
+          {/* {fetching && (
+            <div className="flex h-[92vh] w-full items-center justify-center">
+              <PropagateLoader color={"#E9795D"} loading={fetching} size={25} />
+            </div>
+          )} */}
+          {/* {!fetching && ( */}
+          <div
+            onClick={() => {
+              setShowAddTaskModal(false);
+              setShowEditTaskModal(false);
+            }}
+            className="flex justify-center h-screen w-screen"
+          >
+            {/* <div>DEBUGGING</div> */}
+            <SideNav
+              boards={boards}
               boardId={boardId}
+              setBoardId={setBoardId}
+              updateBoardName={updateBoardName}
+              isOpen={isOpen}
+              setIsOpen={setIsOpen}
+            />
+            <Main
+              activeBoard={activeBoard}
+              boards={boards}
+              boardId={boardId}
+              setBoardId={setBoardId}
+              tasks={tasks}
+              setTaskId={setTaskId}
               setShowAddTaskModal={setShowAddTaskModal}
-              tasks={tasks}
-              columns={columns}
-            />
-          )}
-          {showEditTaskModal && (
-            <EditTaskModal
-              boardId={boardId}
-              taskId={taskId}
               setShowEditTaskModal={setShowEditTaskModal}
-              tasks={tasks}
+              updateBoardName={updateBoardName}
               columns={columns}
+              isOpen={isOpen}
+              setShowShareModal={setShowShareModal}
             />
-          )}
-          {showShareModal && (
-            <ShareModal setShowShareModal={setShowShareModal} />
-          )}
-        </div>
+            {showAddTaskModal && (
+              <AddNewTaskModal
+                boardId={boardId}
+                setShowAddTaskModal={setShowAddTaskModal}
+                tasks={tasks}
+                columns={columns}
+              />
+            )}
+            {showEditTaskModal && (
+              <EditTaskModal
+                boardId={boardId}
+                taskId={taskId}
+                setShowEditTaskModal={setShowEditTaskModal}
+                tasks={tasks}
+                columns={columns}
+              />
+            )}
+            {showShareModal && (
+              <ShareModal setShowShareModal={setShowShareModal} />
+            )}
+          </div>
+          {/* )} */}
+        </>
       ) : (
         <Login />
       )}

@@ -36,7 +36,7 @@ export default async function handler(
         console.error(error.response.body);
       }
     }
-    // Don't understand the "()" bit of syntax
+    // "()" at the end immediatelly calls the nameless async callback func.
   })();
   res.status(200).json({ status: "Ok" });
 }

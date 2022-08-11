@@ -39,11 +39,12 @@ const Login = () => {
         </a>
         <button
           onClick={handleGoogleLogin}
-          className="purpleBtn w-[55%] mx-auto flex justify-center items-center gap-4"
+          // className="py-2 bg-fontTertiary text-backgroundColorMenu dark:text-fontPrimaryDark font-bold rounded-full dark:hover:bg-fontPrimaryDark dark:hover:bg-opacity-100 dark:hover:text-fontTertiary hover:bg-opacity-50 w-[55%] mx-auto flex justify-center items-center gap-4"
+          className="p-[14px] bg-backgroundColorMenu text-[#777777] rounded font-medium drop-shadow-lg hover:drop-shadow-xl mx-auto flex justify-center items-center gap-4"
           type="button"
         >
-          <span className="text-2xl">Log In</span>
           <FcGoogle className="w-8 h-8" />
+          <span className="text-xl">Sign In With Google</span>
         </button>
       </section>
     </div>

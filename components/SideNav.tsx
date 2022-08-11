@@ -60,15 +60,16 @@ const SideNav = ({
 
     // Create 3 default Columns
     defaultColumns?.map((column: any) => {
+      const columnUid = uuidv4();
       const columnRef = doc(
         db,
         "users",
         `${user?.uid}`,
         "columns",
-        `${column?.uid}`
+        `${columnUid}`
       );
       batch.set(columnRef, {
-        uid: column?.uid,
+        uid: columnUid,
         index: column?.index,
         status: column?.status,
         title: column?.title,
@@ -256,7 +257,6 @@ const SideNav = ({
                                             className="bg-transparent cursor-pointer outline-none"
                                             type="text"
                                             value={board.title}
-                                            // ** Having trouble refactoring the logic in a separate func
                                             onChange={(e) => {
                                               updateBoardName(
                                                 board.uid,

@@ -1,5 +1,5 @@
 import { doc, increment, writeBatch } from "firebase/firestore";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { UserContext } from "../../lib/context";
 import { db } from "../../lib/firebase";
 import { AiOutlineUserAdd } from "react-icons/ai";
@@ -26,6 +26,11 @@ const TopSettings = ({
   setShowShareModal,
 }: TopSettingsProps) => {
   const user = useContext(UserContext);
+  const [readOnlyState, setReadOnlyState] = useState(false);
+
+  useEffect(() => {
+    activeBoard?.[0]?.title ? setReadOnlyState(false) : setReadOnlyState(true);
+  }, [activeBoard]);
 
   const handleAddNewTaskBtn = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
@@ -38,20 +43,26 @@ const TopSettings = ({
   };
 
   // ** FIXED
-  const handleDeleteBoard = async (uid: string | null | undefined) => {
+  const handleDeleteBoard = async (boardId: string | null | undefined) => {
     const batch = writeBatch(db);
     // Delete Board
-    const boardDocRef = doc(db, "users", `${user?.uid}`, "boards", `${uid}`);
+    const boardDocRef = doc(
+      db,
+      "users",
+      `${user?.uid}`,
+      "boards",
+      `${boardId}`
+    );
     // If the first Board in the array is deleted, setId to the second Board (which will become the
     // first once the first one is removed from FS). Else, remove the first Board in the array.
-    boards?.[0]?.uid === uid
+    boards?.[0]?.uid === boardId
       ? setBoardId(boards?.[1]?.uid)
       : setBoardId(boards?.[0]?.uid);
     batch.delete(boardDocRef);
 
     // Delete Columns in the Board
     const columnsToDelete = columns?.filter(
-      (column: any) => column?.board === uid
+      (column: any) => column?.board === boardId
     );
     columnsToDelete?.map((column: any) => {
       const columnDocRef = doc(
@@ -84,8 +95,9 @@ const TopSettings = ({
       className={`h-[10%] w-[100%] p-4 flex justify-between items-center bg-backgroundColorMenu dark:bg-darkGray`}
     >
       <input
-        className="text-xl bg-transparent cursor-pointer outline-none text-fontPrimary dark:text-fontPrimaryDark sm:w-[140px] md:w-[40%]"
+        className="read-only text-xl bg-transparent cursor-pointer outline-none text-fontPrimary dark:text-fontPrimaryDark sm:w-[140px] md:w-[40%]"
         type="text"
+        readOnly={readOnlyState}
         value={activeBoard?.[0]?.title || "Future Board Title 🤓"}
         onChange={(e) => {
           updateBoardName(activeBoard?.[0]?.uid, e.target.value);
