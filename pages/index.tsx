@@ -14,11 +14,14 @@ import useFetchFsTasks from "../lib/hooks/useFetchFsTasks";
 import Login from "./login";
 import { PropagateLoader } from "react-spinners";
 import useFetchFsSharedBoards from "../lib/hooks/useFetchFsSharedBoards";
+import useFetchFsUsers from "../lib/hooks/useFetchFsUsers";
 
 const Home: NextPage = () => {
   const user = useContext(UserContext);
   const boards: any = useFetchFsBoards(user?.uid);
   const sharedBoards: any = useFetchFsSharedBoards();
+
+  const users = useFetchFsUsers();
 
   // ** STATES
   const [showAddTaskModal, setShowAddTaskModal] = useState(false);
@@ -26,9 +29,9 @@ const Home: NextPage = () => {
   const [showShareModal, setShowShareModal] = useState(false);
   const [boardId, setBoardId] = useState<string | null | undefined>(null);
   const [taskId, setTaskId] = useState<string | null | undefined>(null);
+  // const [fetching, setFetching] = useState(false);
   // SideNav
   const [isOpen, setIsOpen] = useState(true);
-  // const [fetching, setFetching] = useState(false);
 
   let activeBoard: any;
 
@@ -117,7 +120,7 @@ const Home: NextPage = () => {
           {/* )} */}
         </>
       ) : (
-        <Login />
+        <Login users={users} />
       )}
     </>
   );

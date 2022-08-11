@@ -8,20 +8,17 @@ import {
 import { UserContext } from "../context";
 import { db } from "../firebase";
 
-// WHen is uid null?
 const useFetchFsSharedBoards = () => {
   const user = useContext(UserContext);
 
-  // 1. if (!sharedBoards) return;
-  // 2. Extract boardIds from sharedBoards
-  // 3. Fetch Boards with the extracted boardIds (CollectionGroup query, where boardId
-  // matches one of the extracted boardIds)
-
-  // ** 1. Fetch Users Doc
+  // ** 1. Fetch Users Doc + Extract sharedBoards
   const userRef = doc(db, "users", `${user?.uid}`);
+  const sharedBoards = useDocumentData(userRef)[0]?.sharedBoards;
+  if (!sharedBoards) return;
+  console.log("sharedBoards:", sharedBoards);
 
-  const userDoc = useDocumentData(userRef)[0];
-  console.log("userDoc:", userDoc);
+  // ** Fetch Boards with the extracted boardIds (CollectionGroup query, where boardId
+  // matches one of the extracted boardIds)
 
   const data = "zdare";
 

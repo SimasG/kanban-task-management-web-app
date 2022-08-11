@@ -4,19 +4,31 @@ import toast from "react-hot-toast";
 import { FcGoogle } from "react-icons/fc";
 import { auth, db } from "../lib/firebase";
 
-const Login = () => {
+const Login = (users: any) => {
+  let userIds: any = [];
+
+  // Why are "users" nested in "users"?
+  users?.users?.map((user: any) => {
+    userIds?.push(user?.uid);
+  });
+
   const handleGoogleLogin = () => {
     const provider = new GoogleAuthProvider();
     signInWithPopup(auth, provider)
       // ** Make sure to *not* overwrite the userDoc if it already exists
       .then(async (result) => {
         const user = result.user;
-        await setDoc(doc(db, "users", user.uid), {
-          uid: user.uid,
-          email: user.email,
-          timeStamp: serverTimestamp(),
-        });
-
+        if (userIds?.includes(user?.uid)) {
+          console.log("Existing User Signed Up");
+          // No existing doc overwriting
+        } else {
+          console.log("New User Signed Up");
+          await setDoc(doc(db, "users", user.uid), {
+            uid: user.uid,
+            email: user.email,
+            timestamp: serverTimestamp(),
+          });
+        }
         toast.success(`Welcome ${user.displayName}!`);
       })
       .catch((err) => console.log(err));
