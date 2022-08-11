@@ -8,6 +8,7 @@ const Login = () => {
   const handleGoogleLogin = () => {
     const provider = new GoogleAuthProvider();
     signInWithPopup(auth, provider)
+      // ** Make sure to *not* overwrite the userDoc if it already exists
       .then(async (result) => {
         const user = result.user;
         await setDoc(doc(db, "users", user.uid), {

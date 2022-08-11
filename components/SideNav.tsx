@@ -202,88 +202,97 @@ const SideNav = ({
                 />
               </a>
             </Link>
-            {/* Boards container */}
-            <section className="text-fontSecondary w-[100%]">
-              {/* All Boards title */}
-              <h3 className="pl-4 uppercase font-bold text-xs mb-4">
-                {boards?.length !== 0
-                  ? `All Boards (${boards?.length})`
-                  : "No Boards!"}
-              </h3>
-              {/* Boards subcontainer */}
-              <DragDropContext onDragEnd={onDragEnd}>
-                <Droppable droppableId="boardsSideNav">
-                  {(provided: DroppableProvided, snapshot: any) => {
-                    return (
-                      // ref allows react-beautiful-dnd to control the div
-                      <div
-                        {...provided.droppableProps}
-                        ref={provided.innerRef}
-                        className="overflow-auto"
-                      >
-                        {boards
-                          ? boards.map(
-                              // ** Re-assign board type later
-                              (board: any, index: number) => {
-                                return (
-                                  <Draggable
-                                    key={board.uid}
-                                    draggableId={board.uid}
-                                    index={index}
-                                  >
-                                    {(
-                                      provided: DraggableProvided,
-                                      snapshot: any
-                                    ) => {
-                                      return (
-                                        // Single Board
-                                        <div
-                                          onClick={() => {
-                                            setBoardId(board.uid);
-                                          }}
-                                          ref={provided.innerRef}
-                                          {...provided.draggableProps}
-                                          {...provided.dragHandleProps}
-                                          className={`board rounded-r-full ${
-                                            board.uid === boardId
-                                              ? snapshot.isDragging
-                                                ? " bg-fontTertiary bg-opacity-60 select-none text-fontPrimaryDark"
-                                                : " bg-fontTertiary text-fontPrimaryDark opacity-100"
-                                              : " active:bg-fontTertiary active:bg-opacity-60 active:text-fontPrimaryDark"
-                                          }}`}
-                                        >
-                                          <TbLayoutBoardSplit />
-                                          <input
-                                            className="bg-transparent cursor-pointer outline-none"
-                                            type="text"
-                                            value={board.title}
-                                            onChange={(e) => {
-                                              updateBoardName(
-                                                board.uid,
-                                                e.target.value
-                                              );
+            {/* Boards Container */}
+            <section className="w-[100%] flex flex-col justify-center items-start gap-6">
+              {/* Personal Boards Container */}
+              <div className="w-[100%] text-fontSecondary">
+                {/* All Boards title */}
+                <h3 className="pl-4 uppercase font-bold text-xs mb-4">
+                  {boards?.length !== 0
+                    ? `All Boards (${boards?.length})`
+                    : "No Boards!"}
+                </h3>
+                {/* Personal Boards Subcontainer */}
+                <DragDropContext onDragEnd={onDragEnd}>
+                  <Droppable droppableId="boardsSideNav">
+                    {(provided: DroppableProvided, snapshot: any) => {
+                      return (
+                        // ref allows react-beautiful-dnd to control the div
+                        <div
+                          {...provided.droppableProps}
+                          ref={provided.innerRef}
+                          className="overflow-auto"
+                        >
+                          {boards
+                            ? boards.map(
+                                // ** Re-assign board type later
+                                (board: any, index: number) => {
+                                  return (
+                                    <Draggable
+                                      key={board.uid}
+                                      draggableId={board.uid}
+                                      index={index}
+                                    >
+                                      {(
+                                        provided: DraggableProvided,
+                                        snapshot: any
+                                      ) => {
+                                        return (
+                                          // Single Board
+                                          <div
+                                            onClick={() => {
+                                              setBoardId(board.uid);
                                             }}
-                                          />
-                                        </div>
-                                      );
-                                    }}
-                                  </Draggable>
-                                );
-                              }
-                            )
-                          : "There is nothing bro :(!"}
-                        {provided.placeholder}
-                      </div>
-                    );
-                  }}
-                </Droppable>
-              </DragDropContext>
-              {/* Create new Board container */}
-              <div className="pl-4 flex justify-start items-center gap-3 py-1 text-fontTertiary cursor-pointer dark:hover:bg-fontPrimaryDark hover:bg-fontTertiary hover:bg-opacity-25 hover:rounded-r-full">
-                <TbLayoutBoardSplit />
-                <button onClick={handleCreateNewBoard}>
-                  + Create New Board
-                </button>
+                                            ref={provided.innerRef}
+                                            {...provided.draggableProps}
+                                            {...provided.dragHandleProps}
+                                            className={`board rounded-r-full ${
+                                              board.uid === boardId
+                                                ? snapshot.isDragging
+                                                  ? " bg-fontTertiary bg-opacity-60 select-none text-fontPrimaryDark"
+                                                  : " bg-fontTertiary text-fontPrimaryDark opacity-100"
+                                                : " active:bg-fontTertiary active:bg-opacity-60 active:text-fontPrimaryDark"
+                                            }}`}
+                                          >
+                                            <TbLayoutBoardSplit />
+                                            <input
+                                              className="bg-transparent cursor-pointer outline-none"
+                                              type="text"
+                                              value={board.title}
+                                              onChange={(e) => {
+                                                updateBoardName(
+                                                  board.uid,
+                                                  e.target.value
+                                                );
+                                              }}
+                                            />
+                                          </div>
+                                        );
+                                      }}
+                                    </Draggable>
+                                  );
+                                }
+                              )
+                            : "There is nothing bro :(!"}
+                          {provided.placeholder}
+                        </div>
+                      );
+                    }}
+                  </Droppable>
+                </DragDropContext>
+                {/* Create new Board container */}
+                <div className="pl-4 flex justify-start items-center gap-3 py-1 text-fontTertiary cursor-pointer dark:hover:bg-fontPrimaryDark hover:bg-fontTertiary hover:bg-opacity-25 hover:rounded-r-full">
+                  <TbLayoutBoardSplit />
+                  <button onClick={handleCreateNewBoard}>
+                    + Create New Board
+                  </button>
+                </div>
+              </div>
+              {/* Shared Boards Container */}
+              <div className="w-[100%] text-fontSecondary">
+                <h3 className="pl-4 uppercase font-bold text-xs mb-4">
+                  Shared Boards
+                </h3>
               </div>
             </section>
             {/* Log in/out btn + theme toggle + hide sidebar section */}
