@@ -19,7 +19,6 @@ import useFetchFsUsers from "../lib/hooks/useFetchFsUsers";
 const Home: NextPage = () => {
   const user = useContext(UserContext);
   const boards: any = useFetchFsBoards(user?.uid);
-
   const sharedBoards = useFetchFsSharedBoards();
 
   const users = useFetchFsUsers();
@@ -44,11 +43,11 @@ const Home: NextPage = () => {
     // setFetching(false);
   }, [activeBoard, boards]);
 
-  console.log("boardId:", boardId);
-
   // ** Do these hooks re-fetch *all* the documents on each re-render (not just the new/updated ones)?
-  const columns: any = useFetchFsColumns(boardId);
+  const columns: any = useFetchFsColumns(boardId, users);
   const tasks: any = useFetchFsTasks(boardId);
+
+  console.log("columns:", columns);
 
   activeBoard = boards?.filter((board: any) => board?.uid === boardId);
 
