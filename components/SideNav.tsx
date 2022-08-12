@@ -28,6 +28,7 @@ type SideNavProps = {
   updateBoardName: (uid: string, newName: string) => Promise<void>;
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  sharedBoards: any;
 };
 
 const SideNav = ({
@@ -37,8 +38,11 @@ const SideNav = ({
   updateBoardName,
   isOpen,
   setIsOpen,
+  sharedBoards,
 }: SideNavProps) => {
   const user = useContext(UserContext);
+
+  // console.log("sharedBoards in SideNav:", sharedBoards);
 
   const signOutUser = () => {
     signOut(auth).then(() => toast.success("Logged out!"));
@@ -293,6 +297,9 @@ const SideNav = ({
                 <h3 className="pl-4 uppercase font-bold text-xs mb-4">
                   Shared Boards
                 </h3>
+                {/* {sharedBoards?.map((board: any) => {
+                  return board?.title;
+                })} */}
               </div>
             </section>
             {/* Log in/out btn + theme toggle + hide sidebar section */}

@@ -9,12 +9,11 @@ const useFetchFsBoards = (uid: string | null | undefined) => {
     orderBy("index", "asc")
   );
 
-  // const data = useCollectionData(collection(db, "users", `${uid}`, "boards"));
-  const data = useCollectionData(q);
-
   // Why am I not receiving the array of data I want to fetch immediately
   // (aka why do I have to manually access the first array element to access the desired data)?
-  return data[0];
+  const data = useCollectionData(q)[0];
+
+  return data;
 };
 
 export default useFetchFsBoards;

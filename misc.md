@@ -2489,3 +2489,30 @@ x
 
 Google Log In Btn
 // className="purpleBtn w-[55%] mx-auto flex justify-center items-center gap-4"
+
+// \*\* 1. Fetch Users Doc + Extract shared Board ids
+const userRef = doc(db, "users", `${user?.uid}`);
+const sharedBoardIds = useDocumentData(userRef)[0]?.sharedBoards;
+if (!sharedBoardIds) return;
+
+// *SSR
+export async function getServerSideProps() {
+  // const user = useContext(UserContext);
+
+  const sharedBoardsQuery = query(
+    collectionGroup(db, "boards"),
+    where("collaborators", "array-contains-any", [`simhka15@gmail.com`])
+  );
+
+  const sharedBoards = (await getDocs(sharedBoardsQuery)).docs.map((doc: any) =>
+    doc.data()
+  );
+  console.log(sharedBoards);
+
+  return {
+    props: { sharedBoards },
+  };
+}
+
+  const [sharedBoards, setSharedBoards] = useState(props.sharedBoards);
+  console.log("sharedBoards state using SSR:", sharedBoards);
