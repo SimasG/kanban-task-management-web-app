@@ -43,7 +43,6 @@ const FormikForm = ({
     (column: any) => column?.status === parseInt(initialValues?.status)
   );
 
-  // ** FIXED
   const deleteTask = async () => {
     const batch = writeBatch(db);
 

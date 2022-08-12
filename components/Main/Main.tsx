@@ -46,7 +46,6 @@ const Main = ({
 }: MainProps) => {
   const user = useContext(UserContext);
 
-  // ** FIXED
   const onDragEnd = async (result: DropResult) => {
     const { source, destination, type, draggableId } = result;
     if (!destination) return;
@@ -102,7 +101,6 @@ const Main = ({
   };
 
   // onDragEnd Helpers
-  // ** FIXED
   const updateColumnsIndex = async (
     draggedColumnId: string,
     sourceIndex: number,
@@ -153,7 +151,6 @@ const Main = ({
     await batch.commit();
   };
 
-  // ** FIXED
   const updateTaskWithinColumn = async (
     sourceColumnId: string,
     sourceIndex: number,
@@ -213,7 +210,6 @@ const Main = ({
     await batch.commit();
   };
 
-  // ** FIXED
   const updateTaskBetweenColumns = async (
     draggedTaskId: string,
     sourceIndex: number,
@@ -288,7 +284,6 @@ const Main = ({
     }
   };
 
-  // ** FIXED
   const addNewColumn = async () => {
     const uuid = uuidv4();
     const newColumnDocRef = doc(

@@ -42,7 +42,6 @@ const Column = ({
     (task: any) => task?.status === columnStatus
   ).length;
 
-  // ** FIXED
   const changeColumnTitle = async (newTitle: string) => {
     const columnDocRef = doc(
       db,
@@ -54,7 +53,6 @@ const Column = ({
     await updateDoc(columnDocRef, { title: newTitle });
   };
 
-  // ** FIXED
   const deleteColumn = async () => {
     // Deleting the Column & Tasks that are in the Column
     const batch = writeBatch(db);

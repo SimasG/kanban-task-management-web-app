@@ -42,7 +42,6 @@ const TopSettings = ({
     setShowShareModal(true);
   };
 
-  // ** FIXED
   const handleDeleteBoard = async (boardId: string | null | undefined) => {
     const batch = writeBatch(db);
     // Delete Board

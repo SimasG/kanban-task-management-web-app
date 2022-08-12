@@ -69,14 +69,12 @@ const EditTaskModal = ({
     status: Yup.string().required("Status is Required!"),
   });
 
-  // ** FIXED
   const onSubmit = (values: any, actions: any) => {
     const { setSubmitting, resetForm } = actions;
     // Why do I have to convert "values.status" to number? I thought it's supposed to be a number by default
     updateTask(values, setSubmitting, resetForm);
   };
 
-  // ** FIXED
   const updateTask = async (
     values: any,
     setSubmitting: any,

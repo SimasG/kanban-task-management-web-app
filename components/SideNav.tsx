@@ -33,22 +33,19 @@ type SideNavProps = {
 
 const SideNav = ({
   boards,
+  sharedBoards,
   boardId,
   setBoardId,
   updateBoardName,
   isOpen,
   setIsOpen,
-  sharedBoards,
 }: SideNavProps) => {
   const user = useContext(UserContext);
-
-  // console.log("sharedBoards in SideNav:", sharedBoards);
 
   const signOutUser = () => {
     signOut(auth).then(() => toast.success("Logged out!"));
   };
 
-  // ** FIXED
   const handleCreateNewBoard = async () => {
     // Creating new Board in Firestore
     const batch = writeBatch(db);
@@ -85,30 +82,36 @@ const SideNav = ({
   };
 
   const onDragEnd = (result: DropResult) => {
-    const { source, destination } = result;
+    const { source, destination, type } = result;
     if (!destination) return;
     if (destination.index === source.index) return;
 
     let add;
-    let newBoards = boards;
 
-    add = newBoards[source.index];
-
-    // Removing Board from the array at source.index
-    newBoards.splice(source.index, 1);
-
-    // Adding the same Board in the array at destination.index
-    newBoards.splice(destination.index, 0, add);
-
-    // Reflecting UI changes in Firestore
-    updateBoardsIndex(
-      newBoards[destination.index].uid,
-      source.index,
-      destination.index
-    );
+    if (type === "personalBoards") {
+      let newBoards = boards;
+      add = newBoards[source.index];
+      // Removing Board from the array at source.index
+      newBoards.splice(source.index, 1);
+      // Adding the same Board in the array at destination.index
+      newBoards.splice(destination.index, 0, add);
+      // Reflecting UI changes in Firestore
+      updateBoardsIndex(
+        newBoards[destination.index].uid,
+        source.index,
+        destination.index
+      );
+    } else if (type === "sharedBoards") {
+      let newBoards = sharedBoards;
+      add = newBoards[source.index];
+      // Removing Board from the array at source.index
+      newBoards.splice(source.index, 1);
+      // Adding the same Board in the array at destination.index
+      newBoards.splice(destination.index, 0, add);
+      // Not reflecting UI changes in Firestore since the shared Boards do not belong to the invitee
+    }
   };
 
-  // ** FIXED
   const updateBoardsIndex = async (
     updatedBoardId: string,
     sourceIndex: number,
@@ -207,18 +210,18 @@ const SideNav = ({
               </a>
             </Link>
             {/* Boards Container */}
-            <section className="w-[100%] flex flex-col justify-center items-start gap-6">
-              {/* Personal Boards Container */}
-              <div className="w-[100%] text-fontSecondary">
-                {/* All Boards title */}
-                <h3 className="pl-4 uppercase font-bold text-xs mb-4">
-                  {boards?.length !== 0
-                    ? `All Boards (${boards?.length})`
-                    : "No Boards!"}
-                </h3>
-                {/* Personal Boards Subcontainer */}
-                <DragDropContext onDragEnd={onDragEnd}>
-                  <Droppable droppableId="boardsSideNav">
+            <DragDropContext onDragEnd={onDragEnd}>
+              <section className="w-[100%] flex flex-col justify-center items-start gap-6">
+                {/* Personal Boards Container */}
+                <div className="w-[100%] text-fontSecondary">
+                  {/* Personal Boards title */}
+                  <h3 className="pl-4 uppercase font-bold text-xs mb-4">
+                    {boards?.length !== 0
+                      ? `All Boards (${boards?.length})`
+                      : "No Boards!"}
+                  </h3>
+                  {/* Personal Boards Subcontainer */}
+                  <Droppable droppableId="personalBoards" type="personalBoards">
                     {(provided: DroppableProvided, snapshot: any) => {
                       return (
                         // ref allows react-beautiful-dnd to control the div
@@ -228,80 +231,137 @@ const SideNav = ({
                           className="overflow-auto"
                         >
                           {boards
-                            ? boards.map(
-                                // ** Re-assign board type later
-                                (board: any, index: number) => {
-                                  return (
-                                    <Draggable
-                                      key={board.uid}
-                                      draggableId={board.uid}
-                                      index={index}
-                                    >
-                                      {(
-                                        provided: DraggableProvided,
-                                        snapshot: any
-                                      ) => {
-                                        return (
-                                          // Single Board
-                                          <div
-                                            onClick={() => {
-                                              setBoardId(board.uid);
+                            ? boards.map((board: any, index: number) => {
+                                return (
+                                  <Draggable
+                                    key={board.uid}
+                                    draggableId={board.uid}
+                                    index={index}
+                                  >
+                                    {(
+                                      provided: DraggableProvided,
+                                      snapshot: any
+                                    ) => {
+                                      return (
+                                        // Single Board
+                                        <div
+                                          onClick={() => {
+                                            setBoardId(board.uid);
+                                          }}
+                                          ref={provided.innerRef}
+                                          {...provided.draggableProps}
+                                          {...provided.dragHandleProps}
+                                          className={`board rounded-r-full ${
+                                            board.uid === boardId
+                                              ? snapshot.isDragging
+                                                ? " bg-fontTertiary bg-opacity-60 select-none text-fontPrimaryDark"
+                                                : " bg-fontTertiary text-fontPrimaryDark opacity-100"
+                                              : " active:bg-fontTertiary active:bg-opacity-60 active:text-fontPrimaryDark"
+                                          }}`}
+                                        >
+                                          <TbLayoutBoardSplit />
+                                          <input
+                                            className="bg-transparent cursor-pointer outline-none"
+                                            type="text"
+                                            value={board.title}
+                                            onChange={(e) => {
+                                              updateBoardName(
+                                                board.uid,
+                                                e.target.value
+                                              );
                                             }}
-                                            ref={provided.innerRef}
-                                            {...provided.draggableProps}
-                                            {...provided.dragHandleProps}
-                                            className={`board rounded-r-full ${
-                                              board.uid === boardId
-                                                ? snapshot.isDragging
-                                                  ? " bg-fontTertiary bg-opacity-60 select-none text-fontPrimaryDark"
-                                                  : " bg-fontTertiary text-fontPrimaryDark opacity-100"
-                                                : " active:bg-fontTertiary active:bg-opacity-60 active:text-fontPrimaryDark"
-                                            }}`}
-                                          >
-                                            <TbLayoutBoardSplit />
-                                            <input
-                                              className="bg-transparent cursor-pointer outline-none"
-                                              type="text"
-                                              value={board.title}
-                                              onChange={(e) => {
-                                                updateBoardName(
-                                                  board.uid,
-                                                  e.target.value
-                                                );
-                                              }}
-                                            />
-                                          </div>
-                                        );
-                                      }}
-                                    </Draggable>
-                                  );
-                                }
-                              )
+                                          />
+                                        </div>
+                                      );
+                                    }}
+                                  </Draggable>
+                                );
+                              })
                             : "There is nothing bro :(!"}
                           {provided.placeholder}
                         </div>
                       );
                     }}
                   </Droppable>
-                </DragDropContext>
-                {/* Create new Board container */}
-                <div className="pl-4 flex justify-start items-center gap-3 py-1 text-fontTertiary cursor-pointer dark:hover:bg-fontPrimaryDark hover:bg-fontTertiary hover:bg-opacity-25 hover:rounded-r-full">
-                  <TbLayoutBoardSplit />
-                  <button onClick={handleCreateNewBoard}>
-                    + Create New Board
-                  </button>
+                  {/* Create new Board container */}
+                  <div className="pl-4 flex justify-start items-center gap-3 py-1 text-fontTertiary cursor-pointer dark:hover:bg-fontPrimaryDark hover:bg-fontTertiary hover:bg-opacity-25 hover:rounded-r-full">
+                    <TbLayoutBoardSplit />
+                    <button onClick={handleCreateNewBoard}>
+                      + Create New Board
+                    </button>
+                  </div>
                 </div>
-              </div>
-              {/* Shared Boards Container */}
-              <div className="w-[100%] text-fontSecondary">
-                <h3 className="pl-4 uppercase font-bold text-xs mb-4">
-                  Shared Boards
-                </h3>
-                {/* {sharedBoards?.map((board: any) => {
-                  return board?.title;
-                })} */}
-              </div>
-            </section>
+                {/* Shared Boards Container */}
+                {sharedBoards && (
+                  <div className="w-[100%] text-fontSecondary">
+                    {/* Shared Boards title */}
+                    <h3 className="pl-4 uppercase font-bold text-xs mb-4">
+                      {`Shared Boards (${sharedBoards?.length})`}
+                    </h3>
+                    <Droppable droppableId="sharedBoards" type="sharedBoards">
+                      {(provided: DroppableProvided, snapshot: any) => {
+                        return (
+                          // ref allows react-beautiful-dnd to control the div
+                          <div
+                            {...provided.droppableProps}
+                            ref={provided.innerRef}
+                            className="overflow-auto"
+                          >
+                            {sharedBoards.map((board: any, index: number) => {
+                              return (
+                                <Draggable
+                                  key={board.uid}
+                                  draggableId={board.uid}
+                                  index={index}
+                                >
+                                  {(
+                                    provided: DraggableProvided,
+                                    snapshot: any
+                                  ) => {
+                                    return (
+                                      // Single Board
+                                      <div
+                                        onClick={() => {
+                                          setBoardId(board.uid);
+                                        }}
+                                        ref={provided.innerRef}
+                                        {...provided.draggableProps}
+                                        {...provided.dragHandleProps}
+                                        className={`board rounded-r-full ${
+                                          board.uid === boardId
+                                            ? snapshot.isDragging
+                                              ? " bg-fontTertiary bg-opacity-60 select-none text-fontPrimaryDark"
+                                              : " bg-fontTertiary text-fontPrimaryDark opacity-100"
+                                            : " active:bg-fontTertiary active:bg-opacity-60 active:text-fontPrimaryDark"
+                                        }}`}
+                                      >
+                                        <TbLayoutBoardSplit />
+                                        <input
+                                          className="bg-transparent cursor-pointer outline-none"
+                                          type="text"
+                                          value={board.title}
+                                          onChange={(e) => {
+                                            updateBoardName(
+                                              board.uid,
+                                              e.target.value
+                                            );
+                                          }}
+                                        />
+                                      </div>
+                                    );
+                                  }}
+                                </Draggable>
+                              );
+                            })}
+                            {provided.placeholder}
+                          </div>
+                        );
+                      }}
+                    </Droppable>
+                  </div>
+                )}
+              </section>
+            </DragDropContext>
             {/* Log in/out btn + theme toggle + hide sidebar section */}
             <section className="mt-auto flex flex-col w-[100%]">
               {user && (

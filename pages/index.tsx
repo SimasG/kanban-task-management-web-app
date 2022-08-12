@@ -1,11 +1,4 @@
-import {
-  collectionGroup,
-  doc,
-  getDocs,
-  query,
-  updateDoc,
-  where,
-} from "firebase/firestore";
+import { doc, updateDoc } from "firebase/firestore";
 import type { NextPage } from "next";
 import React, { useContext, useEffect, useState } from "react";
 import AddNewTaskModal from "../components/AddNewTaskModal";
@@ -27,15 +20,7 @@ const Home: NextPage = () => {
   const user = useContext(UserContext);
   const boards: any = useFetchFsBoards(user?.uid);
 
-  // ** Why am I getting a promise instead of a value? In the useFetch hook, I got the value.
   const sharedBoards = useFetchFsSharedBoards();
-  console.log("sharedBoards in index:", sharedBoards);
-
-  // let sharedSharedBoards: any = [];
-  // sharedBoards.then((values) => {
-  //   sharedSharedBoards = values;
-  // });
-  // console.log("sharedSharedBoards:", sharedSharedBoards);
 
   const users = useFetchFsUsers();
 
@@ -49,31 +34,7 @@ const Home: NextPage = () => {
   // SideNav
   const [isOpen, setIsOpen] = useState(true);
 
-  // const [sharedBoards, setSharedBoards] = useState<any>([]);
-
   let activeBoard: any;
-
-  // ** Why am I getting an infinite loop here?
-  // useEffect(() => {
-  //   if (!user?.email) return;
-
-  //   const fetchFsSharedBoards = async () => {
-  //     const sharedBoardsQuery = query(
-  //       collectionGroup(db, "boards"),
-  //       where("collaborators", "array-contains-any", [`${user?.email}`])
-  //     );
-
-  //     const fetchedSharedBoards = (await getDocs(sharedBoardsQuery)).docs.map(
-  //       (doc: any) => doc.data()
-  //     );
-
-  //     setSharedBoards(fetchedSharedBoards);
-  //   };
-
-  //   fetchFsSharedBoards();
-  // }, [sharedBoards, user?.email, setSharedBoards]);
-
-  // console.log("sharedBoards in index:", sharedBoards);
 
   useEffect(() => {
     // setFetching(true);

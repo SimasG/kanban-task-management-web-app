@@ -2495,24 +2495,54 @@ const userRef = doc(db, "users", `${user?.uid}`);
 const sharedBoardIds = useDocumentData(userRef)[0]?.sharedBoards;
 if (!sharedBoardIds) return;
 
-// *SSR
+// \*SSR
 export async function getServerSideProps() {
-  // const user = useContext(UserContext);
+// const user = useContext(UserContext);
 
-  const sharedBoardsQuery = query(
-    collectionGroup(db, "boards"),
-    where("collaborators", "array-contains-any", [`simhka15@gmail.com`])
-  );
+const sharedBoardsQuery = query(
+collectionGroup(db, "boards"),
+where("collaborators", "array-contains-any", [`simhka15@gmail.com`])
+);
 
-  const sharedBoards = (await getDocs(sharedBoardsQuery)).docs.map((doc: any) =>
-    doc.data()
-  );
-  console.log(sharedBoards);
+const sharedBoards = (await getDocs(sharedBoardsQuery)).docs.map((doc: any) =>
+doc.data()
+);
+console.log(sharedBoards);
 
-  return {
-    props: { sharedBoards },
-  };
+return {
+props: { sharedBoards },
+};
 }
 
-  const [sharedBoards, setSharedBoards] = useState(props.sharedBoards);
-  console.log("sharedBoards state using SSR:", sharedBoards);
+const [sharedBoards, setSharedBoards] = useState(props.sharedBoards);
+console.log("sharedBoards state using SSR:", sharedBoards);
+
+// let sharedSharedBoards: any = [];
+// sharedBoards.then((values) => {
+// sharedSharedBoards = values;
+// });
+// console.log("sharedSharedBoards:", sharedSharedBoards);
+
+    // const [sharedBoards, setSharedBoards] = useState<any>([]);
+
+// \*\* Why am I getting an infinite loop here?
+// useEffect(() => {
+// if (!user?.email) return;
+
+// const fetchFsSharedBoards = async () => {
+// const sharedBoardsQuery = query(
+// collectionGroup(db, "boards"),
+// where("collaborators", "array-contains-any", [`${user?.email}`])
+// );
+
+// const fetchedSharedBoards = (await getDocs(sharedBoardsQuery)).docs.map(
+// (doc: any) => doc.data()
+// );
+
+// setSharedBoards(fetchedSharedBoards);
+// };
+
+// fetchFsSharedBoards();
+// }, [sharedBoards, user?.email, setSharedBoards]);
+
+// console.log("sharedBoards in index:", sharedBoards);
