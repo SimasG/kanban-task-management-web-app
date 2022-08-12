@@ -36,12 +36,15 @@ const Home: NextPage = () => {
 
   let activeBoard: any;
 
+  // Initial setting of boardId
   useEffect(() => {
     // setFetching(true);
     if (activeBoard?.length > 0 && boards?.length > 0) return;
     setBoardId(boards?.[0]?.uid);
     // setFetching(false);
   }, [activeBoard, boards]);
+
+  console.log("boardId:", boardId);
 
   // ** Do these hooks re-fetch *all* the documents on each re-render (not just the new/updated ones)?
   const columns: any = useFetchFsColumns(boardId);

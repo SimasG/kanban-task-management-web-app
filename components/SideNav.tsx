@@ -254,8 +254,8 @@ const SideNav = ({
                                           className={`board rounded-r-full ${
                                             board.uid === boardId
                                               ? snapshot.isDragging
-                                                ? " bg-fontTertiary bg-opacity-60 select-none text-fontPrimaryDark"
-                                                : " bg-fontTertiary text-fontPrimaryDark opacity-100"
+                                                ? " bg-fontTertiary bg-opacity-60 select-none text-fontPrimaryDark drop-shadow-lg hover:drop-shadow-xl"
+                                                : " bg-fontTertiary text-fontPrimaryDark opacity-100 drop-shadow-lg hover:drop-shadow-xl"
                                               : " active:bg-fontTertiary active:bg-opacity-60 active:text-fontPrimaryDark"
                                           }}`}
                                         >
@@ -330,8 +330,8 @@ const SideNav = ({
                                         className={`board rounded-r-full ${
                                           board.uid === boardId
                                             ? snapshot.isDragging
-                                              ? " bg-fontTertiary bg-opacity-60 select-none text-fontPrimaryDark"
-                                              : " bg-fontTertiary text-fontPrimaryDark opacity-100"
+                                              ? " bg-fontTertiary bg-opacity-60 select-none text-fontPrimaryDark drop-shadow-lg hover:drop-shadow-xl"
+                                              : " bg-fontTertiary text-fontPrimaryDark opacity-100 drop-shadow-lg hover:drop-shadow-xl"
                                             : " active:bg-fontTertiary active:bg-opacity-60 active:text-fontPrimaryDark"
                                         }}`}
                                       >

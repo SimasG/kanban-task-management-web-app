@@ -201,7 +201,7 @@ const Column = ({
                                   e.stopPropagation();
                                   setShowEditTaskModal(true);
                                 }}
-                                className="task"
+                                className="task drop-shadow-lg hover:drop-shadow-xl"
                                 key={task?.uid}
                                 ref={provided.innerRef}
                                 {...provided.draggableProps}

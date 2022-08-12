@@ -109,7 +109,7 @@ const TopSettings = ({
             onClick={(e) => {
               handleAddNewTaskBtn(e);
             }}
-            className="purpleBtn hidden text-xs px-2 md:px-3 lg:px-4 sm:block md:text-sm lg:text-base"
+            className="purpleBtn hidden text-xs px-2 drop-shadow-lg hover:drop-shadow-xl md:px-3 lg:px-4 sm:block md:text-sm lg:text-base"
           >
             + New Task
           </button>
