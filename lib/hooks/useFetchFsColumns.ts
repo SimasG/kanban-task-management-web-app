@@ -24,7 +24,7 @@ const useFetchFsColumns = (
   let q: any;
 
   if (!sharedBoardIds.includes(boardId)) {
-    console.log("Fetch Columns from a personal Board");
+    // Fetch Columns from a personal Board
     const columnsCollectionRef = collection(
       db,
       "users",
@@ -33,7 +33,7 @@ const useFetchFsColumns = (
     );
     q = query(columnsCollectionRef, where("board", "==", `${boardId}`));
   } else {
-    console.log("Fetch Columns from a shared Board");
+    // Fetch Columns from a shared Board
     const sharedBoard = currentUser?.sharedBoards?.find(
       (board: any) => board?.board === boardId
     );

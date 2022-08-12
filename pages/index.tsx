@@ -21,6 +21,10 @@ const Home: NextPage = () => {
   const boards: any = useFetchFsBoards(user?.uid);
   const sharedBoards = useFetchFsSharedBoards();
 
+  // Creating shared Board Ids array to identify whether the Board manipulated is personal or shared
+  let sharedBoardIds: any = [];
+  sharedBoards?.map((board: any) => sharedBoardIds.push(board?.uid));
+
   const users = useFetchFsUsers();
 
   // ** STATES
@@ -47,16 +51,24 @@ const Home: NextPage = () => {
   const columns: any = useFetchFsColumns(boardId, users);
   const tasks: any = useFetchFsTasks(boardId);
 
-  console.log("columns:", columns);
-
   activeBoard = boards?.filter((board: any) => board?.uid === boardId);
 
   const updateBoardName = async (uid: string, newName: string) => {
     if (newName === "") return;
-    const boardDocRef = doc(db, "users", `${user?.uid}`, "boards", uid);
-    await updateDoc(boardDocRef, {
-      title: newName,
-    });
+
+    if (sharedBoardIds.includes(boardId)) {
+      console.log("Update shared Board Name");
+    } else {
+      console.log("Update personal Board Name");
+    }
+
+    // If active Board is personal Board -> path 1
+    // If active Board is shared Board -> path 2
+
+    // const boardDocRef = doc(db, "users", `${user?.uid}`, "boards", uid);
+    // await updateDoc(boardDocRef, {
+    //   title: newName,
+    // });
   };
 
   return (
