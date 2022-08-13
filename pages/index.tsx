@@ -85,14 +85,6 @@ const Home: NextPage = () => {
         title: newName,
       });
     }
-
-    // If active Board is personal Board -> path 1
-    // If active Board is shared Board -> path 2
-
-    // const boardDocRef = doc(db, "users", `${user?.uid}`, "boards", uid);
-    // await updateDoc(boardDocRef, {
-    //   title: newName,
-    // });
   };
 
   return (
@@ -135,6 +127,7 @@ const Home: NextPage = () => {
               columns={columns}
               isOpen={isOpen}
               setShowShareModal={setShowShareModal}
+              sharedBoardIds={sharedBoardIds}
             />
             {showAddTaskModal && (
               <AddNewTaskModal

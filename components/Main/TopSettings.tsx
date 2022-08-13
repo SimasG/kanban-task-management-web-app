@@ -13,6 +13,7 @@ type TopSettingsProps = {
   updateBoardName: (uid: string, newName: string) => Promise<void>;
   columns: any;
   setShowShareModal: React.Dispatch<React.SetStateAction<boolean>>;
+  sharedBoardIds: any;
 };
 
 const TopSettings = ({
@@ -24,6 +25,7 @@ const TopSettings = ({
   updateBoardName,
   columns,
   setShowShareModal,
+  sharedBoardIds,
 }: TopSettingsProps) => {
   const user = useContext(UserContext);
   const [readOnlyState, setReadOnlyState] = useState(false);
@@ -114,13 +116,15 @@ const TopSettings = ({
             + New Task
           </button>
           {/* Share Btn */}
-          <button
-            onClick={(e) => handleShareBtn(e)}
-            className="bg-fontPrimaryDark dark:hover:bg-fontTertiary text-fontTertiary dark:hover:text-fontPrimaryDark font-bold rounded-full py-2 px-2 md:px-3 lg:px-4 drop-shadow-lg hover:drop-shadow-xl flex justify-between items-center gap-1 text-xs md:text-sm lg:text-base"
-          >
-            <AiOutlineUserAdd />
-            <p>Share</p>
-          </button>
+          {!sharedBoardIds.includes(boardId) && (
+            <button
+              onClick={(e) => handleShareBtn(e)}
+              className="bg-fontPrimaryDark dark:hover:bg-fontTertiary text-fontTertiary dark:hover:text-fontPrimaryDark font-bold rounded-full py-2 px-2 md:px-3 lg:px-4 drop-shadow-lg hover:drop-shadow-xl flex justify-between items-center gap-1 text-xs md:text-sm lg:text-base"
+            >
+              <AiOutlineUserAdd />
+              <p>Share</p>
+            </button>
+          )}
           {/* Mobile Add New Task Btn */}
           <button
             onClick={(e) => {
@@ -131,21 +135,23 @@ const TopSettings = ({
             <span className="relative bottom-[3px]">+</span>
           </button>
           {/* Delete Board Btn */}
-          <svg
-            onClick={() => handleDeleteBoard(boardId)}
-            className="w-12 h-12 sm:w-10 sm:h-10 p-2 text-fontSecondary rounded cursor-pointer hover:bg-backgroundColorMain hover:dark:bg-darkBlue"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-            ></path>
-          </svg>
+          {!sharedBoardIds.includes(boardId) && (
+            <svg
+              onClick={() => handleDeleteBoard(boardId)}
+              className="w-12 h-12 sm:w-10 sm:h-10 p-2 text-fontSecondary rounded cursor-pointer hover:bg-backgroundColorMain hover:dark:bg-darkBlue"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+              ></path>
+            </svg>
+          )}
         </div>
       )}
     </section>

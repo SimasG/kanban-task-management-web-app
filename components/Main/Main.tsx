@@ -28,6 +28,7 @@ type MainProps = {
   columns: any;
   isOpen: boolean;
   setShowShareModal: React.Dispatch<React.SetStateAction<boolean>>;
+  sharedBoardIds: any;
 };
 
 const Main = ({
@@ -43,6 +44,7 @@ const Main = ({
   columns,
   isOpen,
   setShowShareModal,
+  sharedBoardIds,
 }: MainProps) => {
   const user = useContext(UserContext);
 
@@ -322,6 +324,7 @@ const Main = ({
         updateBoardName={updateBoardName}
         columns={columns}
         setShowShareModal={setShowShareModal}
+        sharedBoardIds={sharedBoardIds}
       />
       {/* Main content */}
       <DragDropContext onDragEnd={onDragEnd}>
