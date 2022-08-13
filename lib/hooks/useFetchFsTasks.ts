@@ -24,7 +24,7 @@ const useFetchFsTasks = (
   let q: any;
 
   if (sharedBoardIds.includes(boardId)) {
-    console.log("Fetch Tasks from shared Board");
+    // Fetching Tasks from shared Board
     const sharedBoard = currentUser?.sharedBoards?.find(
       (board: any) => board?.board === boardId
     );
@@ -37,7 +37,7 @@ const useFetchFsTasks = (
 
     q = query(columnsCollectionRef, where("board", "==", `${boardId}`));
   } else {
-    console.log("Fetch Tasks from personal Board");
+    // Fetching Tasks from personal Board
     const columnsCollectionRef = collection(
       db,
       "users",

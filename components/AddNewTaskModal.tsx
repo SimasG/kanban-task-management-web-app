@@ -13,6 +13,8 @@ type IndexProps = {
   setShowAddTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
   tasks: any;
   columns: any;
+  sharedBoardIds: any;
+  users: any;
 };
 
 const AddNewTaskModal = ({
@@ -20,6 +22,8 @@ const AddNewTaskModal = ({
   setShowAddTaskModal,
   tasks,
   columns,
+  sharedBoardIds,
+  users,
 }: IndexProps) => {
   type initialValuesProps = {
     title: string;
@@ -66,7 +70,23 @@ const AddNewTaskModal = ({
     );
 
     const uid = uuidv4();
-    const taskDocRef = doc(db, "users", `${user?.uid}`, "tasks", `${uid}`);
+    let taskDocRef: any;
+
+    if (sharedBoardIds.includes(boardId)) {
+      console.log("Add New Task in shared Board");
+      // Finding Current User (Invitee) Firebase Doc
+      const currentUser = users?.find(
+        (currentUser: any) => currentUser.uid === user?.uid
+      );
+      // Find User Id (Inviter) of the Shared Board
+      const sharedBoard = currentUser?.sharedBoards?.find(
+        (board: any) => board?.board === boardId
+      );
+      taskDocRef = doc(db, "users", `${sharedBoard?.user}`, "tasks", `${uid}`);
+    } else {
+      console.log("Add New Task in personal Board");
+      taskDocRef = doc(db, "users", `${user?.uid}`, "tasks", `${uid}`);
+    }
 
     const chosenColumnTasks = tasks?.filter(
       (task: any) => task?.status === parseInt(values?.status)

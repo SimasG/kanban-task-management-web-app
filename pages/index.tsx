@@ -128,6 +128,8 @@ const Home: NextPage = () => {
                 setShowAddTaskModal={setShowAddTaskModal}
                 tasks={tasks}
                 columns={columns}
+                sharedBoardIds={sharedBoardIds}
+                users={users}
               />
             )}
             {showEditTaskModal && (
