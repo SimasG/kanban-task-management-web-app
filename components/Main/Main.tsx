@@ -227,47 +227,104 @@ const Main = ({
       (task: any) => task?.status === sourceColumn?.status
     );
 
-    columnTasks?.map((task: any) => {
-      if (destinationIndex > sourceIndex) {
-        // Decrement Tasks
-        if (task.index > sourceIndex && task.index <= destinationIndex) {
-          const taskDocRef = doc(
-            db,
-            "users",
-            `${user?.uid}`,
-            "tasks",
-            `${task?.uid}`
-          );
-          batch.update(taskDocRef, { index: increment(-1) });
-        }
-      } else if (destinationIndex < sourceIndex) {
-        // Increment Tasks
-        if (task.index < sourceIndex && task.index >= destinationIndex) {
-          const taskDocRef = doc(
-            db,
-            "users",
-            `${user?.uid}`,
-            "tasks",
-            `${task?.uid}`
-          );
-          batch.update(taskDocRef, { index: increment(1) });
-        }
-      }
-    });
-    // Changing index of dragged Task
-    const taskDocRef = doc(
-      db,
-      "users",
-      `${user?.uid}`,
-      "tasks",
-      `${updatedTaskId}`
-    );
-    batch.update(taskDocRef, {
-      index: destinationIndex,
-      updatedAt: Timestamp.fromDate(new Date()),
-    });
+    if (sharedBoardIds.includes(boardId)) {
+      // Task DnD in a shared Board (within Column)
 
-    await batch.commit();
+      // Finding Current User (Invitee) Firebase Doc
+      const currentUser = users?.find(
+        (currentUser: any) => currentUser.uid === user?.uid
+      );
+      // Find User Id (Inviter) of the Shared Board
+      const sharedBoard = currentUser?.sharedBoards?.find(
+        (board: any) => board?.board === boardId
+      );
+
+      columnTasks?.map((task: any) => {
+        if (destinationIndex > sourceIndex) {
+          // Decrement Tasks
+          if (task.index > sourceIndex && task.index <= destinationIndex) {
+            const taskDocRef = doc(
+              db,
+              "users",
+              `${sharedBoard?.user}`,
+              "tasks",
+              `${task?.uid}`
+            );
+            batch.update(taskDocRef, { index: increment(-1) });
+          }
+        } else if (destinationIndex < sourceIndex) {
+          // Increment Tasks
+          if (task.index < sourceIndex && task.index >= destinationIndex) {
+            const taskDocRef = doc(
+              db,
+              "users",
+              `${sharedBoard?.user}`,
+              "tasks",
+              `${task?.uid}`
+            );
+            batch.update(taskDocRef, { index: increment(1) });
+          }
+        }
+      });
+      // Changing index of dragged Task
+      const taskDocRef = doc(
+        db,
+        "users",
+        `${sharedBoard?.user}`,
+        "tasks",
+        `${updatedTaskId}`
+      );
+      batch.update(taskDocRef, {
+        index: destinationIndex,
+        updatedAt: Timestamp.fromDate(new Date()),
+      });
+
+      await batch.commit();
+    } else {
+      // Task DnD in a personal Board (within Column)
+
+      columnTasks?.map((task: any) => {
+        if (destinationIndex > sourceIndex) {
+          // Decrement Tasks
+          if (task.index > sourceIndex && task.index <= destinationIndex) {
+            const taskDocRef = doc(
+              db,
+              "users",
+              `${user?.uid}`,
+              "tasks",
+              `${task?.uid}`
+            );
+            batch.update(taskDocRef, { index: increment(-1) });
+          }
+        } else if (destinationIndex < sourceIndex) {
+          // Increment Tasks
+          if (task.index < sourceIndex && task.index >= destinationIndex) {
+            const taskDocRef = doc(
+              db,
+              "users",
+              `${user?.uid}`,
+              "tasks",
+              `${task?.uid}`
+            );
+            batch.update(taskDocRef, { index: increment(1) });
+          }
+        }
+      });
+      // Changing index of dragged Task
+      const taskDocRef = doc(
+        db,
+        "users",
+        `${user?.uid}`,
+        "tasks",
+        `${updatedTaskId}`
+      );
+      batch.update(taskDocRef, {
+        index: destinationIndex,
+        updatedAt: Timestamp.fromDate(new Date()),
+      });
+
+      await batch.commit();
+    }
   };
 
   const updateTaskBetweenColumns = async (
@@ -277,70 +334,150 @@ const Main = ({
     sourceColumnId: string,
     destinationColumnId: string
   ) => {
-    try {
-      await runTransaction(db, async (transaction) => {
-        // ** 1. Update index & status of dragged Task
-        const taskDocRef = doc(
-          db,
-          "users",
-          `${user?.uid}`,
-          "tasks",
-          `${draggedTaskId}`
-        );
+    if (sharedBoardIds.includes(boardId)) {
+      console.log("Task DnD in a shared Board (between Columns)");
 
-        const destinationColumn = columns?.find(
-          (column: any) => column?.uid === destinationColumnId
-        );
+      // Finding Current User (Invitee) Firebase Doc
+      const currentUser = users?.find(
+        (currentUser: any) => currentUser.uid === user?.uid
+      );
+      // Find User Id (Inviter) of the Shared Board
+      const sharedBoard = currentUser?.sharedBoards?.find(
+        (board: any) => board?.board === boardId
+      );
 
-        transaction.update(taskDocRef, {
-          index: destinationIndex,
-          status: destinationColumn?.status,
+      try {
+        await runTransaction(db, async (transaction) => {
+          // ** 1. Update index & status of dragged Task
+          const taskDocRef = doc(
+            db,
+            "users",
+            `${sharedBoard?.user}`,
+            "tasks",
+            `${draggedTaskId}`
+          );
+
+          const destinationColumn = columns?.find(
+            (column: any) => column?.uid === destinationColumnId
+          );
+
+          transaction.update(taskDocRef, {
+            index: destinationIndex,
+            status: destinationColumn?.status,
+          });
+
+          // ** 2. Decrement (by 1) the indexes of Tasks that came after dragged Task in source Column
+          const sourceColumn = columns?.find(
+            (column: any) => column?.uid === sourceColumnId
+          );
+          const sourceColumnTasks = tasks?.filter(
+            (task: any) => task?.status === sourceColumn?.status
+          );
+
+          sourceColumnTasks?.map((task: any) => {
+            if (task.index > sourceIndex) {
+              if (task.uid === draggedTaskId) return;
+              const taskDocRef = doc(
+                db,
+                "users",
+                `${sharedBoard?.user}`,
+                "tasks",
+                `${task?.uid}`
+              );
+              transaction.update(taskDocRef, { index: increment(-1) });
+            }
+          });
+
+          // ** 3. Increment (by 1) the indexes of Tasks that came after dragged Task in destination Column
+          const destinationColumnTasks = tasks?.filter(
+            (task: any) => task?.status === destinationColumn?.status
+          );
+          destinationColumnTasks?.map((task: any) => {
+            // |task.index reflects the Tasks' indexes before being updated with the dragged Task.
+            // That's why the Task index at task.index === destinationIndex should still be incremented.
+            if (task.index >= destinationIndex) {
+              if (task.uid === draggedTaskId) return;
+              const taskDocRef = doc(
+                db,
+                "users",
+                `${sharedBoard?.user}`,
+                "tasks",
+                `${task?.uid}`
+              );
+              transaction.update(taskDocRef, { index: increment(1) });
+            }
+          });
         });
+      } catch (err) {
+        console.log("Transaction failed: ", err);
+      }
+    } else {
+      console.log("Task DnD in a personal Board (between Columns)");
+      try {
+        await runTransaction(db, async (transaction) => {
+          // ** 1. Update index & status of dragged Task
+          const taskDocRef = doc(
+            db,
+            "users",
+            `${user?.uid}`,
+            "tasks",
+            `${draggedTaskId}`
+          );
 
-        // ** 2. Decrement (by 1) the indexes of Tasks that came after dragged Task in source Column
-        const sourceColumn = columns?.find(
-          (column: any) => column?.uid === sourceColumnId
-        );
-        const sourceColumnTasks = tasks?.filter(
-          (task: any) => task?.status === sourceColumn?.status
-        );
+          const destinationColumn = columns?.find(
+            (column: any) => column?.uid === destinationColumnId
+          );
 
-        sourceColumnTasks?.map((task: any) => {
-          if (task.index > sourceIndex) {
-            if (task.uid === draggedTaskId) return;
-            const taskDocRef = doc(
-              db,
-              "users",
-              `${user?.uid}`,
-              "tasks",
-              `${task?.uid}`
-            );
-            transaction.update(taskDocRef, { index: increment(-1) });
-          }
+          transaction.update(taskDocRef, {
+            index: destinationIndex,
+            status: destinationColumn?.status,
+          });
+
+          // ** 2. Decrement (by 1) the indexes of Tasks that came after dragged Task in source Column
+          const sourceColumn = columns?.find(
+            (column: any) => column?.uid === sourceColumnId
+          );
+          const sourceColumnTasks = tasks?.filter(
+            (task: any) => task?.status === sourceColumn?.status
+          );
+
+          sourceColumnTasks?.map((task: any) => {
+            if (task.index > sourceIndex) {
+              if (task.uid === draggedTaskId) return;
+              const taskDocRef = doc(
+                db,
+                "users",
+                `${user?.uid}`,
+                "tasks",
+                `${task?.uid}`
+              );
+              transaction.update(taskDocRef, { index: increment(-1) });
+            }
+          });
+
+          // ** 3. Increment (by 1) the indexes of Tasks that came after dragged Task in destination Column
+          const destinationColumnTasks = tasks?.filter(
+            (task: any) => task?.status === destinationColumn?.status
+          );
+          destinationColumnTasks?.map((task: any) => {
+            // |task.index reflects the Tasks' indexes before being updated with the dragged Task.
+            // That's why the Task index at task.index === destinationIndex should still be incremented.
+            if (task.index >= destinationIndex) {
+              if (task.uid === draggedTaskId) return;
+              const taskDocRef = doc(
+                db,
+                "users",
+                `${user?.uid}`,
+                "tasks",
+                `${task?.uid}`
+              );
+              transaction.update(taskDocRef, { index: increment(1) });
+            }
+          });
         });
-
-        // ** 3. Increment (by 1) the indexes of Tasks that came after dragged Task in destination Column
-        const destinationColumnTasks = tasks?.filter(
-          (task: any) => task?.status === destinationColumn?.status
-        );
-        destinationColumnTasks?.map((task: any) => {
-          // |task.index reflects the Tasks' indexes before being updated with the dragged Task.
-          // That's why the Task index at task.index === destinationIndex should still be incremented.
-          if (task.index >= destinationIndex) {
-            if (task.uid === draggedTaskId) return;
-            const taskDocRef = doc(
-              db,
-              "users",
-              `${user?.uid}`,
-              "tasks",
-              `${task?.uid}`
-            );
-            transaction.update(taskDocRef, { index: increment(1) });
-          }
-        });
-      });
-    } catch (err) {
-      console.log("Transaction failed: ", err);
+      } catch (err) {
+        console.log("Transaction failed: ", err);
+      }
     }
   };
 

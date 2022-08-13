@@ -139,6 +139,8 @@ const Home: NextPage = () => {
                 setShowEditTaskModal={setShowEditTaskModal}
                 tasks={tasks}
                 columns={columns}
+                sharedBoardIds={sharedBoardIds}
+                users={users}
               />
             )}
             {showShareModal && (

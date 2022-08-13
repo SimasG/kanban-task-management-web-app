@@ -73,7 +73,8 @@ const AddNewTaskModal = ({
     let taskDocRef: any;
 
     if (sharedBoardIds.includes(boardId)) {
-      console.log("Add New Task in shared Board");
+      // Add New Task in shared Board
+
       // Finding Current User (Invitee) Firebase Doc
       const currentUser = users?.find(
         (currentUser: any) => currentUser.uid === user?.uid
@@ -84,7 +85,7 @@ const AddNewTaskModal = ({
       );
       taskDocRef = doc(db, "users", `${sharedBoard?.user}`, "tasks", `${uid}`);
     } else {
-      console.log("Add New Task in personal Board");
+      // Add New Task in personal Board
       taskDocRef = doc(db, "users", `${user?.uid}`, "tasks", `${uid}`);
     }
 

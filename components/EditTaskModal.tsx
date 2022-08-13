@@ -14,6 +14,8 @@ type IndexProps = {
   setShowEditTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
   tasks: any;
   columns: any;
+  sharedBoardIds: any;
+  users: any;
 };
 
 const EditTaskModal = ({
@@ -22,6 +24,8 @@ const EditTaskModal = ({
   setShowEditTaskModal,
   tasks,
   columns,
+  sharedBoardIds,
+  users,
 }: IndexProps) => {
   const user = useContext(UserContext);
   const [data, setData] = useState<any>();
@@ -81,8 +85,30 @@ const EditTaskModal = ({
     resetForm: any
   ) => {
     setSubmitting(true);
+    let taskDocRef: any;
 
-    const taskDocRef = doc(db, "users", `${user?.uid}`, "tasks", `${taskId}`);
+    if (sharedBoardIds.includes(boardId)) {
+      // Edit Task in shared Board
+
+      // Finding Current User (Invitee) Firebase Doc
+      const currentUser = users?.find(
+        (currentUser: any) => currentUser.uid === user?.uid
+      );
+      // Find User Id (Inviter) of the Shared Board
+      const sharedBoard = currentUser?.sharedBoards?.find(
+        (board: any) => board?.board === boardId
+      );
+      taskDocRef = doc(
+        db,
+        "users",
+        `${sharedBoard?.user}`,
+        "tasks",
+        `${taskId}`
+      );
+    } else {
+      // Edit Task in personal Board
+      taskDocRef = doc(db, "users", `${user?.uid}`, "tasks", `${taskId}`);
+    }
 
     await updateDoc(taskDocRef, {
       // Using type guard to ensure that we're always spreading an object
