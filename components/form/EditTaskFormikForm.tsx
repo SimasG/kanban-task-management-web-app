@@ -15,6 +15,8 @@ type IndexProps = {
   tasks: any;
   formik: any;
   columns: any;
+  sharedBoardIds: any;
+  users: any;
 };
 
 const FormikForm = ({
@@ -24,6 +26,8 @@ const FormikForm = ({
   tasks,
   formik,
   columns,
+  sharedBoardIds,
+  users,
 }: IndexProps) => {
   const user = useContext(UserContext);
 
@@ -50,22 +54,60 @@ const FormikForm = ({
       (task: any) => task?.status === initialValues?.status
     );
 
-    // Delete chosen Task
-    const taskRef = doc(db, "users", `${user?.uid}`, "tasks", `${taskId}`);
-    batch.delete(taskRef);
+    if (sharedBoardIds.includes(boardId)) {
+      // Delete Task in shared Board
 
-    // Decrement indexes of Tasks that came after the deleted Task
-    selectedColumnTasks.map((task: any) => {
-      if (task?.index <= initialValues?.index) return;
-      const taskDocRef = doc(
+      // Finding Current User (Invitee) Firebase Doc
+      const currentUser = users?.find(
+        (currentUser: any) => currentUser.uid === user?.uid
+      );
+      // Find User Id (Inviter) of the Shared Board
+      const sharedBoard = currentUser?.sharedBoards?.find(
+        (board: any) => board?.board === boardId
+      );
+
+      // Delete chosen Task
+      const taskRef = doc(
         db,
         "users",
-        `${user?.uid}`,
+        `${sharedBoard?.user}`,
         "tasks",
-        `${task?.uid}`
+        `${taskId}`
       );
-      batch.update(taskDocRef, { index: increment(-1) });
-    });
+      batch.delete(taskRef);
+
+      // Decrement indexes of Tasks that came after the deleted Task
+      selectedColumnTasks.map((task: any) => {
+        if (task?.index <= initialValues?.index) return;
+        const taskDocRef = doc(
+          db,
+          "users",
+          `${sharedBoard?.user}`,
+          "tasks",
+          `${task?.uid}`
+        );
+        batch.update(taskDocRef, { index: increment(-1) });
+      });
+    } else {
+      // Delete Task in personal Board
+
+      // Delete chosen Task
+      const taskRef = doc(db, "users", `${user?.uid}`, "tasks", `${taskId}`);
+      batch.delete(taskRef);
+
+      // Decrement indexes of Tasks that came after the deleted Task
+      selectedColumnTasks.map((task: any) => {
+        if (task?.index <= initialValues?.index) return;
+        const taskDocRef = doc(
+          db,
+          "users",
+          `${user?.uid}`,
+          "tasks",
+          `${task?.uid}`
+        );
+        batch.update(taskDocRef, { index: increment(-1) });
+      });
+    }
 
     await batch.commit();
     setShowEditTaskModal(false);

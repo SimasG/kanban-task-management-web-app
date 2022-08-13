@@ -140,6 +140,8 @@ const EditTaskModal = ({
             tasks={tasks}
             formik={formik}
             columns={columns}
+            sharedBoardIds={sharedBoardIds}
+            users={users}
           />
         );
       }}
