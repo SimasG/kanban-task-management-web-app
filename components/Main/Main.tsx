@@ -110,49 +110,105 @@ const Main = ({
     sourceIndex: number,
     destinationIndex: number
   ) => {
-    const batch = writeBatch(db);
+    if (sharedBoardIds.includes(boardId)) {
+      console.log("Shared Column DnD");
 
-    // 1. Updating the indexes of affected Columns
-    columns?.map((column: any) => {
-      if (column.uid === draggedColumnId) return;
-      if (destinationIndex > sourceIndex) {
-        if (column.index > sourceIndex && column.index <= destinationIndex) {
-          const columnDocRef = doc(
-            db,
-            "users",
-            `${user?.uid}`,
-            "columns",
-            `${column.uid}`
-          );
-          batch.update(columnDocRef, { index: increment(-1) });
+      // Finding Current User (Invitee) Firebase Doc
+      const currentUser = users?.find(
+        (currentUser: any) => currentUser.uid === user?.uid
+      );
+      // Find User Id (Inviter) of the Shared Board
+      const sharedBoard = currentUser?.sharedBoards?.find(
+        (board: any) => board?.board === boardId
+      );
+
+      const batch = writeBatch(db);
+      // 1. Updating the indexes of affected Columns
+      columns?.map((column: any) => {
+        if (column.uid === draggedColumnId) return;
+        if (destinationIndex > sourceIndex) {
+          if (column.index > sourceIndex && column.index <= destinationIndex) {
+            const columnDocRef = doc(
+              db,
+              "users",
+              `${sharedBoard?.user}`,
+              "columns",
+              `${column.uid}`
+            );
+            batch.update(columnDocRef, { index: increment(-1) });
+          }
+        } else if (destinationIndex < sourceIndex) {
+          if (column.index < sourceIndex && column.index >= destinationIndex) {
+            const columnDocRef = doc(
+              db,
+              "users",
+              `${sharedBoard?.user}`,
+              "columns",
+              `${column.uid}`
+            );
+            batch.update(columnDocRef, { index: increment(1) });
+          }
         }
-      } else if (destinationIndex < sourceIndex) {
-        if (column.index < sourceIndex && column.index >= destinationIndex) {
-          const columnDocRef = doc(
-            db,
-            "users",
-            `${user?.uid}`,
-            "columns",
-            `${column.uid}`
-          );
-          batch.update(columnDocRef, { index: increment(1) });
+      });
+
+      // 2. Updating dragged Column
+      const columnDocRef = doc(
+        db,
+        "users",
+        `${sharedBoard?.user}`,
+        "columns",
+        `${draggedColumnId}`
+      );
+      batch.update(columnDocRef, {
+        index: destinationIndex,
+      });
+
+      await batch.commit();
+    } else {
+      console.log("Personal Column DnD");
+      const batch = writeBatch(db);
+      // 1. Updating the indexes of affected Columns
+      columns?.map((column: any) => {
+        if (column.uid === draggedColumnId) return;
+        if (destinationIndex > sourceIndex) {
+          if (column.index > sourceIndex && column.index <= destinationIndex) {
+            const columnDocRef = doc(
+              db,
+              "users",
+              `${user?.uid}`,
+              "columns",
+              `${column.uid}`
+            );
+            batch.update(columnDocRef, { index: increment(-1) });
+          }
+        } else if (destinationIndex < sourceIndex) {
+          if (column.index < sourceIndex && column.index >= destinationIndex) {
+            const columnDocRef = doc(
+              db,
+              "users",
+              `${user?.uid}`,
+              "columns",
+              `${column.uid}`
+            );
+            batch.update(columnDocRef, { index: increment(1) });
+          }
         }
-      }
-    });
+      });
 
-    // 2. Updating dragged Column
-    const columnDocRef = doc(
-      db,
-      "users",
-      `${user?.uid}`,
-      "columns",
-      `${draggedColumnId}`
-    );
-    batch.update(columnDocRef, {
-      index: destinationIndex,
-    });
+      // 2. Updating dragged Column
+      const columnDocRef = doc(
+        db,
+        "users",
+        `${user?.uid}`,
+        "columns",
+        `${draggedColumnId}`
+      );
+      batch.update(columnDocRef, {
+        index: destinationIndex,
+      });
 
-    await batch.commit();
+      await batch.commit();
+    }
   };
 
   const updateTaskWithinColumn = async (

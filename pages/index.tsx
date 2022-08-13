@@ -51,7 +51,7 @@ const Home: NextPage = () => {
 
   // ** Do these hooks re-fetch *all* the documents on each re-render (not just the new/updated ones)?
   const columns: any = useFetchFsColumns(boardId, users);
-  const tasks: any = useFetchFsTasks(boardId);
+  const tasks: any = useFetchFsTasks(boardId, users);
 
   activeBoard = allBoards?.filter((board: any) => board?.uid === boardId);
 
