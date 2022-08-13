@@ -18,8 +18,10 @@ import useFetchFsUsers from "../lib/hooks/useFetchFsUsers";
 
 const Home: NextPage = () => {
   const user = useContext(UserContext);
-  const boards: any = useFetchFsBoards(user?.uid);
-  const sharedBoards = useFetchFsSharedBoards();
+  const boards: any = useFetchFsBoards(user?.uid); // Personal Boards
+  const sharedBoards = useFetchFsSharedBoards(); // Boards are fetched from the *owner's* Firebase doc path
+
+  const allBoards = boards.concat(sharedBoards);
 
   // Creating shared Board Ids array to identify whether the Board manipulated is personal or shared
   let sharedBoardIds: any = [];
@@ -51,15 +53,37 @@ const Home: NextPage = () => {
   const columns: any = useFetchFsColumns(boardId, users);
   const tasks: any = useFetchFsTasks(boardId);
 
-  activeBoard = boards?.filter((board: any) => board?.uid === boardId);
+  activeBoard = allBoards?.filter((board: any) => board?.uid === boardId);
 
   const updateBoardName = async (uid: string, newName: string) => {
     if (newName === "") return;
 
     if (sharedBoardIds.includes(boardId)) {
       console.log("Update shared Board Name");
+      // Finding Current User (Invitee) Firebase Doc
+      const currentUser = users?.find(
+        (currentUser: any) => currentUser.uid === user?.uid
+      );
+      // Find User Id (Inviter) of the Shared Board
+      const sharedBoard = currentUser?.sharedBoards?.find(
+        (board: any) => board?.board === boardId
+      );
+      const boardDocRef = doc(
+        db,
+        "users",
+        `${sharedBoard?.user}`,
+        "boards",
+        uid
+      );
+      await updateDoc(boardDocRef, {
+        title: newName,
+      });
     } else {
       console.log("Update personal Board Name");
+      const boardDocRef = doc(db, "users", `${user?.uid}`, "boards", uid);
+      await updateDoc(boardDocRef, {
+        title: newName,
+      });
     }
 
     // If active Board is personal Board -> path 1

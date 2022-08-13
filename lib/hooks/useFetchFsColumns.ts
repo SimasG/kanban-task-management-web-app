@@ -23,16 +23,7 @@ const useFetchFsColumns = (
 
   let q: any;
 
-  if (!sharedBoardIds.includes(boardId)) {
-    // Fetch Columns from a personal Board
-    const columnsCollectionRef = collection(
-      db,
-      "users",
-      `${user?.uid}`,
-      "columns"
-    );
-    q = query(columnsCollectionRef, where("board", "==", `${boardId}`));
-  } else {
+  if (sharedBoardIds.includes(boardId)) {
     // Fetch Columns from a shared Board
     const sharedBoard = currentUser?.sharedBoards?.find(
       (board: any) => board?.board === boardId
@@ -41,6 +32,15 @@ const useFetchFsColumns = (
       db,
       "users",
       `${sharedBoard?.user}`,
+      "columns"
+    );
+    q = query(columnsCollectionRef, where("board", "==", `${boardId}`));
+  } else {
+    // Fetch Columns from a personal Board
+    const columnsCollectionRef = collection(
+      db,
+      "users",
+      `${user?.uid}`,
       "columns"
     );
     q = query(columnsCollectionRef, where("board", "==", `${boardId}`));
