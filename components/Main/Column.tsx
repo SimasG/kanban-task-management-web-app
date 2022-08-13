@@ -21,6 +21,8 @@ type ColumnProps = {
   index: number;
   columnId: string;
   columnColor: string;
+  sharedBoardIds: any;
+  users: any;
 };
 
 const Column = ({
@@ -33,6 +35,8 @@ const Column = ({
   boardId,
   index,
   columnColor,
+  sharedBoardIds,
+  users,
 }: ColumnProps) => {
   const user = useContext(UserContext);
 
@@ -43,43 +47,106 @@ const Column = ({
   ).length;
 
   const changeColumnTitle = async (newTitle: string) => {
-    const columnDocRef = doc(
-      db,
-      "users",
-      `${user?.uid}`,
-      "columns",
-      `${columnId}`
-    );
-    await updateDoc(columnDocRef, { title: newTitle });
-  };
-
-  const deleteColumn = async () => {
-    // Deleting the Column & Tasks that are in the Column
-    const batch = writeBatch(db);
-    const columnDocRef = doc(
-      db,
-      "users",
-      `${user?.uid}`,
-      "columns",
-      `${columnId}`
-    );
-    batch.delete(columnDocRef);
-
-    const tasksToDelete = tasks?.filter(
-      (task: any) => task?.status === columnStatus
-    );
-    tasksToDelete.map((task: any) => {
-      const taskDocRef = doc(
+    if (sharedBoardIds.includes(boardId)) {
+      console.log("Update shared Column Title");
+      // Finding Current User (Invitee) Firebase Doc
+      const currentUser = users?.find(
+        (currentUser: any) => currentUser.uid === user?.uid
+      );
+      // Find User Id (Inviter) of the Shared Board
+      const sharedBoard = currentUser?.sharedBoards?.find(
+        (board: any) => board?.board === boardId
+      );
+      const columnDocRef = doc(
+        db,
+        "users",
+        `${sharedBoard?.user}`,
+        "columns",
+        `${columnId}`
+      );
+      await updateDoc(columnDocRef, { title: newTitle });
+    } else {
+      console.log("Update personal Column Title");
+      const columnDocRef = doc(
         db,
         "users",
         `${user?.uid}`,
-        "tasks",
-        `${task?.uid}`
+        "columns",
+        `${columnId}`
       );
-      batch.delete(taskDocRef);
-    });
-    await batch.commit();
-    toast.success(`${columnTitle} Deleted!`);
+      await updateDoc(columnDocRef, { title: newTitle });
+    }
+  };
+
+  // ** WIP
+  const deleteColumn = async () => {
+    if (sharedBoardIds.includes(boardId)) {
+      console.log("Delete Column in a shared Board");
+      // Finding Current User (Invitee) Firebase Doc
+      const currentUser = users?.find(
+        (currentUser: any) => currentUser.uid === user?.uid
+      );
+      // Find User Id (Inviter) of the Shared Board
+      const sharedBoard = currentUser?.sharedBoards?.find(
+        (board: any) => board?.board === boardId
+      );
+
+      // ** NEED TO ACCESS & DELETE SHARED TASKS AS WELL
+      // // Deleting the Column & Tasks that are in the Column
+      // const batch = writeBatch(db);
+      // const columnDocRef = doc(
+      //   db,
+      //   "users",
+      //   `${sharedBoard?.user}`,
+      //   "columns",
+      //   `${columnId}`
+      // );
+      // batch.delete(columnDocRef);
+
+      // const tasksToDelete = tasks?.filter(
+      //   (task: any) => task?.status === columnStatus
+      // );
+      // tasksToDelete.map((task: any) => {
+      //   const taskDocRef = doc(
+      //     db,
+      //     "users",
+      //     `${sharedBoard?.user}`,
+      //     "tasks",
+      //     `${task?.uid}`
+      //   );
+      //   batch.delete(taskDocRef);
+      // });
+      // await batch.commit();
+      // toast.success(`${columnTitle} Deleted!`);
+    } else {
+      console.log("Delete Column in a personal Board");
+      // Deleting the Column & Tasks that are in the Column
+      const batch = writeBatch(db);
+      const columnDocRef = doc(
+        db,
+        "users",
+        `${user?.uid}`,
+        "columns",
+        `${columnId}`
+      );
+      batch.delete(columnDocRef);
+
+      const tasksToDelete = tasks?.filter(
+        (task: any) => task?.status === columnStatus
+      );
+      tasksToDelete.map((task: any) => {
+        const taskDocRef = doc(
+          db,
+          "users",
+          `${user?.uid}`,
+          "tasks",
+          `${task?.uid}`
+        );
+        batch.delete(taskDocRef);
+      });
+      await batch.commit();
+      toast.success(`${columnTitle} Deleted!`);
+    }
   };
 
   return (

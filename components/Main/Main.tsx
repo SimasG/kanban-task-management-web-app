@@ -371,6 +371,8 @@ const Main = ({
                     columnColor={column?.color}
                     boardId={boardId}
                     index={index}
+                    sharedBoardIds={sharedBoardIds}
+                    users={users}
                   />
                 ))}
                 {provided.placeholder}
