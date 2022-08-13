@@ -29,6 +29,7 @@ type MainProps = {
   isOpen: boolean;
   setShowShareModal: React.Dispatch<React.SetStateAction<boolean>>;
   sharedBoardIds: any;
+  users: any;
 };
 
 const Main = ({
@@ -45,6 +46,7 @@ const Main = ({
   isOpen,
   setShowShareModal,
   sharedBoardIds,
+  users,
 }: MainProps) => {
   const user = useContext(UserContext);
 
@@ -288,13 +290,29 @@ const Main = ({
 
   const addNewColumn = async () => {
     const uuid = uuidv4();
-    const newColumnDocRef = doc(
-      db,
-      "users",
-      `${user?.uid}`,
-      "columns",
-      `${uuid}`
-    );
+    let newColumnDocRef: any;
+
+    if (sharedBoardIds.includes(boardId)) {
+      console.log("Add New Column in a shared Board");
+      // Finding Current User (Invitee) Firebase Doc
+      const currentUser = users?.find(
+        (currentUser: any) => currentUser.uid === user?.uid
+      );
+      // Find User Id (Inviter) of the Shared Board
+      const sharedBoard = currentUser?.sharedBoards?.find(
+        (board: any) => board?.board === boardId
+      );
+      newColumnDocRef = doc(
+        db,
+        "users",
+        `${sharedBoard?.user}`,
+        "columns",
+        `${uuid}`
+      );
+    } else {
+      console.log("Add New Column in a personal Board");
+      newColumnDocRef = doc(db, "users", `${user?.uid}`, "columns", `${uuid}`);
+    }
 
     const random = Math.floor(Math.random() * colorArray.length);
     await setDoc(newColumnDocRef, {

@@ -18,16 +18,15 @@ import useFetchFsUsers from "../lib/hooks/useFetchFsUsers";
 
 const Home: NextPage = () => {
   const user = useContext(UserContext);
+  const users = useFetchFsUsers();
   const boards: any = useFetchFsBoards(user?.uid); // Personal Boards
   const sharedBoards = useFetchFsSharedBoards(); // Boards are fetched from the *owner's* Firebase doc path
 
-  const allBoards = boards.concat(sharedBoards);
+  const allBoards = boards?.concat(sharedBoards);
 
   // Creating shared Board Ids array to identify whether the Board manipulated is personal or shared
   let sharedBoardIds: any = [];
   sharedBoards?.map((board: any) => sharedBoardIds.push(board?.uid));
-
-  const users = useFetchFsUsers();
 
   // ** STATES
   const [showAddTaskModal, setShowAddTaskModal] = useState(false);
@@ -39,6 +38,7 @@ const Home: NextPage = () => {
   // SideNav
   const [isOpen, setIsOpen] = useState(true);
 
+  // Is it better to have these as a separate state, or smth else altogether?
   let activeBoard: any;
 
   // Initial setting of boardId
@@ -57,6 +57,7 @@ const Home: NextPage = () => {
 
   const updateBoardName = async (uid: string, newName: string) => {
     if (newName === "") return;
+    let boardDocRef: any;
 
     if (sharedBoardIds.includes(boardId)) {
       console.log("Update shared Board Name");
@@ -68,23 +69,15 @@ const Home: NextPage = () => {
       const sharedBoard = currentUser?.sharedBoards?.find(
         (board: any) => board?.board === boardId
       );
-      const boardDocRef = doc(
-        db,
-        "users",
-        `${sharedBoard?.user}`,
-        "boards",
-        uid
-      );
-      await updateDoc(boardDocRef, {
-        title: newName,
-      });
+      boardDocRef = doc(db, "users", `${sharedBoard?.user}`, "boards", uid);
     } else {
       console.log("Update personal Board Name");
-      const boardDocRef = doc(db, "users", `${user?.uid}`, "boards", uid);
-      await updateDoc(boardDocRef, {
-        title: newName,
-      });
+      boardDocRef = doc(db, "users", `${user?.uid}`, "boards", uid);
     }
+
+    await updateDoc(boardDocRef, {
+      title: newName,
+    });
   };
 
   return (
@@ -104,7 +97,6 @@ const Home: NextPage = () => {
             }}
             className="flex justify-center h-screen w-screen"
           >
-            {/* <div>DEBUGGING</div> */}
             <SideNav
               boards={boards}
               boardId={boardId}
@@ -128,6 +120,7 @@ const Home: NextPage = () => {
               isOpen={isOpen}
               setShowShareModal={setShowShareModal}
               sharedBoardIds={sharedBoardIds}
+              users={users}
             />
             {showAddTaskModal && (
               <AddNewTaskModal
