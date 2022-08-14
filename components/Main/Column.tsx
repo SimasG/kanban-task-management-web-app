@@ -78,7 +78,6 @@ const Column = ({
     }
   };
 
-  // ** WIP
   const deleteColumn = async () => {
     if (sharedBoardIds.includes(boardId)) {
       console.log("Delete Column in a shared Board");
@@ -91,33 +90,33 @@ const Column = ({
         (board: any) => board?.board === boardId
       );
 
-      // ** NEED TO ACCESS & DELETE SHARED TASKS AS WELL
-      // // Deleting the Column & Tasks that are in the Column
-      // const batch = writeBatch(db);
-      // const columnDocRef = doc(
-      //   db,
-      //   "users",
-      //   `${sharedBoard?.user}`,
-      //   "columns",
-      //   `${columnId}`
-      // );
-      // batch.delete(columnDocRef);
+      // Deleting the Column & Tasks that are in the Column
+      const batch = writeBatch(db);
+      const columnDocRef = doc(
+        db,
+        "users",
+        `${sharedBoard?.user}`,
+        "columns",
+        `${columnId}`
+      );
+      batch.delete(columnDocRef);
 
-      // const tasksToDelete = tasks?.filter(
-      //   (task: any) => task?.status === columnStatus
-      // );
-      // tasksToDelete.map((task: any) => {
-      //   const taskDocRef = doc(
-      //     db,
-      //     "users",
-      //     `${sharedBoard?.user}`,
-      //     "tasks",
-      //     `${task?.uid}`
-      //   );
-      //   batch.delete(taskDocRef);
-      // });
-      // await batch.commit();
-      // toast.success(`${columnTitle} Deleted!`);
+      const tasksToDelete = tasks?.filter(
+        (task: any) => task?.status === columnStatus
+      );
+
+      tasksToDelete.map((task: any) => {
+        const taskDocRef = doc(
+          db,
+          "users",
+          `${sharedBoard?.user}`,
+          "tasks",
+          `${task?.uid}`
+        );
+        batch.delete(taskDocRef);
+      });
+      await batch.commit();
+      toast.success(`${columnTitle} Deleted!`);
     } else {
       console.log("Delete Column in a personal Board");
       // Deleting the Column & Tasks that are in the Column
@@ -134,6 +133,7 @@ const Column = ({
       const tasksToDelete = tasks?.filter(
         (task: any) => task?.status === columnStatus
       );
+
       tasksToDelete.map((task: any) => {
         const taskDocRef = doc(
           db,
