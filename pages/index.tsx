@@ -1,4 +1,4 @@
-import { doc, updateDoc } from "firebase/firestore";
+import { doc, increment, updateDoc, writeBatch } from "firebase/firestore";
 import type { NextPage } from "next";
 import React, { useContext, useEffect, useState } from "react";
 import AddNewTaskModal from "../components/AddNewTaskModal";
@@ -15,6 +15,7 @@ import Login from "./login";
 import { PropagateLoader } from "react-spinners";
 import useFetchFsSharedBoards from "../lib/hooks/useFetchFsSharedBoards";
 import useFetchFsUsers from "../lib/hooks/useFetchFsUsers";
+import toast from "react-hot-toast";
 
 const Home: NextPage = () => {
   const user = useContext(UserContext);
@@ -80,6 +81,57 @@ const Home: NextPage = () => {
     });
   };
 
+  const handleDeleteBoard = async (boardId: string | null | undefined) => {
+    const batch = writeBatch(db);
+    // Delete Board
+    const boardDocRef = doc(
+      db,
+      "users",
+      `${user?.uid}`,
+      "boards",
+      `${boardId}`
+    );
+    // If the first Board in the array is deleted, setId to the second Board (which will become the
+    // first once the first one is removed from FS). Else, remove the first Board in the array.
+    boards?.[0]?.uid === boardId
+      ? setBoardId(boards?.[1]?.uid)
+      : setBoardId(boards?.[0]?.uid);
+    batch.delete(boardDocRef);
+
+    // Delete Columns in the Board
+    const columnsToDelete = columns?.filter(
+      (column: any) => column?.board === boardId
+    );
+    columnsToDelete?.map((column: any) => {
+      const columnDocRef = doc(
+        db,
+        "users",
+        `${user?.uid}`,
+        "columns",
+        `${column?.uid}`
+      );
+      batch.delete(columnDocRef);
+    });
+
+    // Decrement indexes of Boards that come after deleted Board
+    boards?.map((board: any) => {
+      if (board?.index <= activeBoard?.[0]?.index) return;
+      const boardDocRef = doc(
+        db,
+        "users",
+        `${user?.uid}`,
+        "boards",
+        `${board?.uid}`
+      );
+      batch.update(boardDocRef, { index: increment(-1) });
+    });
+
+    const selectedBoard = boards?.find((board: any) => board?.uid === boardId);
+    toast.success(`${selectedBoard?.title} has been deleted`);
+
+    await batch.commit();
+  };
+
   return (
     <>
       {user ? (
@@ -105,6 +157,7 @@ const Home: NextPage = () => {
               isOpen={isOpen}
               setIsOpen={setIsOpen}
               sharedBoards={sharedBoards}
+              handleDeleteBoard={handleDeleteBoard}
             />
             <Main
               activeBoard={activeBoard}
@@ -121,6 +174,7 @@ const Home: NextPage = () => {
               setShowShareModal={setShowShareModal}
               sharedBoardIds={sharedBoardIds}
               users={users}
+              handleDeleteBoard={handleDeleteBoard}
             />
             {showAddTaskModal && (
               <AddNewTaskModal

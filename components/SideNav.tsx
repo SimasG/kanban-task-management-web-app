@@ -31,6 +31,7 @@ type SideNavProps = {
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
   sharedBoards: any;
+  handleDeleteBoard: any;
 };
 
 const SideNav = ({
@@ -41,6 +42,7 @@ const SideNav = ({
   updateBoardName,
   isOpen,
   setIsOpen,
+  handleDeleteBoard,
 }: SideNavProps) => {
   const user = useContext(UserContext);
 
@@ -213,7 +215,7 @@ const SideNav = ({
             </Link>
             {/* Boards Container */}
             <DragDropContext onDragEnd={onDragEnd}>
-              <section className="w-[100%] max-h-[60%] overflow-auto flex flex-col justify-center items-start gap-6">
+              <section className="w-[100%] h-[80%] max-h-[90%] overflow-auto flex flex-col justify-start items-start gap-6">
                 {/* Personal Boards Container */}
                 <div className="w-[100%] text-fontSecondary">
                   {/* Personal Boards title */}
@@ -278,22 +280,28 @@ const SideNav = ({
                                             <Popover.Target>
                                               <BsThreeDots className="shrink-0 w-6 h-6 p-1 hover:bg-[#7c78d2] rounded cursor-pointer" />
                                             </Popover.Target>
-                                            <Popover.Dropdown className="top-12 right-0 z-[9999]">
-                                              <div className="w-[100%] hover:bg-[#eef2f7]">
-                                                <button className="block p-2 text-fontPrimary">
+                                            <Popover.Dropdown className="top-12 right-0 z-[9999] w-[185px]">
+                                              {board?.collaborators?.length >
+                                                0 && (
+                                                <button
+                                                  className="w-[100%] text-left hover:bg-[#eef2f7] cursor-pointer block p-2 text-fontPrimary"
+                                                  onClick={() =>
+                                                    console.log(
+                                                      "collaborators will be removed"
+                                                    )
+                                                  }
+                                                >
                                                   Remove Collaborators
                                                 </button>
-                                              </div>
-                                              <div className="w-[100%] hover:bg-[#eef2f7]">
-                                                <button className="block p-2 text-fontPrimary">
-                                                  Delete Board
-                                                </button>
-                                              </div>
-                                              <div className="w-[100%] hover:bg-[#eef2f7]">
-                                                <button className="block p-2 text-fontPrimary">
-                                                  Leave Board
-                                                </button>
-                                              </div>
+                                              )}
+                                              <button
+                                                className="w-[100%] text-left hover:bg-[#eef2f7] cursor-pointer block p-2 text-fontPrimary"
+                                                onClick={() => {
+                                                  handleDeleteBoard(boardId);
+                                                }}
+                                              >
+                                                Delete Board
+                                              </button>
                                             </Popover.Dropdown>
                                           </Popover>
                                         </div>
@@ -362,7 +370,7 @@ const SideNav = ({
                                       >
                                         <TbLayoutBoardSplit />
                                         <input
-                                          className="bg-transparent cursor-pointer outline-none"
+                                          className="bg-transparent cursor-pointer outline-none w-[80%] grow"
                                           type="text"
                                           value={board.title}
                                           onChange={(e) => {
@@ -372,6 +380,23 @@ const SideNav = ({
                                             );
                                           }}
                                         />
+                                        <Popover shadow="md">
+                                          <Popover.Target>
+                                            <BsThreeDots className="shrink-0 w-6 h-6 p-1 hover:bg-[#7c78d2] rounded cursor-pointer" />
+                                          </Popover.Target>
+                                          <Popover.Dropdown className="top-12 right-0 z-[9999] w-[185px]">
+                                            <button
+                                              onClick={() =>
+                                                console.log(
+                                                  "User will leave Board"
+                                                )
+                                              }
+                                              className="w-[100%] text-left hover:bg-[#eef2f7] cursor-pointer block p-2 text-fontPrimary"
+                                            >
+                                              Leave Board
+                                            </button>
+                                          </Popover.Dropdown>
+                                        </Popover>
                                       </div>
                                     );
                                   }}

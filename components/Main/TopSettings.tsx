@@ -14,6 +14,7 @@ type TopSettingsProps = {
   columns: any;
   setShowShareModal: React.Dispatch<React.SetStateAction<boolean>>;
   sharedBoardIds: any;
+  handleDeleteBoard: any;
 };
 
 const TopSettings = ({
@@ -26,6 +27,7 @@ const TopSettings = ({
   columns,
   setShowShareModal,
   sharedBoardIds,
+  handleDeleteBoard,
 }: TopSettingsProps) => {
   const user = useContext(UserContext);
   const [readOnlyState, setReadOnlyState] = useState(false);
@@ -42,53 +44,6 @@ const TopSettings = ({
   const handleShareBtn = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     setShowShareModal(true);
-  };
-
-  const handleDeleteBoard = async (boardId: string | null | undefined) => {
-    const batch = writeBatch(db);
-    // Delete Board
-    const boardDocRef = doc(
-      db,
-      "users",
-      `${user?.uid}`,
-      "boards",
-      `${boardId}`
-    );
-    // If the first Board in the array is deleted, setId to the second Board (which will become the
-    // first once the first one is removed from FS). Else, remove the first Board in the array.
-    boards?.[0]?.uid === boardId
-      ? setBoardId(boards?.[1]?.uid)
-      : setBoardId(boards?.[0]?.uid);
-    batch.delete(boardDocRef);
-
-    // Delete Columns in the Board
-    const columnsToDelete = columns?.filter(
-      (column: any) => column?.board === boardId
-    );
-    columnsToDelete?.map((column: any) => {
-      const columnDocRef = doc(
-        db,
-        "users",
-        `${user?.uid}`,
-        "columns",
-        `${column?.uid}`
-      );
-      batch.delete(columnDocRef);
-    });
-
-    // Decrement indexes of Boards that come after deleted Board
-    boards?.map((board: any) => {
-      if (board?.index <= activeBoard?.[0]?.index) return;
-      const boardDocRef = doc(
-        db,
-        "users",
-        `${user?.uid}`,
-        "boards",
-        `${board?.uid}`
-      );
-      batch.update(boardDocRef, { index: increment(-1) });
-    });
-    await batch.commit();
   };
 
   return (
