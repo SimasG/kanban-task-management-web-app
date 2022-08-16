@@ -14,7 +14,6 @@ const Demo = () => {
       <button>Leave Board</button>
       <button>Delete Board</button>
     </Popover>
-    // <div>eiknx</div>
   );
 };
 

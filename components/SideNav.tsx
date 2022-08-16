@@ -153,7 +153,6 @@ const SideNav = ({
         }
       }
     });
-
     // ** Changing index of dragged Board
     const boardDocRef = doc(
       db,
