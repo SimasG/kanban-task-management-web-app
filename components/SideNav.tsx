@@ -5,6 +5,7 @@ import React, { useContext } from "react";
 import toast from "react-hot-toast";
 import { TbLayoutBoardSplit } from "react-icons/tb";
 import { BiRightArrowAlt, BiLeftArrowAlt } from "react-icons/bi";
+import { BsThreeDots } from "react-icons/bs";
 import { HiSun } from "react-icons/hi";
 import { IoMdMoon } from "react-icons/io";
 import { UserContext } from "../lib/context";
@@ -20,6 +21,8 @@ import {
 } from "react-beautiful-dnd";
 import { defaultColumns } from "../lib/helpers";
 import Link from "next/link";
+import { Popover, Text } from "@mantine/core";
+import Demo from "./Demo";
 
 type SideNavProps = {
   boards: any;
@@ -209,6 +212,7 @@ const SideNav = ({
                 />
               </a>
             </Link>
+            <Demo />
             {/* Boards Container */}
             <DragDropContext onDragEnd={onDragEnd}>
               <section className="w-[100%] flex flex-col justify-center items-start gap-6">
@@ -259,9 +263,9 @@ const SideNav = ({
                                               : " active:bg-fontTertiary active:bg-opacity-60 active:text-fontPrimaryDark"
                                           }}`}
                                         >
-                                          <TbLayoutBoardSplit />
+                                          <TbLayoutBoardSplit className="shrink-0" />
                                           <input
-                                            className="bg-transparent cursor-pointer outline-none"
+                                            className="bg-transparent cursor-pointer outline-none w-[80%] grow"
                                             type="text"
                                             value={board.title}
                                             onChange={(e) => {
@@ -271,6 +275,18 @@ const SideNav = ({
                                               );
                                             }}
                                           />
+                                          <BsThreeDots className="shrink-0 w-6 h-6 p-1 hover:bg-[#7c78d2] rounded cursor-pointer" />
+
+                                          {/* <Popover width={200} position="bottom" withArrow shadow="md">
+                                        <Popover.Target>
+
+                                          <BsThreeDots className="shrink-0 w-6 h-6 p-1 hover:bg-[#7c78d2] rounded cursor-pointer" />
+                                        </Popover.Target>
+                                        <Popover.Dropdown>
+                                        <Text size="sm">This is uncontrolled popover, it is opened when button is clicked</Text>
+
+                                        </Popover.Dropdown>
+                                        </Popover> */}
                                         </div>
                                       );
                                     }}
