@@ -303,18 +303,6 @@ const SideNav = ({
                                               </div>
                                             </Popover.Dropdown>
                                           </Popover>
-                                          {/* <BsThreeDots className="shrink-0 w-6 h-6 p-1 hover:bg-[#7c78d2] rounded cursor-pointer" /> */}
-
-                                          {/* <Popover width={200} position="bottom" withArrow shadow="md">
-                                        <Popover.Target>
-
-                                          <BsThreeDots className="shrink-0 w-6 h-6 p-1 hover:bg-[#7c78d2] rounded cursor-pointer" />
-                                        </Popover.Target>
-                                        <Popover.Dropdown>
-                                        <Text size="sm">This is uncontrolled popover, it is opened when button is clicked</Text>
-
-                                        </Popover.Dropdown>
-                                        </Popover> */}
                                         </div>
                                       );
                                     }}
