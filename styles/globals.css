@@ -47,26 +47,9 @@ body {
 .mantine-Checkbox-input {
   @apply border-2 border-fontTertiary dark:border-none cursor-pointer checked:bg-fontTertiary checked:border-none;
 }
-/* .mantine-Popover-popover { */
-.mantine-1iu7nck {
-  @apply bg-fontTertiary  flex justify-start items-start;
-}
-
-/* .mantine-Popover-body { */
-.mantine-ptywf3 {
-  @apply flex flex-col justify-start items-start;
-}
-
-.mantine-Popover-inner {
-  @apply flex justify-start items-start;
-}
-
-#mantine-gypzkqcv9-body {
-  @apply flex justify-start items-start;
-}
 
 .mantine-Popover-dropdown {
-  @apply bg-red-400;
+  @apply bg-backgroundColorMenu p-0;
 }
 
 .purpleBtn {

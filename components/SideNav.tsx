@@ -21,7 +21,7 @@ import {
 } from "react-beautiful-dnd";
 import { defaultColumns } from "../lib/helpers";
 import Link from "next/link";
-import { Popover, Text } from "@mantine/core";
+import { Popover } from "@mantine/core";
 import Demo from "./Demo";
 
 type SideNavProps = {
@@ -153,6 +153,7 @@ const SideNav = ({
         }
       }
     });
+
     // ** Changing index of dragged Board
     const boardDocRef = doc(
       db,
@@ -211,7 +212,7 @@ const SideNav = ({
                 />
               </a>
             </Link>
-            <Demo />
+            {/* <Demo /> */}
             {/* Boards Container */}
             <DragDropContext onDragEnd={onDragEnd}>
               <section className="w-[100%] flex flex-col justify-center items-start gap-6">
@@ -274,7 +275,35 @@ const SideNav = ({
                                               );
                                             }}
                                           />
-                                          <BsThreeDots className="shrink-0 w-6 h-6 p-1 hover:bg-[#7c78d2] rounded cursor-pointer" />
+                                          <Popover
+                                            // (alias) type FloatingPosition = "left-end" | FloatingSide | "bottom-end"
+                                            // | "bottom-start" | "left-start" | "right-end" | "right-start" |
+                                            // "top-end" | "top-start"
+                                            position="top-end"
+                                            shadow="md"
+                                          >
+                                            <Popover.Target>
+                                              <BsThreeDots className="shrink-0 w-6 h-6 p-1 hover:bg-[#7c78d2] rounded cursor-pointer" />
+                                            </Popover.Target>
+                                            <Popover.Dropdown>
+                                              <div className="w-[100%] hover:bg-[#eef2f7]">
+                                                <button className="block p-2 text-fontPrimary">
+                                                  Remove Collaborators
+                                                </button>
+                                              </div>
+                                              <div className="w-[100%] hover:bg-[#eef2f7]">
+                                                <button className="block p-2 text-fontPrimary">
+                                                  Delete Board
+                                                </button>
+                                              </div>
+                                              <div className="w-[100%] hover:bg-[#eef2f7]">
+                                                <button className="block p-2 text-fontPrimary">
+                                                  Leave Board
+                                                </button>
+                                              </div>
+                                            </Popover.Dropdown>
+                                          </Popover>
+                                          {/* <BsThreeDots className="shrink-0 w-6 h-6 p-1 hover:bg-[#7c78d2] rounded cursor-pointer" /> */}
 
                                           {/* <Popover width={200} position="bottom" withArrow shadow="md">
                                         <Popover.Target>
