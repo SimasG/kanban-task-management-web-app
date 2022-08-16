@@ -22,7 +22,6 @@ import {
 import { defaultColumns } from "../lib/helpers";
 import Link from "next/link";
 import { Popover } from "@mantine/core";
-import Demo from "./Demo";
 
 type SideNavProps = {
   boards: any;
@@ -212,10 +211,9 @@ const SideNav = ({
                 />
               </a>
             </Link>
-            {/* <Demo /> */}
             {/* Boards Container */}
             <DragDropContext onDragEnd={onDragEnd}>
-              <section className="w-[100%] flex flex-col justify-center items-start gap-6">
+              <section className="w-[100%] max-h-[60%] overflow-auto flex flex-col justify-center items-start gap-6">
                 {/* Personal Boards Container */}
                 <div className="w-[100%] text-fontSecondary">
                   {/* Personal Boards title */}
@@ -232,7 +230,7 @@ const SideNav = ({
                         <div
                           {...provided.droppableProps}
                           ref={provided.innerRef}
-                          className="overflow-auto"
+                          // className="overflow-auto"
                         >
                           {boards
                             ? boards.map((board: any, index: number) => {
@@ -255,6 +253,7 @@ const SideNav = ({
                                           ref={provided.innerRef}
                                           {...provided.draggableProps}
                                           {...provided.dragHandleProps}
+                                          // hover:static hover:z-[-1]
                                           className={`board rounded-r-full ${
                                             board.uid === boardId
                                               ? snapshot.isDragging
@@ -275,17 +274,11 @@ const SideNav = ({
                                               );
                                             }}
                                           />
-                                          <Popover
-                                            // (alias) type FloatingPosition = "left-end" | FloatingSide | "bottom-end"
-                                            // | "bottom-start" | "left-start" | "right-end" | "right-start" |
-                                            // "top-end" | "top-start"
-                                            position="top-end"
-                                            shadow="md"
-                                          >
+                                          <Popover shadow="md">
                                             <Popover.Target>
                                               <BsThreeDots className="shrink-0 w-6 h-6 p-1 hover:bg-[#7c78d2] rounded cursor-pointer" />
                                             </Popover.Target>
-                                            <Popover.Dropdown>
+                                            <Popover.Dropdown className="top-12 right-0 z-[9999]">
                                               <div className="w-[100%] hover:bg-[#eef2f7]">
                                                 <button className="block p-2 text-fontPrimary">
                                                   Remove Collaborators
@@ -337,7 +330,7 @@ const SideNav = ({
                           <div
                             {...provided.droppableProps}
                             ref={provided.innerRef}
-                            className="overflow-auto"
+                            // className="overflow-auto"
                           >
                             {sharedBoards.map((board: any, index: number) => {
                               return (
