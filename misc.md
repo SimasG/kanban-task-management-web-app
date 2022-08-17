@@ -2587,3 +2587,33 @@ setSharedBoards(sharedBoards1);
 setColumns(columns1);
 setTasks(tasks1);
 }, [boards1, sharedBoards1, columns1, tasks1]);
+
+// import {
+// collectionGroup,
+// doc,
+// getDocs,
+// query,
+// where,
+// } from "firebase/firestore";
+// import { useContext } from "react";
+// import { useDocumentData } from "react-firebase-hooks/firestore";
+// import { UserContext } from "../context";
+// import { db } from "../firebase";
+
+// const useFetchFsSharedBoards = async () => {
+// const user = useContext(UserContext);
+
+// const sharedBoardsQuery = query(
+// collectionGroup(db, "boards"),
+// where("collaborators", "array-contains-any", [`${user?.email}`])
+// );
+
+// const sharedBoards = (await getDocs(sharedBoardsQuery)).docs.map((doc: any) =>
+// doc.data()
+// );
+// // console.log("sharedBoards in useFetch hook:", sharedBoards);
+
+// return sharedBoards;
+// };
+
+// export default useFetchFsSharedBoards;

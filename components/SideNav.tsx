@@ -60,6 +60,7 @@ const SideNav = ({
       uid: uuid,
       createdAt: Timestamp.fromDate(new Date()),
       index: boards?.length,
+      collaborators: [],
     });
     setBoardId(uuid);
 

@@ -16,6 +16,8 @@ const useFetchFsTasks = (
     (currentUser: any) => currentUser.uid === user?.uid
   );
 
+  // Utilising sharedBoardIds & sharedBoards (Boards current user has been invited to)
+  // array to fetch the correct Tasks
   let sharedBoardIds: any = [];
   currentUser?.sharedBoards?.map((board: any) =>
     sharedBoardIds.push(board?.board)

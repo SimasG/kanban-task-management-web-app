@@ -1,18 +1,77 @@
+import { doc, DocumentData, getDoc, writeBatch } from "firebase/firestore";
 import { ErrorMessage, Field, Form, Formik } from "formik";
+import { useContext } from "react";
 import toast from "react-hot-toast";
+import { UserContext } from "../lib/context";
+import { db } from "../lib/firebase";
 import { EmailFormErrorsSchema } from "../lib/types";
 
 type IndexProps = {
   setShowShareModal: React.Dispatch<React.SetStateAction<boolean>>;
+  boardId: string | null | undefined;
+  users: DocumentData[] | undefined;
 };
 
-const ShareModal = ({ setShowShareModal }: IndexProps) => {
-  // const user = useContext(UserContext);
+const ShareModal = ({ setShowShareModal, boardId, users }: IndexProps) => {
+  const user = useContext(UserContext);
 
   // Send Invite Email with Link to Address Specified
   const onSubmit = async (values: any, actions: any) => {
+    const batch = writeBatch(db);
     // ** 1. Create/update *collaborators* array for the current User
-    console.log("values:", values);
+    // ** 1.1 Create/add invitee's email to "collaborators" array in the inviter's Board doc
+    const boardRef = doc(db, "users", `${user?.uid}`, "boards", `${boardId}`);
+    const docSnap = await getDoc(boardRef);
+    const currentCollaborators = docSnap.data()?.collaborators;
+
+    batch.update(boardRef, {
+      collaborators: [
+        ...(typeof currentCollaborators === "object" && currentCollaborators),
+        `${values?.email}`,
+      ],
+    });
+
+    // ** 1.2 Create/add inviter's email, boardId & userId to "sharedBoards" array in the invitee's User doc
+    // Finding Current User Firebase Doc
+    const currentUser = users?.find(
+      (currentUser: any) => currentUser.uid === user?.uid
+    );
+
+    // Finding invitee's Firebase Doc
+    const inviteeUser = users?.find(
+      (user: any) => user?.email === values?.email
+    );
+    const inviteeUserRef = doc(db, "users", `${inviteeUser?.uid}`);
+
+    const updatedInviteeUserDoc = {
+      // Using type guard to ensure that we're always spreading an object
+      ...(typeof inviteeUser === "object" && inviteeUser),
+      sharedBoards: [
+        ...(inviteeUser?.sharedBoards && inviteeUser?.sharedBoards),
+        {
+          board: boardId,
+          email: currentUser?.email,
+          user: currentUser?.uid,
+        },
+      ],
+    };
+
+    batch.update(inviteeUserRef, {
+      // Using type guard to ensure that we're always spreading an object
+      // ...(typeof inviteeUser === "object" ? inviteeUser : {}),
+      ...inviteeUser,
+      sharedBoards: [
+        ...(inviteeUser?.sharedBoards && inviteeUser?.sharedBoards),
+        {
+          board: boardId,
+          email: currentUser?.email,
+          user: currentUser?.uid,
+        },
+      ],
+    });
+
+    await batch.commit();
+
     // ** 2. Create/update *sharedBoards* array for the invited User
     // a. If user email already exists, create/update *sharedBoards* array for the invited User
     // b. If user email doesn't exist, 1. Send invite email & 2. Get the invitee to sign in 3. Create/update *sharedBoards* array for the invited User

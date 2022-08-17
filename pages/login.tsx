@@ -27,6 +27,7 @@ const Login = (users: any) => {
             uid: user.uid,
             email: user.email,
             timestamp: serverTimestamp(),
+            sharedBoards: [],
           });
         }
         toast.success(`Welcome ${user.displayName}!`);

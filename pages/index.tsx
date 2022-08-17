@@ -60,7 +60,7 @@ const Home: NextPage = () => {
     let boardDocRef: any;
 
     if (sharedBoardIds.includes(boardId)) {
-      console.log("Update shared Board Name");
+      // Updating shared Board Name
       // Finding Current User (Invitee) Firebase Doc
       const currentUser = users?.find(
         (currentUser: any) => currentUser.uid === user?.uid
@@ -71,7 +71,7 @@ const Home: NextPage = () => {
       );
       boardDocRef = doc(db, "users", `${sharedBoard?.user}`, "boards", uid);
     } else {
-      console.log("Update personal Board Name");
+      // Updating personal Board Name
       boardDocRef = doc(db, "users", `${user?.uid}`, "boards", uid);
     }
 
@@ -197,7 +197,11 @@ const Home: NextPage = () => {
               />
             )}
             {showShareModal && (
-              <ShareModal setShowShareModal={setShowShareModal} />
+              <ShareModal
+                setShowShareModal={setShowShareModal}
+                boardId={boardId}
+                users={users}
+              />
             )}
           </div>
           {/* )} */}
