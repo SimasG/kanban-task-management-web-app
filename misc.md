@@ -2571,3 +2571,19 @@ return statusIndexSortedTasks;
 };
 
 export default useFetchFsTasks;
+
+const [boards, setBoards] = useState<any>(); // Personal Boards
+const [sharedBoards, setSharedBoards] = useState<any>(); // Boards are fetched from the _owner's_ Firebase doc path
+const [columns, setColumns] = useState(useFetchFsColumns(boardId, users));
+const [tasks, setTasks] = useState(useFetchFsTasks(boardId, users));
+
+// Porting DB data to state vars
+useEffect(() => {
+// If sharedBoards/columns/tasks don't exist, useEffect won't break since useCollectionData hook will return truthy value "[]"
+if (!boards1 || !sharedBoards1 || !columns1 || !tasks1) return;
+console.log("new useEffect ran");
+setBoards(boards1);
+setSharedBoards(sharedBoards1);
+setColumns(columns1);
+setTasks(tasks1);
+}, [boards1, sharedBoards1, columns1, tasks1]);

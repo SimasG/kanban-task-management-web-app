@@ -20,14 +20,11 @@ import toast from "react-hot-toast";
 const Home: NextPage = () => {
   const user = useContext(UserContext);
   const users = useFetchFsUsers();
+  // ** How could I change "boards" type from "DocumentData[] | undefined" (coming from
+  // **  useCollectionData hook) to "BoardSchema[] | undefined"?
   const boards: any = useFetchFsBoards(user?.uid); // Personal Boards
-  const sharedBoards = useFetchFsSharedBoards(); // Boards are fetched from the *owner's* Firebase doc path
-
+  const sharedBoards: any = useFetchFsSharedBoards(); // Boards are fetched from the *owner's* Firebase doc path
   const allBoards = boards?.concat(sharedBoards);
-
-  // Creating shared Board Ids array to identify whether the Board manipulated is personal or shared
-  let sharedBoardIds: any = [];
-  sharedBoards?.map((board: any) => sharedBoardIds.push(board?.uid));
 
   // ** STATES
   const [showAddTaskModal, setShowAddTaskModal] = useState(false);
@@ -36,11 +33,15 @@ const Home: NextPage = () => {
   const [boardId, setBoardId] = useState<string | null | undefined>(null);
   const [taskId, setTaskId] = useState<string | null | undefined>(null);
   // const [fetching, setFetching] = useState(false);
-  // SideNav
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(true); // SideNav
+
+  // Creating shared Board Ids array to identify whether the Board manipulated is personal or shared
+  let sharedBoardIds: any = [];
+  sharedBoards?.map((board: any) => sharedBoardIds.push(board?.uid));
 
   // Is it better to have these as a separate state, or smth else altogether?
   let activeBoard: any;
+  activeBoard = allBoards?.filter((board: any) => board?.uid === boardId);
 
   // Initial setting of boardId
   useEffect(() => {
@@ -53,8 +54,6 @@ const Home: NextPage = () => {
   // ** Do these hooks re-fetch *all* the documents on each re-render (not just the new/updated ones)?
   const columns: any = useFetchFsColumns(boardId, users);
   const tasks: any = useFetchFsTasks(boardId, users);
-
-  activeBoard = allBoards?.filter((board: any) => board?.uid === boardId);
 
   const updateBoardName = async (uid: string, newName: string) => {
     if (newName === "") return;

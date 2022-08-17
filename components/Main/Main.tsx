@@ -284,7 +284,6 @@ const Main = ({
       await batch.commit();
     } else {
       // Task DnD in a personal Board (within Column)
-
       columnTasks?.map((task: any) => {
         if (destinationIndex > sourceIndex) {
           // Decrement Tasks

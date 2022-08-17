@@ -1,12 +1,5 @@
 import { ErrorMessage, Field, Form, Formik } from "formik";
-import { v4 as uuidv4 } from "uuid";
-import FormikForm from "./form/FormikForm";
-import { doc, setDoc, Timestamp } from "firebase/firestore";
-import { db } from "../lib/firebase";
-import { useContext } from "react";
-import { UserContext } from "../lib/context";
 import toast from "react-hot-toast";
-import FormikControl from "./form/FormikControl";
 import { EmailFormErrorsSchema } from "../lib/types";
 
 type IndexProps = {
@@ -18,17 +11,23 @@ const ShareModal = ({ setShowShareModal }: IndexProps) => {
 
   // Send Invite Email with Link to Address Specified
   const onSubmit = async (values: any, actions: any) => {
-    const { setSubmitting, resetForm } = actions;
-    setSubmitting(true);
-    // Sending a POST request to an API endpoint "api/mail" with a body where the form values are stored
-    fetch("api/mail", {
-      method: "post",
-      body: JSON.stringify(values),
-    });
-    toast.success("Invite Sent!");
-    setSubmitting(false);
-    resetForm();
-    setShowShareModal(false);
+    // ** 1. Create/update *collaborators* array for the current User
+    console.log("values:", values);
+    // ** 2. Create/update *sharedBoards* array for the invited User
+    // a. If user email already exists, create/update *sharedBoards* array for the invited User
+    // b. If user email doesn't exist, 1. Send invite email & 2. Get the invitee to sign in 3. Create/update *sharedBoards* array for the invited User
+
+    // const { setSubmitting, resetForm } = actions;
+    // setSubmitting(true);
+    // // Sending a POST request to an API endpoint "api/mail" with a body where the form values are stored
+    // fetch("api/mail", {
+    //   method: "post",
+    //   body: JSON.stringify(values),
+    // });
+    // toast.success("Invite Sent!");
+    // setSubmitting(false);
+    // resetForm();
+    // setShowShareModal(false);
   };
 
   return (
