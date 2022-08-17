@@ -17,76 +17,65 @@ const ShareModal = ({ setShowShareModal, boardId, users }: IndexProps) => {
 
   // Send Invite Email with Link to Address Specified
   const onSubmit = async (values: any, actions: any) => {
-    const batch = writeBatch(db);
-    // ** 1. Create/update *collaborators* array for the current User
-    // ** 1.1 Create/add invitee's email to "collaborators" array in the inviter's Board doc
-    const boardRef = doc(db, "users", `${user?.uid}`, "boards", `${boardId}`);
-    const docSnap = await getDoc(boardRef);
-    const currentCollaborators = docSnap.data()?.collaborators;
+    // const batch = writeBatch(db);
 
-    batch.update(boardRef, {
-      collaborators: [
-        ...(typeof currentCollaborators === "object" && currentCollaborators),
-        `${values?.email}`,
-      ],
-    });
+    // let userEmails: any = [];
+    // users?.forEach((user: any) => userEmails.push(user?.email));
 
-    // ** 1.2 Create/add inviter's email, boardId & userId to "sharedBoards" array in the invitee's User doc
-    // Finding Current User Firebase Doc
-    const currentUser = users?.find(
-      (currentUser: any) => currentUser.uid === user?.uid
-    );
-
-    // Finding invitee's Firebase Doc
-    const inviteeUser = users?.find(
-      (user: any) => user?.email === values?.email
-    );
-    const inviteeUserRef = doc(db, "users", `${inviteeUser?.uid}`);
-
-    const updatedInviteeUserDoc = {
-      // Using type guard to ensure that we're always spreading an object
-      ...(typeof inviteeUser === "object" && inviteeUser),
-      sharedBoards: [
-        ...(inviteeUser?.sharedBoards && inviteeUser?.sharedBoards),
-        {
-          board: boardId,
-          email: currentUser?.email,
-          user: currentUser?.uid,
-        },
-      ],
-    };
-
-    batch.update(inviteeUserRef, {
-      // Using type guard to ensure that we're always spreading an object
-      // ...(typeof inviteeUser === "object" ? inviteeUser : {}),
-      ...inviteeUser,
-      sharedBoards: [
-        ...(inviteeUser?.sharedBoards && inviteeUser?.sharedBoards),
-        {
-          board: boardId,
-          email: currentUser?.email,
-          user: currentUser?.uid,
-        },
-      ],
-    });
-
-    await batch.commit();
-
-    // ** 2. Create/update *sharedBoards* array for the invited User
-    // a. If user email already exists, create/update *sharedBoards* array for the invited User
-    // b. If user email doesn't exist, 1. Send invite email & 2. Get the invitee to sign in 3. Create/update *sharedBoards* array for the invited User
-
-    // const { setSubmitting, resetForm } = actions;
-    // setSubmitting(true);
-    // // Sending a POST request to an API endpoint "api/mail" with a body where the form values are stored
-    // fetch("api/mail", {
-    //   method: "post",
-    //   body: JSON.stringify(values),
+    // if (userEmails?.includes(values?.email)) {
+    // ** Logic for existing users
+    // // 1. Create/update *collaborators* array for the current User
+    // // 1.1 Create/add invitee's email to "collaborators" array in the inviter's Board doc
+    // const boardRef = doc(db, "users", `${user?.uid}`, "boards", `${boardId}`);
+    // const docSnap = await getDoc(boardRef);
+    // const currentCollaborators = docSnap.data()?.collaborators;
+    // batch.update(boardRef, {
+    //   collaborators: [
+    //     ...(typeof currentCollaborators === "object" && currentCollaborators),
+    //     `${values?.email}`,
+    //   ],
     // });
-    // toast.success("Invite Sent!");
-    // setSubmitting(false);
-    // resetForm();
-    // setShowShareModal(false);
+    // // 1.2 Create/add inviter's email, boardId & userId to "sharedBoards" array in the invitee's User doc
+    // // Finding Current User Firebase Doc
+    // const currentUser = users?.find(
+    //   (currentUser: any) => currentUser.uid === user?.uid
+    // );
+    // // Finding invitee's Firebase Doc
+    // const inviteeUser = users?.find(
+    //   (user: any) => user?.email === values?.email
+    // );
+    // const inviteeUserRef = doc(db, "users", `${inviteeUser?.uid}`);
+    // batch.update(inviteeUserRef, {
+    //   // Using type guard to ensure that we're always spreading an object
+    //   ...(typeof inviteeUser === "object" && inviteeUser),
+    //   sharedBoards: [
+    //     ...(inviteeUser?.sharedBoards && inviteeUser?.sharedBoards),
+    //     {
+    //       board: boardId,
+    //       email: currentUser?.email,
+    //       user: currentUser?.uid,
+    //     },
+    //   ],
+    // });
+    // await batch.commit();
+    // } else {
+    // Logic for new users
+    // 1. Repeat logic used for existing users (caveat: add is_active: false to the new userDoc)
+    // 2. Send invite email (generic link sent)
+    // 3. Get the invitee to sign in
+    // }
+
+    const { setSubmitting, resetForm } = actions;
+    setSubmitting(true);
+    // Sending a POST request to an API endpoint "api/mail" with a body where the form values are stored
+    fetch("api/mail", {
+      method: "post",
+      body: JSON.stringify(values),
+    });
+    toast.success("Invite Sent!");
+    setSubmitting(false);
+    resetForm();
+    setShowShareModal(false);
   };
 
   return (
