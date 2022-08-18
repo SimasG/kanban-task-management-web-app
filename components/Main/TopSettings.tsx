@@ -33,7 +33,7 @@ const TopSettings = ({
   const [readOnlyState, setReadOnlyState] = useState(false);
 
   useEffect(() => {
-    activeBoard?.[0]?.title ? setReadOnlyState(false) : setReadOnlyState(true);
+    activeBoard?.title ? setReadOnlyState(false) : setReadOnlyState(true);
   }, [activeBoard]);
 
   const handleAddNewTaskBtn = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -54,9 +54,9 @@ const TopSettings = ({
         className="read-only text-xl bg-transparent cursor-pointer outline-none text-fontPrimary dark:text-fontPrimaryDark sm:w-[140px] md:w-[40%]"
         type="text"
         readOnly={readOnlyState}
-        value={activeBoard?.[0]?.title || "Future Board Title 🤓"}
+        value={activeBoard?.title || "Future Board Title 🤓"}
         onChange={(e) => {
-          updateBoardName(activeBoard?.[0]?.uid, e.target.value);
+          updateBoardName(activeBoard?.uid, e.target.value);
         }}
       />
       {boards?.length > 0 && (

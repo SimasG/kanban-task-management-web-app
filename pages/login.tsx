@@ -18,6 +18,7 @@ const Login = (users: any) => {
       .then(async (result) => {
         const user = result.user;
 
+        // Finding userDoc of the user with the specified email
         const userDoc = users?.users?.find(
           (existingUser: any) => existingUser?.email === user?.email
         );
@@ -25,13 +26,13 @@ const Login = (users: any) => {
         console.log("user:", user, "userDoc:", userDoc);
 
         // If an *active* existing user signs in
-        if (userDoc && userDoc?.isActive) {
+        if (userDoc && userDoc.isActive) {
           console.log("active existing user signed in");
           return;
         }
 
         // If *passive* (invited) user signs in
-        if (userDoc && !userDoc?.isActive) {
+        if (userDoc && !userDoc.isActive) {
           console.log("passive invited user signed in");
           const batch = writeBatch(db);
           // 1. Delete passive doc

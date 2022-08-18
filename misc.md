@@ -2630,3 +2630,8 @@ let userIds: any = [];
 users?.users?.map((user: any) => {
 userIds?.push(user?.uid);
 });
+
+        // Finding Current User Firebase Doc
+        const currentUser = users?.find(
+          (currentUser: any) => currentUser.uid === user?.uid
+        );

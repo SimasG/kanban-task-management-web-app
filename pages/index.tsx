@@ -41,12 +41,12 @@ const Home: NextPage = () => {
 
   // Is it better to have these as a separate state, or smth else altogether?
   let activeBoard: any;
-  activeBoard = allBoards?.filter((board: any) => board?.uid === boardId);
+  activeBoard = allBoards?.find((board: any) => board?.uid === boardId);
 
   // Initial setting of boardId
   useEffect(() => {
     // setFetching(true);
-    if (activeBoard?.length > 0 && boards?.length > 0) return;
+    if (activeBoard > 0 && boards?.length > 0) return;
     setBoardId(boards?.[0]?.uid);
     // setFetching(false);
   }, [activeBoard, boards]);
@@ -114,7 +114,7 @@ const Home: NextPage = () => {
 
     // Decrement indexes of Boards that come after deleted Board
     boards?.map((board: any) => {
-      if (board?.index <= activeBoard?.[0]?.index) return;
+      if (board?.index <= activeBoard?.index) return;
       const boardDocRef = doc(
         db,
         "users",
