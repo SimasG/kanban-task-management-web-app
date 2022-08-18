@@ -3,6 +3,7 @@ import type { NextPage } from "next";
 import React, { useContext, useEffect, useState } from "react";
 import AddNewTaskModal from "../components/AddNewTaskModal";
 import EditTaskModal from "../components/EditTaskModal";
+import EditCollaboratorsModal from "../components/EditCollaboratorsModal";
 import Main from "../components/Main/Main";
 import ShareModal from "../components/ShareModal";
 import SideNav from "../components/SideNav";
@@ -30,6 +31,7 @@ const Home: NextPage = () => {
   const [showAddTaskModal, setShowAddTaskModal] = useState(false);
   const [showEditTaskModal, setShowEditTaskModal] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
+  const [showEditCollabsModal, setShowEditCollabsModal] = useState(false);
   const [boardId, setBoardId] = useState<string | null | undefined>(null);
   const [taskId, setTaskId] = useState<string | null | undefined>(null);
   // const [fetching, setFetching] = useState(false);
@@ -176,6 +178,7 @@ const Home: NextPage = () => {
               sharedBoardIds={sharedBoardIds}
               users={users}
               handleDeleteBoard={handleDeleteBoard}
+              setShowEditCollabsModal={setShowEditCollabsModal}
             />
             {showAddTaskModal && (
               <AddNewTaskModal
@@ -204,6 +207,11 @@ const Home: NextPage = () => {
                 boardId={boardId}
                 users={users}
                 activeBoard={activeBoard}
+              />
+            )}
+            {showEditCollabsModal && (
+              <EditCollaboratorsModal
+                setShowEditCollabsModal={setShowEditCollabsModal}
               />
             )}
           </div>

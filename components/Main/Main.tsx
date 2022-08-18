@@ -31,6 +31,7 @@ type MainProps = {
   sharedBoardIds: any;
   users: any;
   handleDeleteBoard: any;
+  setShowEditCollabsModal: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const Main = ({
@@ -49,6 +50,7 @@ const Main = ({
   sharedBoardIds,
   users,
   handleDeleteBoard,
+  setShowEditCollabsModal,
 }: MainProps) => {
   const user = useContext(UserContext);
 
@@ -539,6 +541,7 @@ const Main = ({
         sharedBoardIds={sharedBoardIds}
         handleDeleteBoard={handleDeleteBoard}
         users={users}
+        setShowEditCollabsModal={setShowEditCollabsModal}
       />
       {/* Main content */}
       <DragDropContext onDragEnd={onDragEnd}>

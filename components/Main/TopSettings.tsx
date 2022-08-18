@@ -15,6 +15,7 @@ type TopSettingsProps = {
   sharedBoardIds: any;
   handleDeleteBoard: any;
   users: any;
+  setShowEditCollabsModal: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const TopSettings = ({
@@ -29,6 +30,7 @@ const TopSettings = ({
   sharedBoardIds,
   handleDeleteBoard,
   users,
+  setShowEditCollabsModal,
 }: TopSettingsProps) => {
   const user = useContext(UserContext);
   // console.log("user:", user);
@@ -65,7 +67,11 @@ const TopSettings = ({
         <div className="flex justify-center items-center gap-2 md:gap-3 lg:gap-4">
           {/* Displaying Collaborators */}
           {activeBoard?.collaborators?.length > 0 && (
-            <Collaborators activeBoard={activeBoard} users={users} />
+            <Collaborators
+              activeBoard={activeBoard}
+              users={users}
+              setShowEditCollabsModal={setShowEditCollabsModal}
+            />
           )}
           {/* Desktop Add New Task Btn */}
           <button
