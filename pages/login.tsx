@@ -17,13 +17,13 @@ const Login = (users: any) => {
           (existingUser: any) => existingUser?.email === user?.email
         );
 
-        // If an *active* existing user signs in
+        // ** If an *active* existing user signs in
         if (userDoc && userDoc.isActive) {
           console.log("active existing user signed in");
           return;
         }
 
-        // If *passive* (invited) user signs in
+        // ** If *passive* (invited) user signs in
         if (userDoc && !userDoc.isActive) {
           console.log("passive invited user signed in");
           const batch = writeBatch(db);
@@ -47,6 +47,7 @@ const Login = (users: any) => {
             timestamp: serverTimestamp(),
             sharedBoards: [],
             isActive: true,
+            photoURL: user?.photoURL,
           });
         }
         // toast.success(`Welcome ${user.displayName}!`);

@@ -374,7 +374,7 @@ const SideNav = ({
                   </div>
                 </div>
                 {/* Shared Boards Container */}
-                {sharedBoards && (
+                {sharedBoards?.length > 0 && (
                   <div className="w-[100%] text-fontSecondary">
                     {/* Shared Boards title */}
                     <h3 className="pl-4 uppercase font-bold text-xs mb-4">
@@ -469,7 +469,7 @@ const SideNav = ({
                   </button>
                   <Image
                     className="w-8 h-8 rounded-full"
-                    src={user?.photoURL || "hacker.png"}
+                    src={user?.photoURL || "/hacker.png"}
                     height={32}
                     width={32}
                     alt="user photo"

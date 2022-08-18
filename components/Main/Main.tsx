@@ -538,6 +538,7 @@ const Main = ({
         setShowShareModal={setShowShareModal}
         sharedBoardIds={sharedBoardIds}
         handleDeleteBoard={handleDeleteBoard}
+        users={users}
       />
       {/* Main content */}
       <DragDropContext onDragEnd={onDragEnd}>

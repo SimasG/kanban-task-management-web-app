@@ -4,6 +4,6 @@ module.exports = {
   // find droppable entry with id - not sure why
   reactStrictMode: false,
   images: {
-    domains: ["lh3.googleusercontent.com"],
+    domains: ["lh3.googleusercontent.com", "drive.google.com"],
   },
 };

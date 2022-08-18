@@ -1,8 +1,7 @@
-import { doc, increment, writeBatch } from "firebase/firestore";
 import { useContext, useEffect, useState } from "react";
 import { UserContext } from "../../lib/context";
-import { db } from "../../lib/firebase";
 import { AiOutlineUserAdd } from "react-icons/ai";
+import Collaborators from "../Collaborators";
 
 type TopSettingsProps = {
   activeBoard: any;
@@ -15,6 +14,7 @@ type TopSettingsProps = {
   setShowShareModal: React.Dispatch<React.SetStateAction<boolean>>;
   sharedBoardIds: any;
   handleDeleteBoard: any;
+  users: any;
 };
 
 const TopSettings = ({
@@ -28,8 +28,10 @@ const TopSettings = ({
   setShowShareModal,
   sharedBoardIds,
   handleDeleteBoard,
+  users,
 }: TopSettingsProps) => {
   const user = useContext(UserContext);
+  // console.log("user:", user);
   const [readOnlyState, setReadOnlyState] = useState(false);
 
   useEffect(() => {
@@ -61,6 +63,10 @@ const TopSettings = ({
       />
       {boards?.length > 0 && (
         <div className="flex justify-center items-center gap-2 md:gap-3 lg:gap-4">
+          {/* Displaying Collaborators */}
+          {activeBoard?.collaborators?.length > 0 && (
+            <Collaborators activeBoard={activeBoard} users={users} />
+          )}
           {/* Desktop Add New Task Btn */}
           <button
             onClick={(e) => {
