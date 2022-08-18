@@ -34,6 +34,7 @@ type SideNavProps = {
   handleDeleteBoard: any;
   activeBoard: any;
   users: any;
+  setShowEditCollabsModal: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const SideNav = ({
@@ -47,6 +48,7 @@ const SideNav = ({
   handleDeleteBoard,
   activeBoard,
   users,
+  setShowEditCollabsModal,
 }: SideNavProps) => {
   const user = useContext(UserContext);
 
@@ -335,8 +337,8 @@ const SideNav = ({
                                                 <button
                                                   className="w-[100%] text-left hover:bg-[#eef2f7] cursor-pointer block p-2 text-fontPrimary"
                                                   onClick={() =>
-                                                    console.log(
-                                                      "collaborators will be removed"
+                                                    setShowEditCollabsModal(
+                                                      true
                                                     )
                                                   }
                                                 >

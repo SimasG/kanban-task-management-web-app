@@ -161,6 +161,7 @@ const Home: NextPage = () => {
               handleDeleteBoard={handleDeleteBoard}
               activeBoard={activeBoard}
               users={users}
+              setShowEditCollabsModal={setShowEditCollabsModal}
             />
             <Main
               activeBoard={activeBoard}
@@ -178,7 +179,6 @@ const Home: NextPage = () => {
               sharedBoardIds={sharedBoardIds}
               users={users}
               handleDeleteBoard={handleDeleteBoard}
-              setShowEditCollabsModal={setShowEditCollabsModal}
             />
             {showAddTaskModal && (
               <AddNewTaskModal
@@ -212,6 +212,9 @@ const Home: NextPage = () => {
             {showEditCollabsModal && (
               <EditCollaboratorsModal
                 setShowEditCollabsModal={setShowEditCollabsModal}
+                users={users}
+                activeBoard={activeBoard}
+                boardId={boardId}
               />
             )}
           </div>

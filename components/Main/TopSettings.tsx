@@ -3,7 +3,7 @@ import { UserContext } from "../../lib/context";
 import { AiOutlineUserAdd } from "react-icons/ai";
 import Collaborators from "../Collaborators";
 
-type TopSettingsProps = {
+type MainProps = {
   activeBoard: any;
   boards: any;
   boardId: string | null | undefined;
@@ -15,7 +15,6 @@ type TopSettingsProps = {
   sharedBoardIds: any;
   handleDeleteBoard: any;
   users: any;
-  setShowEditCollabsModal: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const TopSettings = ({
@@ -30,8 +29,7 @@ const TopSettings = ({
   sharedBoardIds,
   handleDeleteBoard,
   users,
-  setShowEditCollabsModal,
-}: TopSettingsProps) => {
+}: MainProps) => {
   const user = useContext(UserContext);
   // console.log("user:", user);
   const [readOnlyState, setReadOnlyState] = useState(false);
@@ -67,11 +65,7 @@ const TopSettings = ({
         <div className="flex justify-center items-center gap-2 md:gap-3 lg:gap-4">
           {/* Displaying Collaborators */}
           {activeBoard?.collaborators?.length > 0 && (
-            <Collaborators
-              activeBoard={activeBoard}
-              users={users}
-              setShowEditCollabsModal={setShowEditCollabsModal}
-            />
+            <Collaborators activeBoard={activeBoard} users={users} />
           )}
           {/* Desktop Add New Task Btn */}
           <button

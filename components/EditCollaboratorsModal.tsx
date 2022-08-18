@@ -1,13 +1,75 @@
+import { doc, writeBatch } from "firebase/firestore";
+import Image from "next/image";
 import { useContext } from "react";
 import toast from "react-hot-toast";
 import { UserContext } from "../lib/context";
+import { db } from "../lib/firebase";
 
 type IndexProps = {
   setShowEditCollabsModal: React.Dispatch<React.SetStateAction<boolean>>;
+  users: any;
+  activeBoard: any;
+  boardId: string | null | undefined;
 };
 
-const ShareModal = ({ setShowEditCollabsModal }: IndexProps) => {
+const ShareModal = ({
+  setShowEditCollabsModal,
+  users,
+  activeBoard,
+  boardId,
+}: IndexProps) => {
   const user: any = useContext(UserContext);
+
+  // Filtering users whose emails are in the collaborators' array
+  let collaboratorUsers: any = [];
+  users?.filter((user: any) => {
+    activeBoard?.collaborators.includes(user?.email) &&
+      collaboratorUsers.push(user);
+  });
+
+  const handleRemoveUser = async () => {
+    const batch = writeBatch(db);
+
+    // 1. Update sharedBoards array in the invitee's (current User) userDoc
+    const inviteeUserDoc = users?.find(
+      (existingUser: any) => existingUser?.email === user?.email
+    );
+
+    // Filtering out the shared Board
+    const filteredSharedBoards = inviteeUserDoc.sharedBoards?.filter(
+      (sharedBoard: any) => sharedBoard?.board !== boardId
+    );
+
+    const userDocRef = doc(db, "users", `${user?.uid}`);
+    batch.update(userDocRef, {
+      ...inviteeUserDoc,
+      sharedBoards: filteredSharedBoards,
+    });
+
+    // 2. Update collaborators array in the inviter's boardDoc
+    const currentSharedBoard = inviteeUserDoc.sharedBoards?.find(
+      (sharedBoard: any) => sharedBoard?.board === boardId
+    );
+
+    const filteredCollaborators = activeBoard.collaborators?.filter(
+      (collaborator: any) => collaborator !== user?.email
+    );
+
+    const boardDocRef = doc(
+      db,
+      "users",
+      `${currentSharedBoard?.user}`,
+      "boards",
+      `${currentSharedBoard?.board}`
+    );
+    batch.update(boardDocRef, {
+      ...activeBoard,
+      collaborators: filteredCollaborators,
+    });
+
+    await batch.commit();
+    toast.success(`userEmail has been removed`);
+  };
 
   return (
     <div
@@ -16,8 +78,40 @@ const ShareModal = ({ setShowEditCollabsModal }: IndexProps) => {
     >
       <section
         onClick={(e) => e.stopPropagation()}
-        className="p-6 bg-backgroundColorMenu dark:bg-darkGray rounded-md flex flex-col justify-between w-[95%] sm:w-[70%] md:w-[60%] lg:w-[50%] xl:w-[40%] 2xl:w-[35%]"
-      ></section>
+        className="p-3 sm:p-4 md:p-6 bg-backgroundColorMenu dark:bg-darkGray rounded-md flex flex-col justify-between w-[95%] sm:w-[70%] md:w-[60%] lg:w-[50%] xl:w-[40%] 2xl:w-[35%]"
+      >
+        <h1 className="text-fontPrimary dark:text-fontPrimaryDark text-xl font-bold mb-4">
+          Remove Collaborators
+        </h1>
+
+        <div className="flex-col justify-start items-center gap-2 md:gap-4">
+          {collaboratorUsers?.map((user: any, index: number) => {
+            return (
+              <div
+                key={user?.uid}
+                className="flex justify-between gap-2 items-center mb-4"
+              >
+                <Image
+                  className="w-8 h-8 rounded-full"
+                  src={user?.photoURL || "/hacker.png"}
+                  height={32}
+                  width={32}
+                  alt="user photo"
+                />
+                <span className="mr-auto text-sm md:text-base">
+                  {user?.email}
+                </span>
+                <button
+                  className="purpleBtn px-4 text-xs	sm:text-sm md:text-base"
+                  onClick={handleRemoveUser}
+                >
+                  Remove
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      </section>
     </div>
   );
 };

@@ -4,14 +4,9 @@ import React from "react";
 type TopSettingsProps = {
   activeBoard: any;
   users: any;
-  setShowEditCollabsModal: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const Collaborators = ({
-  activeBoard,
-  users,
-  setShowEditCollabsModal,
-}: TopSettingsProps) => {
+const Collaborators = ({ activeBoard, users }: TopSettingsProps) => {
   // Filtering users whose emails are in the collaborators' array
   let collaboratorUsers: any = [];
   users?.filter((user: any) => {
@@ -20,14 +15,11 @@ const Collaborators = ({
   });
 
   return (
-    <div
-      className="flex items-center relative"
-      onClick={() => setShowEditCollabsModal(true)}
-    >
+    <div className="flex items-center relative">
       {collaboratorUsers?.map((user: any, index: number) => {
         if (index > 1)
           return (
-            <div className="w-8 h-8 rounded-full cursor-pointer bg-blue-300 flex justify-center items-center">
+            <div className="w-8 h-8 rounded-full bg-blue-300 flex justify-center items-center">
               <span className="text-backgroundColorMenu">
                 +{collaboratorUsers?.length - 2}
               </span>
@@ -35,9 +27,7 @@ const Collaborators = ({
           );
         return (
           <Image
-            className={`${
-              index > 0 && "absolute ml-[-20px]"
-            } w-8 h-8 rounded-full cursor-pointer`}
+            className="w-8 h-8 rounded-full"
             src={user?.photoURL || "/hacker.png"}
             height={32}
             width={32}
