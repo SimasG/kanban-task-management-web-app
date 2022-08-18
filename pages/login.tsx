@@ -1,18 +1,16 @@
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import { doc, serverTimestamp, setDoc, updateDoc } from "firebase/firestore";
+import {
+  doc,
+  serverTimestamp,
+  setDoc,
+  updateDoc,
+  writeBatch,
+} from "firebase/firestore";
 import toast from "react-hot-toast";
 import { FcGoogle } from "react-icons/fc";
 import { auth, db } from "../lib/firebase";
 
 const Login = (users: any) => {
-  let userIds: any = [];
-
-  // Why are "users" nested in "users"?
-  users?.users?.map((user: any) => {
-    userIds?.push(user?.uid);
-  });
-
-  // ** Check if the user has been invited (aka provided email is already in the database + is_active is false)
   const handleGoogleLogin = () => {
     const provider = new GoogleAuthProvider();
     signInWithPopup(auth, provider)
@@ -24,19 +22,28 @@ const Login = (users: any) => {
           (existingUser: any) => existingUser?.email === user?.email
         );
 
+        console.log("user:", user, "userDoc:", userDoc);
+
         // If an *active* existing user signs in
         if (userDoc && userDoc?.isActive) {
           console.log("active existing user signed in");
           return;
         }
-        // if (userIds?.includes(user?.uid)) return;
 
         // If *passive* (invited) user signs in
         if (userDoc && !userDoc?.isActive) {
           console.log("passive invited user signed in");
-          await updateDoc(doc(db, "users", `${user.uid}`), {
+          const batch = writeBatch(db);
+          // 1. Delete passive doc
+          batch.delete(doc(db, "users", `${userDoc.uid}`));
+          // 2. Create active doc with uid from User Auth object
+          batch.set(doc(db, "users", `${user?.uid}`), {
+            ...userDoc,
+            uid: user?.uid,
             isActive: true,
           });
+
+          await batch.commit();
         }
         // If new user signs in
         else {
@@ -49,7 +56,7 @@ const Login = (users: any) => {
             isActive: true,
           });
         }
-        toast.success(`Welcome ${user.displayName}!`);
+        // toast.success(`Welcome ${user.displayName}!`);
       })
       .catch((err) => console.log(err));
   };

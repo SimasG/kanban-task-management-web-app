@@ -1,10 +1,18 @@
-import { doc, DocumentData, getDoc, writeBatch } from "firebase/firestore";
+import {
+  doc,
+  DocumentData,
+  getDoc,
+  serverTimestamp,
+  setDoc,
+  writeBatch,
+} from "firebase/firestore";
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import { useContext } from "react";
 import toast from "react-hot-toast";
 import { UserContext } from "../lib/context";
 import { db } from "../lib/firebase";
 import { EmailFormErrorsSchema } from "../lib/types";
+import { v4 as uuidv4 } from "uuid";
 
 type IndexProps = {
   setShowShareModal: React.Dispatch<React.SetStateAction<boolean>>;
@@ -21,15 +29,12 @@ const ShareModal = ({
 }: IndexProps) => {
   const user: any = useContext(UserContext);
 
-  // Send Invite Email with Link to Address Specified
   const onSubmit = async (values: any, actions: any) => {
     // const batch = writeBatch(db);
-
     // let userEmails: any = [];
     // users?.forEach((user: any) => userEmails.push(user?.email));
-
     // if (userEmails?.includes(values?.email)) {
-    // ** Logic for existing users
+    // // ** Logic for existing users
     // // 1. Create/update *collaborators* array for the current User
     // // 1.1 Create/add invitee's email to "collaborators" array in the inviter's Board doc
     // const boardRef = doc(db, "users", `${user?.uid}`, "boards", `${boardId}`);
@@ -65,30 +70,42 @@ const ShareModal = ({
     // });
     // await batch.commit();
     // } else {
-    // Logic for new users
-    // 1. Repeat logic used for existing users (caveat: add is_active: false to the new userDoc)
-    // 2. Send invite email (generic link sent)
-    // 3. Get the invitee to sign in
+    // // ** Logic for new users
+    // // 1. Create userDoc in Firebase (caveat: add isActive: false)
+    // // 2. Repeat logic used for existing users
+    // // 3. Send invite email (generic link sent)
     // }
-
-    // Data to be used in the invite email
-    const data: any = {
-      ...values,
-      inviterEmail: user?.email,
-      boardTitle: activeBoard?.[0]?.title,
-    };
-
-    const { setSubmitting, resetForm } = actions;
-    setSubmitting(true);
-    // Sending a POST request to an API endpoint "api/mail" with a body where the form values are stored
-    fetch("api/mail", {
-      method: "post",
-      body: JSON.stringify(data),
+    const uuid = uuidv4();
+    await setDoc(doc(db, "users", `${uuid}`), {
+      email: values?.email,
+      timestamp: serverTimestamp(),
+      sharedBoards: [
+        {
+          board: boardId,
+          email: user?.email,
+          user: user?.uid,
+        },
+      ],
+      isActive: false,
+      uid: uuid,
     });
-    toast.success("Invite Sent!");
-    setSubmitting(false);
-    resetForm();
-    setShowShareModal(false);
+    // // Data to be used in the invite email
+    // const data: any = {
+    //   ...values,
+    //   inviterEmail: user?.email,
+    //   boardTitle: activeBoard?.[0]?.title,
+    // };
+    // const { setSubmitting, resetForm } = actions;
+    // setSubmitting(true);
+    // // Sending a POST request to an API endpoint "api/mail" with a body where the form values are stored
+    // fetch("api/mail", {
+    //   method: "post",
+    //   body: JSON.stringify(data),
+    // });
+    // toast.success("Invite Sent!");
+    // setSubmitting(false);
+    // resetForm();
+    // setShowShareModal(false);
   };
 
   return (

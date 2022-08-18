@@ -2622,3 +2622,11 @@ setTasks(tasks1);
 
 const message = `Message: zdare. Recipient email: ${body.email}`;
 text: message,
+
+        // if (userIds?.includes(user?.uid)) return;
+
+let userIds: any = [];
+// Why are "users" nested in "users"?
+users?.users?.map((user: any) => {
+userIds?.push(user?.uid);
+});
