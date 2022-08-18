@@ -44,10 +44,10 @@ const ShareModal = ({
 
       // 1. Create/add invitee's email to "collaborators" array in the inviter's Board doc
       const boardRef = doc(db, "users", `${user?.uid}`, "boards", `${boardId}`);
-      const currentCollaborators = activeBoard?.collaborators;
       batch.update(boardRef, {
         collaborators: [
-          ...(typeof currentCollaborators === "object" && currentCollaborators),
+          ...(typeof activeBoard?.collaborators === "object" &&
+            activeBoard?.collaborators),
           `${values?.email}`,
         ],
       });
@@ -91,10 +91,10 @@ const ShareModal = ({
 
       // 2. Create/add invitee's email to "collaborators" array in the inviter's Board doc
       const boardRef = doc(db, "users", `${user?.uid}`, "boards", `${boardId}`);
-      const currentCollaborators = activeBoard?.collaborators;
       batch.update(boardRef, {
         collaborators: [
-          ...(typeof currentCollaborators === "object" && currentCollaborators),
+          ...(typeof activeBoard?.collaborators === "object" &&
+            activeBoard?.collaborators),
           `${values?.email}`,
         ],
       });

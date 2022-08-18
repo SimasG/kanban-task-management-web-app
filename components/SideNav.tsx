@@ -32,6 +32,8 @@ type SideNavProps = {
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
   sharedBoards: any;
   handleDeleteBoard: any;
+  activeBoard: any;
+  users: any;
 };
 
 const SideNav = ({
@@ -43,6 +45,8 @@ const SideNav = ({
   isOpen,
   setIsOpen,
   handleDeleteBoard,
+  activeBoard,
+  users,
 }: SideNavProps) => {
   const user = useContext(UserContext);
 
@@ -180,6 +184,50 @@ const SideNav = ({
       htmlDoc?.classList.add("dark");
       localStorage.theme = "dark";
     }
+  };
+
+  const handleLeaveBoard = async () => {
+    const batch = writeBatch(db);
+
+    // 1. Update sharedBoards array in the invitee's (current User) userDoc
+    const inviteeUserDoc = users?.find(
+      (existingUser: any) => existingUser?.email === user?.email
+    );
+
+    // Filtering out the shared Board
+    const filteredSharedBoards = inviteeUserDoc.sharedBoards?.filter(
+      (sharedBoard: any) => sharedBoard?.board !== boardId
+    );
+
+    const userDocRef = doc(db, "users", `${user?.uid}`);
+    batch.update(userDocRef, {
+      ...inviteeUserDoc,
+      sharedBoards: filteredSharedBoards,
+    });
+
+    // 2. Update collaborators array in the inviter's boardDoc
+    const currentSharedBoard = inviteeUserDoc.sharedBoards?.find(
+      (sharedBoard: any) => sharedBoard?.board === boardId
+    );
+
+    const filteredCollaborators = activeBoard.collaborators?.filter(
+      (collaborator: any) => collaborator !== user?.email
+    );
+
+    const boardDocRef = doc(
+      db,
+      "users",
+      `${currentSharedBoard?.user}`,
+      "boards",
+      `${currentSharedBoard?.board}`
+    );
+    batch.update(boardDocRef, {
+      ...activeBoard,
+      collaborators: filteredCollaborators,
+    });
+
+    await batch.commit();
+    toast.success(`Left ${activeBoard.title}`);
   };
 
   return (
@@ -387,11 +435,7 @@ const SideNav = ({
                                           </Popover.Target>
                                           <Popover.Dropdown className="top-12 right-0 z-[9999] w-[185px]">
                                             <button
-                                              onClick={() =>
-                                                console.log(
-                                                  "User will leave Board"
-                                                )
-                                              }
+                                              onClick={() => handleLeaveBoard()}
                                               className="w-[100%] text-left hover:bg-[#eef2f7] cursor-pointer block p-2 text-fontPrimary"
                                             >
                                               Leave Board

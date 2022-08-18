@@ -48,7 +48,6 @@ const Home: NextPage = () => {
     // setFetching(true);
     if (activeBoard && boards?.length > 0) return;
     setBoardId(boards?.[0]?.uid);
-    console.log("activeBoard useEffect ran");
     // setFetching(false);
   }, [activeBoard, boards]);
 
@@ -158,6 +157,8 @@ const Home: NextPage = () => {
               setIsOpen={setIsOpen}
               sharedBoards={sharedBoards}
               handleDeleteBoard={handleDeleteBoard}
+              activeBoard={activeBoard}
+              users={users}
             />
             <Main
               activeBoard={activeBoard}
