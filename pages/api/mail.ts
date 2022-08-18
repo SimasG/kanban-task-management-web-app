@@ -1,4 +1,3 @@
-// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
 import "dotenv/config";
 
@@ -15,8 +14,6 @@ export default async function handler(
   res: NextApiResponse<Data>
 ) {
   const body = JSON.parse(req.body);
-
-  const message = `Message: zdare. Recipient email: ${body.email}`;
 
   const html = `<html lang="en">
   <head>
@@ -115,8 +112,8 @@ export default async function handler(
                                 padding-right: 56px;
                               "
                             >
-                              Hey there! Simas Gradeckas invited you to join the
-                              Test Board board on Trello:
+                              Hey there! ${body.inviterEmail} invited you to join the
+                              ${body.boardTitle} board on Kanban:
                             </p>
 
                             <div
@@ -246,9 +243,9 @@ export default async function handler(
                                 padding-bottom: 8px;
                               "
                             >
-                              In order to get access to the "board name" board,
+                              In order to get access to the ${body.boardTitle} board,
                               please sign in using the email address that this
-                              email has been sent to
+                              email has been sent to.
                             </p>
                           </td>
                         </tr>
@@ -282,16 +279,15 @@ export default async function handler(
     to: `${body.email}`,
     from: "simas@tstudents.io",
     subject: "You've been invited to join a Kanban Board!",
-    text: message,
     html: html,
   };
 
   (async () => {
     try {
       await mail.send(data);
+      console.log("body:", body);
     } catch (error: any) {
       console.error(error);
-
       if (error.response) {
         console.error(error.response.body);
       }

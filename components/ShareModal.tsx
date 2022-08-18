@@ -10,10 +10,16 @@ type IndexProps = {
   setShowShareModal: React.Dispatch<React.SetStateAction<boolean>>;
   boardId: string | null | undefined;
   users: DocumentData[] | undefined;
+  activeBoard: any;
 };
 
-const ShareModal = ({ setShowShareModal, boardId, users }: IndexProps) => {
-  const user = useContext(UserContext);
+const ShareModal = ({
+  setShowShareModal,
+  boardId,
+  users,
+  activeBoard,
+}: IndexProps) => {
+  const user: any = useContext(UserContext);
 
   // Send Invite Email with Link to Address Specified
   const onSubmit = async (values: any, actions: any) => {
@@ -65,12 +71,19 @@ const ShareModal = ({ setShowShareModal, boardId, users }: IndexProps) => {
     // 3. Get the invitee to sign in
     // }
 
+    // Data to be used in the invite email
+    const data: any = {
+      ...values,
+      inviterEmail: user?.email,
+      boardTitle: activeBoard?.[0]?.title,
+    };
+
     const { setSubmitting, resetForm } = actions;
     setSubmitting(true);
     // Sending a POST request to an API endpoint "api/mail" with a body where the form values are stored
     fetch("api/mail", {
       method: "post",
-      body: JSON.stringify(values),
+      body: JSON.stringify(data),
     });
     toast.success("Invite Sent!");
     setSubmitting(false);

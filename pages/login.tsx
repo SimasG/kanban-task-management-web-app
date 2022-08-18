@@ -1,5 +1,5 @@
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import { doc, serverTimestamp, setDoc } from "firebase/firestore";
+import { doc, serverTimestamp, setDoc, updateDoc } from "firebase/firestore";
 import toast from "react-hot-toast";
 import { FcGoogle } from "react-icons/fc";
 import { auth, db } from "../lib/firebase";
@@ -12,22 +12,41 @@ const Login = (users: any) => {
     userIds?.push(user?.uid);
   });
 
+  // ** Check if the user has been invited (aka provided email is already in the database + is_active is false)
   const handleGoogleLogin = () => {
     const provider = new GoogleAuthProvider();
     signInWithPopup(auth, provider)
       // ** Make sure to *not* overwrite the userDoc if it already exists
       .then(async (result) => {
         const user = result.user;
-        if (userIds?.includes(user?.uid)) {
-          console.log("Existing User Signed Up");
-          // No existing doc overwriting
-        } else {
-          console.log("New User Signed Up");
-          await setDoc(doc(db, "users", user.uid), {
+
+        const userDoc = users?.users?.find(
+          (existingUser: any) => existingUser?.email === user?.email
+        );
+
+        // If an *active* existing user signs in
+        if (userDoc && userDoc?.isActive) {
+          console.log("active existing user signed in");
+          return;
+        }
+        // if (userIds?.includes(user?.uid)) return;
+
+        // If *passive* (invited) user signs in
+        if (userDoc && !userDoc?.isActive) {
+          console.log("passive invited user signed in");
+          await updateDoc(doc(db, "users", `${user.uid}`), {
+            isActive: true,
+          });
+        }
+        // If new user signs in
+        else {
+          console.log("new user signed in");
+          await setDoc(doc(db, "users", `${user.uid}`), {
             uid: user.uid,
             email: user.email,
             timestamp: serverTimestamp(),
             sharedBoards: [],
+            isActive: true,
           });
         }
         toast.success(`Welcome ${user.displayName}!`);
@@ -54,7 +73,7 @@ const Login = (users: any) => {
         <button
           onClick={handleGoogleLogin}
           // className="py-2 bg-fontTertiary text-backgroundColorMenu dark:text-fontPrimaryDark font-bold rounded-full dark:hover:bg-fontPrimaryDark dark:hover:bg-opacity-100 dark:hover:text-fontTertiary hover:bg-opacity-50 w-[55%] mx-auto flex justify-center items-center gap-4"
-          className="p-[14px] bg-backgroundColorMenu text-[#777777] rounded font-medium drop-shadow-lg hover:drop-shadow-xl mx-auto flex justify-center items-center gap-4"
+          className="p-[14px] bg-backgroundColorMenu text-[#777777] rounded font-medium drop-shadow-lg hover:drop-shadow-xl mx-auto flex justify-center items-center gap-4 cursor-pointer"
           type="button"
         >
           <FcGoogle className="w-8 h-8" />

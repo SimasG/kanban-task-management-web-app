@@ -201,6 +201,7 @@ const Home: NextPage = () => {
                 setShowShareModal={setShowShareModal}
                 boardId={boardId}
                 users={users}
+                activeBoard={activeBoard}
               />
             )}
           </div>

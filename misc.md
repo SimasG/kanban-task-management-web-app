@@ -2619,3 +2619,6 @@ setTasks(tasks1);
 // export default useFetchFsSharedBoards;
 
     // https://trello.com/confirm?confirmationToken=&idMember=5e14bb6e4deb7c604bea127e&returnUrl=%2Fb%2FIpIioytF%2Ftest-board
+
+const message = `Message: zdare. Recipient email: ${body.email}`;
+text: message,
