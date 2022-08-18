@@ -2635,3 +2635,114 @@ userIds?.push(user?.uid);
         const currentUser = users?.find(
           (currentUser: any) => currentUser.uid === user?.uid
         );
+
+const onSubmit = async (values: any, actions: any) => {
+const { setSubmitting, resetForm } = actions;
+setSubmitting(true);
+
+    const batch = writeBatch(db);
+
+    let userEmails: any = [];
+    users?.forEach((user: any) => userEmails.push(user?.email));
+
+    if (userEmails?.includes(values?.email)) {
+      console.log("Specified email is already in the database");
+
+      // Finding userDoc of the user with the specified email
+      const userDoc = users?.find(
+        (existingUser: any) => existingUser?.email === values?.email
+      );
+
+      if (userDoc && !userDoc.isActive) {
+        console.log("Specified user is passive");
+        // ** Logic for new users who have been invited to join >1 Board & still haven't signed in
+      } else {
+        console.log("Specified user is active");
+        // ** Logic for active existing users
+        // 1. Create/add invitee's email to "collaborators" array in the inviter's Board doc
+        const boardRef = doc(
+          db,
+          "users",
+          `${user?.uid}`,
+          "boards",
+          `${boardId}`
+        );
+        const currentCollaborators = activeBoard?.collaborators;
+        batch.update(boardRef, {
+          collaborators: [
+            ...(typeof currentCollaborators === "object" &&
+              currentCollaborators),
+            `${values?.email}`,
+          ],
+        });
+        // 2. Create/add inviter's email, boardId & userId to "sharedBoards" array in the invitee's User doc
+        // Finding invitee's Firebase Doc
+        const inviteeUser = users?.find(
+          (user: any) => user?.email === values?.email
+        );
+        const inviteeUserRef = doc(db, "users", `${inviteeUser?.uid}`);
+        batch.update(inviteeUserRef, {
+          // Using type guard to ensure that we're always spreading an object
+          ...(typeof inviteeUser === "object" && inviteeUser),
+          sharedBoards: [
+            ...(inviteeUser?.sharedBoards && inviteeUser?.sharedBoards),
+            {
+              board: boardId,
+              email: user?.email,
+              user: user?.uid,
+            },
+          ],
+        });
+        await batch.commit();
+      }
+    } else {
+      // ** Logic for new users who have been invited to join a Board for the first time
+      // 1. Create userDoc in Firebase (caveat: add isActive: false) + email, boardId & userId to "sharedBoards" array
+      const uuid = uuidv4();
+      batch.set(doc(db, "users", `${uuid}`), {
+        email: values?.email,
+        timestamp: serverTimestamp(),
+        sharedBoards: [
+          {
+            board: boardId,
+            email: user?.email,
+            user: user?.uid,
+          },
+        ],
+        isActive: false,
+        uid: uuid,
+      });
+
+      // 2. Create/add invitee's email to "collaborators" array in the inviter's Board doc
+      const boardRef = doc(db, "users", `${user?.uid}`, "boards", `${boardId}`);
+      const currentCollaborators = activeBoard?.collaborators;
+      batch.update(boardRef, {
+        collaborators: [
+          ...(typeof currentCollaborators === "object" && currentCollaborators),
+          `${values?.email}`,
+        ],
+      });
+
+      await batch.commit();
+
+      // 3. Send invite email (generic link sent)
+      // Data to be used in the invite email
+      const data: any = {
+        ...values,
+        inviterEmail: user?.email,
+        boardTitle: activeBoard?.title,
+      };
+
+      // Sending a POST request to an API endpoint "api/mail" with a body where the form values are stored
+      fetch("api/mail", {
+        method: "post",
+        body: JSON.stringify(data),
+      });
+    }
+
+    toast.success("Invite Sent!");
+    setSubmitting(false);
+    resetForm();
+    setShowShareModal(false);
+
+};
