@@ -27,48 +27,85 @@ const ShareModal = ({
       collaboratorUsers.push(user);
   });
 
-  const handleRemoveUser = async () => {
+  const handleRemoveUser = async (
+    inviteeEmail: string,
+    inviteeUserId: string
+  ) => {
     const batch = writeBatch(db);
 
     // 1. Update sharedBoards array in the invitee's (current User) userDoc
-    const inviteeUserDoc = users?.find(
-      (existingUser: any) => existingUser?.email === user?.email
-    );
-
-    // Filtering out the shared Board
-    const filteredSharedBoards = inviteeUserDoc.sharedBoards?.filter(
-      (sharedBoard: any) => sharedBoard?.board !== boardId
-    );
-
-    const userDocRef = doc(db, "users", `${user?.uid}`);
-    batch.update(userDocRef, {
-      ...inviteeUserDoc,
-      sharedBoards: filteredSharedBoards,
-    });
-
-    // 2. Update collaborators array in the inviter's boardDoc
-    const currentSharedBoard = inviteeUserDoc.sharedBoards?.find(
-      (sharedBoard: any) => sharedBoard?.board === boardId
-    );
+    // *NEW* 1. Update collaborators array in the inviter's (current User) boardDoc
 
     const filteredCollaborators = activeBoard.collaborators?.filter(
-      (collaborator: any) => collaborator !== user?.email
+      (collaborator: any) => collaborator !== inviteeEmail
     );
 
     const boardDocRef = doc(
       db,
       "users",
-      `${currentSharedBoard?.user}`,
+      `${user?.uid}`,
       "boards",
-      `${currentSharedBoard?.board}`
+      `${boardId}`
     );
     batch.update(boardDocRef, {
       ...activeBoard,
       collaborators: filteredCollaborators,
     });
 
+    // const inviteeUserDoc = users?.find(
+    //   (existingUser: any) => existingUser?.email === user?.email
+    // );
+
+    // // Filtering out the shared Board
+    // const filteredSharedBoards = inviteeUserDoc.sharedBoards?.filter(
+    //   (sharedBoard: any) => sharedBoard?.board !== boardId
+    // );
+
+    // const userDocRef = doc(db, "users", `${user?.uid}`);
+    // batch.update(userDocRef, {
+    //   ...inviteeUserDoc,
+    //   sharedBoards: filteredSharedBoards,
+    // });
+
+    // 2. Update collaborators array in the inviter's boardDoc
+    // *NEW* 2. Update sharedBoards array in the invitee's userDoc
+
+    const inviteeUserDoc = users?.find(
+      (user: any) => user?.uid === inviteeUserId
+    );
+
+    const filteredSharedBoards = inviteeUserDoc?.sharedBoards?.filter(
+      (sharedBoard: any) => sharedBoard?.board !== boardId
+    );
+
+    const userDocRef = doc(db, "users", `${inviteeUserId}`);
+    batch.update(userDocRef, {
+      ...(typeof inviteeUserDoc === "object" && inviteeUserDoc),
+      sharedBoards: filteredSharedBoards,
+    });
+
+    // const currentSharedBoard = inviteeUserDoc.sharedBoards?.find(
+    //   (sharedBoard: any) => sharedBoard?.board === boardId
+    // );
+
+    // const filteredCollaborators = activeBoard.collaborators?.filter(
+    //   (collaborator: any) => collaborator !== user?.email
+    // );
+
+    // const boardDocRef = doc(
+    //   db,
+    //   "users",
+    //   `${currentSharedBoard?.user}`,
+    //   "boards",
+    //   `${currentSharedBoard?.board}`
+    // );
+    // batch.update(boardDocRef, {
+    //   ...activeBoard,
+    //   collaborators: filteredCollaborators,
+    // });
+
     await batch.commit();
-    toast.success(`userEmail has been removed`);
+    toast.success(`${inviteeEmail} has been removed`);
   };
 
   return (
@@ -102,8 +139,8 @@ const ShareModal = ({
                   {user?.email}
                 </span>
                 <button
-                  className="purpleBtn px-4 text-xs	sm:text-sm md:text-base"
-                  onClick={handleRemoveUser}
+                  className="purpleBtn px-4 text-xs	sm:text-sm md:text-base drop-shadow-lg hover:drop-shadow-xl"
+                  onClick={() => handleRemoveUser(user?.email, user?.uid)}
                 >
                   Remove
                 </button>
