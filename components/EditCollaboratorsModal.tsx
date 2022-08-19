@@ -33,9 +33,7 @@ const ShareModal = ({
   ) => {
     const batch = writeBatch(db);
 
-    // 1. Update sharedBoards array in the invitee's (current User) userDoc
-    // *NEW* 1. Update collaborators array in the inviter's (current User) boardDoc
-
+    // ** 1. Update collaborators array in the inviter's (current User) boardDoc
     const filteredCollaborators = activeBoard.collaborators?.filter(
       (collaborator: any) => collaborator !== inviteeEmail
     );
@@ -52,24 +50,7 @@ const ShareModal = ({
       collaborators: filteredCollaborators,
     });
 
-    // const inviteeUserDoc = users?.find(
-    //   (existingUser: any) => existingUser?.email === user?.email
-    // );
-
-    // // Filtering out the shared Board
-    // const filteredSharedBoards = inviteeUserDoc.sharedBoards?.filter(
-    //   (sharedBoard: any) => sharedBoard?.board !== boardId
-    // );
-
-    // const userDocRef = doc(db, "users", `${user?.uid}`);
-    // batch.update(userDocRef, {
-    //   ...inviteeUserDoc,
-    //   sharedBoards: filteredSharedBoards,
-    // });
-
-    // 2. Update collaborators array in the inviter's boardDoc
-    // *NEW* 2. Update sharedBoards array in the invitee's userDoc
-
+    // ** 2. Update sharedBoards array in the invitee's userDoc
     const inviteeUserDoc = users?.find(
       (user: any) => user?.uid === inviteeUserId
     );
@@ -83,26 +64,6 @@ const ShareModal = ({
       ...(typeof inviteeUserDoc === "object" && inviteeUserDoc),
       sharedBoards: filteredSharedBoards,
     });
-
-    // const currentSharedBoard = inviteeUserDoc.sharedBoards?.find(
-    //   (sharedBoard: any) => sharedBoard?.board === boardId
-    // );
-
-    // const filteredCollaborators = activeBoard.collaborators?.filter(
-    //   (collaborator: any) => collaborator !== user?.email
-    // );
-
-    // const boardDocRef = doc(
-    //   db,
-    //   "users",
-    //   `${currentSharedBoard?.user}`,
-    //   "boards",
-    //   `${currentSharedBoard?.board}`
-    // );
-    // batch.update(boardDocRef, {
-    //   ...activeBoard,
-    //   collaborators: filteredCollaborators,
-    // });
 
     await batch.commit();
     toast.success(`${inviteeEmail} has been removed`);

@@ -483,6 +483,7 @@ const Main = ({
   };
 
   const addNewColumn = async () => {
+    if (!boardId) return;
     const uuid = uuidv4();
     let newColumnDocRef: any;
 

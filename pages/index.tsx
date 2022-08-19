@@ -48,7 +48,7 @@ const Home: NextPage = () => {
   // Initial setting of boardId
   useEffect(() => {
     // setFetching(true);
-    if (activeBoard && boards?.length > 0) return;
+    if (activeBoard && boards?.length >= 0) return;
     setBoardId(boards?.[0]?.uid);
     // setFetching(false);
   }, [activeBoard, boards]);

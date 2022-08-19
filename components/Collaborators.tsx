@@ -1,5 +1,5 @@
 import Image from "next/image";
-import React from "react";
+import { v4 as uuidv4 } from "uuid";
 
 type TopSettingsProps = {
   activeBoard: any;
@@ -19,7 +19,10 @@ const Collaborators = ({ activeBoard, users }: TopSettingsProps) => {
       {collaboratorUsers?.map((user: any, index: number) => {
         if (index > 1)
           return (
-            <div className="w-8 h-8 rounded-full bg-blue-300 flex justify-center items-center">
+            <div
+              key={uuidv4()}
+              className="w-8 h-8 rounded-full bg-blue-300 flex justify-center items-center"
+            >
               <span className="text-backgroundColorMenu">
                 +{collaboratorUsers?.length - 2}
               </span>
