@@ -41,6 +41,19 @@ export type TaskSchema = {
   uid: string;
 };
 
+export type FormikValuesSchema = {
+  filter(arg0: (task: any) => boolean): FormikValuesSchema[];
+  board: string;
+  column: string;
+  createdAt: FieldValue;
+  description: string;
+  index: number | undefined;
+  status: string;
+  subtasks: SubtaskSchema[];
+  title: string;
+  uid: string;
+};
+
 export type SubtaskSchema = {
   checked: boolean;
   title: string;
@@ -63,4 +76,11 @@ export type initialValuesProps = {
   subtasks: SubtaskSchema[];
   status: number | undefined;
   index: number | undefined;
+};
+
+export type DefaultColumn = {
+  color: string;
+  index: number;
+  status: number;
+  title: string;
 };

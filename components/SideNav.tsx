@@ -22,18 +22,24 @@ import {
 import { defaultColumns } from "../lib/helpers";
 import Link from "next/link";
 import { Popover } from "@mantine/core";
+import {
+  BoardSchema,
+  DefaultColumn,
+  SharedBoardRef,
+  UserSchema,
+} from "../lib/types";
 
 type SideNavProps = {
-  boards: any;
+  boards: BoardSchema[];
   boardId: string | null | undefined;
   setBoardId: React.Dispatch<React.SetStateAction<string | null | undefined>>;
   updateBoardName: (uid: string, newName: string) => Promise<void>;
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  sharedBoards: any;
-  handleDeleteBoard: any;
-  activeBoard: any;
-  users: any;
+  sharedBoards: BoardSchema[];
+  handleDeleteBoard: (boardId: string | null | undefined) => Promise<void>;
+  activeBoard: BoardSchema;
+  users: UserSchema[];
   setShowEditCollabsModal: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
@@ -71,7 +77,7 @@ const SideNav = ({
     setBoardId(uuid);
 
     // Create 3 default Columns
-    defaultColumns?.map((column: any) => {
+    defaultColumns?.map((column: DefaultColumn) => {
       const columnUid = uuidv4();
       const columnRef = doc(
         db,
@@ -97,7 +103,7 @@ const SideNav = ({
     if (!destination) return;
     if (destination.index === source.index) return;
 
-    let add;
+    let add: BoardSchema;
 
     if (type === "personalBoards") {
       let newBoards = boards;
@@ -131,7 +137,7 @@ const SideNav = ({
     const batch = writeBatch(db);
 
     // ** Changing indexes of Boards affected
-    boards?.map((board: any) => {
+    boards?.map((board: BoardSchema) => {
       if (board.uid === boardId) return;
       if (destinationIndex > sourceIndex) {
         // Decrement Boards
@@ -193,12 +199,12 @@ const SideNav = ({
 
     // 1. Update sharedBoardRefs array in the invitee's (current User) userDoc
     const inviteeUserDoc = users?.find(
-      (existingUser: any) => existingUser?.email === user?.email
+      (existingUser: UserSchema) => existingUser?.email === user?.email
     );
 
     // Filtering out the shared Board
-    const filteredSharedBoardRefs = inviteeUserDoc.sharedBoardRefs?.filter(
-      (sharedBoard: any) => sharedBoard?.board !== boardId
+    const filteredSharedBoardRefs = inviteeUserDoc?.sharedBoardRefs?.filter(
+      (sharedBoardRef: SharedBoardRef) => sharedBoardRef?.board !== boardId
     );
 
     const userDocRef = doc(db, "users", `${user?.uid}`);
@@ -208,12 +214,12 @@ const SideNav = ({
     });
 
     // 2. Update collaborators array in the inviter's boardDoc
-    const currentSharedBoard = inviteeUserDoc.sharedBoardRefs?.find(
-      (sharedBoard: any) => sharedBoard?.board === boardId
+    const currentSharedBoard = inviteeUserDoc?.sharedBoardRefs?.find(
+      (sharedBoardRef: SharedBoardRef) => sharedBoardRef?.board === boardId
     );
 
     const filteredCollaborators = activeBoard.collaborators?.filter(
-      (collaborator: any) => collaborator !== user?.email
+      (collaborator: string) => collaborator !== user?.email
     );
 
     const boardDocRef = doc(

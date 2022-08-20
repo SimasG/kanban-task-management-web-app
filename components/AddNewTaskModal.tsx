@@ -15,6 +15,7 @@ import { UserContext } from "../lib/context";
 import toast from "react-hot-toast";
 import {
   ColumnSchema,
+  FormikValuesSchema,
   initialValuesProps,
   SharedBoardRef,
   TaskSchema,
@@ -66,14 +67,14 @@ const AddNewTaskModal = ({
   });
 
   // Add New Task
-  const onSubmit = async (values: TaskSchema, actions: any) => {
-    // *TypeScript* How do I get the "actions" type? It's fat and formik says it's TS-friendly
+  const onSubmit = async (values: FormikValuesSchema, actions: any) => {
+    // *TypeScript* How do I get the "actions" type? It's fat and formik should provide it (they say they're TS-friendly)
     const { setSubmitting, resetForm } = actions;
 
     setSubmitting(true);
     // Identifying Column id, to which the Task should be added.
     const selectedColumn = columns?.find(
-      (column: ColumnSchema) => column?.status === values?.status
+      (column: ColumnSchema) => column?.status === parseInt(values?.status) // *TypeScript* Why does the status type has to be just "string" instead of "string | number"?
     );
 
     const uid = uuidv4();
@@ -103,14 +104,14 @@ const AddNewTaskModal = ({
     }
 
     const chosenColumnTasks = tasks?.filter(
-      (task: TaskSchema) => task?.status === values?.status
+      (task: TaskSchema) => task?.status === parseInt(values?.status)
     );
 
     await setDoc(taskDocRef, {
       // Using type guard to ensure that we're always spreading an object
       ...(typeof values === "object" ? values : {}),
       index: chosenColumnTasks?.length,
-      status: values?.status,
+      status: parseInt(values?.status),
       uid: uid,
       createdAt: Timestamp.fromDate(new Date()),
       board: boardId,
