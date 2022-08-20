@@ -55,7 +55,7 @@ const Home: NextPage = () => {
 
   // Setting activeBoard amongst shared Boards
   useEffect(() => {
-    if (boards?.length !== 0 && sharedBoards?.length <= 0) return;
+    if (boards?.length > 0) return;
     setBoardId(sharedBoards?.[0]?.uid);
   }, [boards, sharedBoards]);
 

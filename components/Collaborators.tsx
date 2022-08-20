@@ -15,7 +15,7 @@ const Collaborators = ({ activeBoard, users }: TopSettingsProps) => {
   });
 
   return (
-    <div className="flex items-center relative">
+    <div className="hidden sm:flex items-center relative">
       {collaboratorUsers?.map((user: any, index: number) => {
         if (index > 1)
           return (

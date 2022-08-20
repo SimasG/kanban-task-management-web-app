@@ -2746,3 +2746,5 @@ setSubmitting(true);
     setShowShareModal(false);
 
 };
+
+    // if (boards?.length > 0 && sharedBoards?.length <= 0) return;

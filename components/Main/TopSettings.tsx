@@ -55,7 +55,7 @@ const TopSettings = ({
       className={`h-[10%] w-[100%] p-4 flex justify-between items-center bg-backgroundColorMenu dark:bg-darkGray`}
     >
       <input
-        className="read-only text-xl bg-transparent cursor-pointer outline-none text-fontPrimary dark:text-fontPrimaryDark sm:w-[140px] md:w-[40%]"
+        className="read-only text-lg sm:text-xl bg-transparent cursor-pointer outline-none text-fontPrimary dark:text-fontPrimaryDark w-[140px] md:w-[40%]"
         type="text"
         readOnly={readOnlyState}
         value={activeBoard?.title || "Future Board Title 🤓"}
@@ -64,7 +64,7 @@ const TopSettings = ({
         }}
       />
       {allBoards?.length > 0 && (
-        <div className="flex justify-center items-center gap-2 md:gap-3 lg:gap-4">
+        <div className="flex justify-center items-center gap-1 sm:gap-2 md:gap-3 lg:gap-4">
           {/* Displaying Collaborators */}
           {activeBoard?.collaborators?.length > 0 && (
             <Collaborators activeBoard={activeBoard} users={users} />
@@ -101,7 +101,7 @@ const TopSettings = ({
           {!sharedBoardIds.includes(boardId) && (
             <svg
               onClick={() => handleDeleteBoard(boardId)}
-              className="w-12 h-12 sm:w-10 sm:h-10 p-2 text-fontSecondary rounded cursor-pointer hover:bg-backgroundColorMain hover:dark:bg-darkBlue"
+              className="w-10 h-10 p-2 text-fontSecondary rounded cursor-pointer hover:bg-backgroundColorMain hover:dark:bg-darkBlue"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
