@@ -31,6 +31,7 @@ type MainProps = {
   sharedBoardIds: any;
   users: any;
   handleDeleteBoard: any;
+  allBoards: any;
 };
 
 const Main = ({
@@ -49,6 +50,7 @@ const Main = ({
   sharedBoardIds,
   users,
   handleDeleteBoard,
+  allBoards,
 }: MainProps) => {
   const user = useContext(UserContext);
 
@@ -538,6 +540,7 @@ const Main = ({
         sharedBoardIds={sharedBoardIds}
         handleDeleteBoard={handleDeleteBoard}
         users={users}
+        allBoards={allBoards}
       />
       {/* Main content */}
       <DragDropContext onDragEnd={onDragEnd}>

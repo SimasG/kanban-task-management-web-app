@@ -45,12 +45,19 @@ const Home: NextPage = () => {
   let activeBoard: any;
   activeBoard = allBoards?.find((board: any) => board?.uid === boardId);
 
+  // Setting activeBoard amongst personal Boards
   useEffect(() => {
     // setFetching(true);
     if (boards?.length >= 0 && activeBoard) return;
     setBoardId(boards?.[0]?.uid);
     // setFetching(false);
   }, [activeBoard, boards]);
+
+  // Setting activeBoard amongst shared Boards
+  useEffect(() => {
+    if (boards?.length !== 0 && sharedBoards?.length <= 0) return;
+    setBoardId(sharedBoards?.[0]?.uid);
+  }, [boards, sharedBoards]);
 
   // ** Do these hooks re-fetch *all* the documents on each re-render (not just the new/updated ones)?
   const columns: any = useFetchFsColumns(boardId, users);
@@ -178,6 +185,7 @@ const Home: NextPage = () => {
               sharedBoardIds={sharedBoardIds}
               users={users}
               handleDeleteBoard={handleDeleteBoard}
+              allBoards={allBoards}
             />
             {showAddTaskModal && (
               <AddNewTaskModal

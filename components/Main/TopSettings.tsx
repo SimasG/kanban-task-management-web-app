@@ -15,6 +15,7 @@ type MainProps = {
   sharedBoardIds: any;
   handleDeleteBoard: any;
   users: any;
+  allBoards: any;
 };
 
 const TopSettings = ({
@@ -29,6 +30,7 @@ const TopSettings = ({
   sharedBoardIds,
   handleDeleteBoard,
   users,
+  allBoards,
 }: MainProps) => {
   const user = useContext(UserContext);
   // console.log("user:", user);
@@ -61,7 +63,7 @@ const TopSettings = ({
           updateBoardName(activeBoard?.uid, e.target.value);
         }}
       />
-      {boards?.length > 0 && (
+      {allBoards?.length > 0 && (
         <div className="flex justify-center items-center gap-2 md:gap-3 lg:gap-4">
           {/* Displaying Collaborators */}
           {activeBoard?.collaborators?.length > 0 && (
