@@ -42,7 +42,24 @@ const ShareModal = ({
     if (userDoc) {
       console.log("Specified email is already in the database");
 
-      // 1. Create/add invitee's email to "collaborators" array in the inviter's Board doc
+      // 1. Ensure invitee's email isn't already in the "collaborators" array
+      // + Ensure invitee's userDoc doesn't already have this Board
+      // Finding invitee's Firebase Doc
+      const inviteeUser = users?.find(
+        (user: any) => user?.email === values?.email
+      );
+
+      if (
+        activeBoard?.collaborators.includes(values?.email) &&
+        inviteeUser?.sharedBoards?.find(
+          (sharedBoard: any) => sharedBoard?.board === boardId
+        )
+      ) {
+        toast.error("This user has already been invited to this Board");
+        return;
+      }
+
+      // 2. Add invitee's email to "collaborators" array in the inviter's Board doc
       const boardRef = doc(db, "users", `${user?.uid}`, "boards", `${boardId}`);
       batch.update(boardRef, {
         collaborators: [
@@ -51,14 +68,10 @@ const ShareModal = ({
           `${values?.email}`,
         ],
       });
-      // 2. Create/add inviter's email, boardId & userId to "sharedBoards" array in the invitee's User doc
-      // Finding invitee's Firebase Doc
-      const inviteeUser = users?.find(
-        (user: any) => user?.email === values?.email
-      );
+
+      // 3. Add inviter's email, boardId & userId to "sharedBoards" array in the invitee's User doc
       const inviteeUserRef = doc(db, "users", `${inviteeUser?.uid}`);
       batch.update(inviteeUserRef, {
-        // Using type guard to ensure that we're always spreading an object
         ...(typeof inviteeUser === "object" && inviteeUser),
         sharedBoards: [
           ...(inviteeUser?.sharedBoards && inviteeUser?.sharedBoards),
@@ -73,6 +86,8 @@ const ShareModal = ({
     }
     // ** Logic for new users who have been invited to join a Board for the first time
     else {
+      console.log("Invite sent to new user");
+
       // 1. Create userDoc in Firebase (caveat: add isActive: false) + email, boardId & userId to "sharedBoards" array
       const uuid = uuidv4();
       batch.set(doc(db, "users", `${uuid}`), {
@@ -89,7 +104,7 @@ const ShareModal = ({
         uid: uuid,
       });
 
-      // 2. Create/add invitee's email to "collaborators" array in the inviter's Board doc
+      // 2. Add invitee's email to "collaborators" array in the inviter's Board doc
       const boardRef = doc(db, "users", `${user?.uid}`, "boards", `${boardId}`);
       batch.update(boardRef, {
         collaborators: [

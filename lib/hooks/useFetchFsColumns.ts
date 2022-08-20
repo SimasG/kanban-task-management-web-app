@@ -51,6 +51,8 @@ const useFetchFsColumns = (
     (a: any, b: any) => a.index - b.index
   );
 
+  // console.log("freshly fetched columns:", sortedColumnData);
+
   return sortedColumnData;
 };
 

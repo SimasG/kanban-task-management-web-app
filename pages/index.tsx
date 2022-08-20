@@ -45,10 +45,9 @@ const Home: NextPage = () => {
   let activeBoard: any;
   activeBoard = allBoards?.find((board: any) => board?.uid === boardId);
 
-  // Initial setting of boardId
   useEffect(() => {
     // setFetching(true);
-    if (activeBoard && boards?.length >= 0) return;
+    if (boards?.length >= 0 && activeBoard) return;
     setBoardId(boards?.[0]?.uid);
     // setFetching(false);
   }, [activeBoard, boards]);

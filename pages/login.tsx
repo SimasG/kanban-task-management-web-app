@@ -34,6 +34,7 @@ const Login = (users: any) => {
             ...userDoc,
             uid: user?.uid,
             isActive: true,
+            photoURL: user?.photoURL,
           });
 
           await batch.commit();
@@ -50,7 +51,7 @@ const Login = (users: any) => {
             photoURL: user?.photoURL,
           });
         }
-        // toast.success(`Welcome ${user.displayName}!`);
+        toast.success(`Welcome ${user.displayName}!`);
       })
       .catch((err) => console.log(err));
   };

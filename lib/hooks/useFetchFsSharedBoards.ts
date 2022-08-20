@@ -4,7 +4,6 @@ import { useCollectionData } from "react-firebase-hooks/firestore";
 import { UserContext } from "../context";
 import { db } from "../firebase";
 
-// WHen is uid null?
 const useFetchFsSharedBoards = () => {
   const user = useContext(UserContext);
 

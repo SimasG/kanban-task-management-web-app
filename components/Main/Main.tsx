@@ -483,12 +483,11 @@ const Main = ({
   };
 
   const addNewColumn = async () => {
-    if (!boardId) return;
+    if (!boardId || columns?.length === 0) return;
     const uuid = uuidv4();
     let newColumnDocRef: any;
 
     if (sharedBoardIds.includes(boardId)) {
-      console.log("Add New Column in a shared Board");
       // Finding Current User (Invitee) Firebase Doc
       const currentUser = users?.find(
         (currentUser: any) => currentUser.uid === user?.uid
@@ -505,7 +504,6 @@ const Main = ({
         `${uuid}`
       );
     } else {
-      console.log("Add New Column in a personal Board");
       newColumnDocRef = doc(db, "users", `${user?.uid}`, "columns", `${uuid}`);
     }
 

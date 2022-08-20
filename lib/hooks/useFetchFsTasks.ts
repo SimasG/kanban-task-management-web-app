@@ -57,6 +57,8 @@ const useFetchFsTasks = (
     (a: any, b: any) => a.status - b.status
   );
 
+  // console.log("freshly fetched tasks:", statusIndexSortedTasks);
+
   return statusIndexSortedTasks;
 };
 
