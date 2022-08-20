@@ -14,24 +14,30 @@ import Column from "./Column";
 import TopSettings from "./TopSettings";
 import { v4 as uuidv4 } from "uuid";
 import { colorArray } from "../../lib/helpers";
+import {
+  BoardSchema,
+  ColumnSchema,
+  TaskSchema,
+  UserSchema,
+} from "../../lib/types";
 
 type MainProps = {
-  activeBoard: any;
-  boards: any;
+  activeBoard: BoardSchema;
+  boards: BoardSchema[];
   boardId: string | null | undefined;
   setBoardId: React.Dispatch<React.SetStateAction<string | null | undefined>>;
-  tasks: any;
+  tasks: any; // *TypeScript* Why does "TaskSchema[]" make "draggedTask" be of type "TaskSchema | undefined"?
   setTaskId: React.Dispatch<React.SetStateAction<string | null | undefined>>;
   setShowAddTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
   setShowEditTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
   updateBoardName: (uid: string, newName: string) => Promise<void>;
-  columns: any;
+  columns: ColumnSchema[]; // *TypeScript* Why am I not getting an error here, as with "tasks"?
   isOpen: boolean;
   setShowShareModal: React.Dispatch<React.SetStateAction<boolean>>;
-  sharedBoardIds: any;
-  users: any;
-  handleDeleteBoard: any;
-  allBoards: any;
+  sharedBoardIds: (string | null | undefined)[];
+  users: any; // *TypeScript* Why does "TaskSchema[]" become "TaskSchema | undefined"?
+  handleDeleteBoard: (boardId: string | null | undefined) => void;
+  allBoards: BoardSchema[];
 };
 
 const Main = ({
@@ -82,7 +88,9 @@ const Main = ({
     }
     // Task DnD logic
     else if (type === "task") {
-      const draggedTask = tasks?.find((task: any) => task?.uid === draggableId);
+      const draggedTask = tasks?.find(
+        (task: TaskSchema) => task?.uid === draggableId
+      );
       // Making changes in Firestore
       if (source.droppableId === destination.droppableId) {
         updateTaskWithinColumn(

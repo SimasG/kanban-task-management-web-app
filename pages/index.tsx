@@ -24,7 +24,7 @@ import { PropagateLoader } from "react-spinners";
 import useFetchFsSharedBoards from "../lib/hooks/useFetchFsSharedBoards";
 import useFetchFsUsers from "../lib/hooks/useFetchFsUsers";
 import toast from "react-hot-toast";
-import { BoardSchema, SharedBoardRef, UserSchema } from "../lib/types";
+import { BoardSchema, SharedBoardRef } from "../lib/types";
 
 const Home: NextPage = () => {
   const user = useContext(UserContext);
@@ -33,7 +33,7 @@ const Home: NextPage = () => {
   const users = useFetchFsUsers(); // *TypeScript*
   const boards: any = useFetchFsBoards(user?.uid); // Personal Boards // *TypeScript*
   const sharedBoards: any = useFetchFsSharedBoards(); // Boards are fetched from the *owner's* Firebase doc path
-  const allBoards: BoardSchema = boards?.concat(sharedBoards);
+  const allBoards: any = boards?.concat(sharedBoards); // *TypeScript* why "BoardSchema[]" throws errors + why "BoardSchema" doesn't?
 
   // ** STATES
   const [showAddTaskModal, setShowAddTaskModal] = useState(false);
@@ -46,7 +46,7 @@ const Home: NextPage = () => {
   const [isOpen, setIsOpen] = useState(true); // SideNav
 
   // Creating shared Board Ids array to identify whether the Board manipulated is personal or shared
-  let sharedBoardIds: any[] = []; // *TypeScript* How do I change sharedBoardIds type to accommodate arrays of strings, null | undefined values?
+  let sharedBoardIds: (string | null | undefined)[] = [];
   sharedBoards?.map((board: BoardSchema) => {
     sharedBoardIds.push(board?.uid);
   });
@@ -99,7 +99,8 @@ const Home: NextPage = () => {
     });
   };
 
-  const handleDeleteBoard = async (boardId: string | null | undefined) => {
+  let handleDeleteBoard: (boardId: string | null | undefined) => void; // *TypeScript* is there a way to export this type declaration instead of writing it here?
+  handleDeleteBoard = async (boardId: string | null | undefined) => {
     const batch = writeBatch(db);
     // 1. Delete Board
     const boardDocRef = doc(
@@ -145,7 +146,8 @@ const Home: NextPage = () => {
     });
 
     // 4. Delete Board reference from sharedBoardRefs array for every invitee (if there are invitees)
-    users?.map((user: UserSchema) => {
+    users?.map((user: any) => {
+      // *TypeScript* why can't "user" type be "UserSchema"?
       user?.sharedBoardRefs?.map((sharedBoardRef: SharedBoardRef) => {
         if (!sharedBoardRef?.board.includes(activeBoard?.uid)) return;
 

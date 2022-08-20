@@ -18,6 +18,33 @@ export type BoardSchema = {
   uid: string;
 };
 
+export type ColumnSchema = {
+  board: string;
+  color: string;
+  index: number;
+  status: number;
+  title: string;
+  uid: string;
+};
+
+export type TaskSchema = {
+  board: string;
+  column: string;
+  createdAt: FieldValue;
+  description: string;
+  index: number;
+  status: number;
+  subtasks: SubtaskSchema[];
+  title: string;
+  uid: string;
+};
+
+export type SubtaskSchema = {
+  checked: boolean;
+  title: string;
+  uid: string;
+};
+
 export type SharedBoardRef = {
   board: string;
   email: string;
