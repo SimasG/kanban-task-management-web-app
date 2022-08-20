@@ -51,8 +51,8 @@ const ShareModal = ({
 
       if (
         activeBoard?.collaborators.includes(values?.email) &&
-        inviteeUser?.sharedBoards?.find(
-          (sharedBoard: any) => sharedBoard?.board === boardId
+        inviteeUser?.sharedBoardRefs?.find(
+          (sharedBoardRef: any) => sharedBoardRef?.board === boardId
         )
       ) {
         toast.error("This user has already been invited to this Board");
@@ -73,8 +73,8 @@ const ShareModal = ({
       const inviteeUserRef = doc(db, "users", `${inviteeUser?.uid}`);
       batch.update(inviteeUserRef, {
         ...(typeof inviteeUser === "object" && inviteeUser),
-        sharedBoards: [
-          ...(inviteeUser?.sharedBoards && inviteeUser?.sharedBoards),
+        sharedBoardRefs: [
+          ...(inviteeUser?.sharedBoardRefs && inviteeUser?.sharedBoardRefs),
           {
             board: boardId,
             email: user?.email,
@@ -93,7 +93,7 @@ const ShareModal = ({
       batch.set(doc(db, "users", `${uuid}`), {
         email: values?.email,
         createdAt: serverTimestamp(),
-        sharedBoards: [
+        sharedBoardRefs: [
           {
             board: boardId,
             email: user?.email,

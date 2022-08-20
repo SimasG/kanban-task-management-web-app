@@ -191,24 +191,24 @@ const SideNav = ({
   const handleLeaveBoard = async () => {
     const batch = writeBatch(db);
 
-    // 1. Update sharedBoards array in the invitee's (current User) userDoc
+    // 1. Update sharedBoardRefs array in the invitee's (current User) userDoc
     const inviteeUserDoc = users?.find(
       (existingUser: any) => existingUser?.email === user?.email
     );
 
     // Filtering out the shared Board
-    const filteredSharedBoards = inviteeUserDoc.sharedBoards?.filter(
+    const filteredSharedBoardRefs = inviteeUserDoc.sharedBoardRefs?.filter(
       (sharedBoard: any) => sharedBoard?.board !== boardId
     );
 
     const userDocRef = doc(db, "users", `${user?.uid}`);
     batch.update(userDocRef, {
       ...inviteeUserDoc,
-      sharedBoards: filteredSharedBoards,
+      sharedBoardRefs: filteredSharedBoardRefs,
     });
 
     // 2. Update collaborators array in the inviter's boardDoc
-    const currentSharedBoard = inviteeUserDoc.sharedBoards?.find(
+    const currentSharedBoard = inviteeUserDoc.sharedBoardRefs?.find(
       (sharedBoard: any) => sharedBoard?.board === boardId
     );
 

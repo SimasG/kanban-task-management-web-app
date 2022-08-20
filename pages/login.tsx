@@ -46,7 +46,7 @@ const Login = (users: any) => {
             uid: user.uid,
             email: user.email,
             createdAt: serverTimestamp(),
-            sharedBoards: [],
+            sharedBoardRefs: [],
             isActive: true,
             photoURL: user?.photoURL,
           });

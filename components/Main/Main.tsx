@@ -122,7 +122,7 @@ const Main = ({
         (currentUser: any) => currentUser.uid === user?.uid
       );
       // Find User Id (Inviter) of the Shared Board
-      const sharedBoard = currentUser?.sharedBoards?.find(
+      const sharedBoardRef = currentUser?.sharedBoardRefs?.find(
         (board: any) => board?.board === boardId
       );
 
@@ -135,7 +135,7 @@ const Main = ({
             const columnDocRef = doc(
               db,
               "users",
-              `${sharedBoard?.user}`,
+              `${sharedBoardRef?.user}`,
               "columns",
               `${column.uid}`
             );
@@ -146,7 +146,7 @@ const Main = ({
             const columnDocRef = doc(
               db,
               "users",
-              `${sharedBoard?.user}`,
+              `${sharedBoardRef?.user}`,
               "columns",
               `${column.uid}`
             );
@@ -159,7 +159,7 @@ const Main = ({
       const columnDocRef = doc(
         db,
         "users",
-        `${sharedBoard?.user}`,
+        `${sharedBoardRef?.user}`,
         "columns",
         `${draggedColumnId}`
       );
@@ -239,7 +239,7 @@ const Main = ({
         (currentUser: any) => currentUser.uid === user?.uid
       );
       // Find User Id (Inviter) of the Shared Board
-      const sharedBoard = currentUser?.sharedBoards?.find(
+      const sharedBoardRef = currentUser?.sharedBoardRefs?.find(
         (board: any) => board?.board === boardId
       );
 
@@ -250,7 +250,7 @@ const Main = ({
             const taskDocRef = doc(
               db,
               "users",
-              `${sharedBoard?.user}`,
+              `${sharedBoardRef?.user}`,
               "tasks",
               `${task?.uid}`
             );
@@ -262,7 +262,7 @@ const Main = ({
             const taskDocRef = doc(
               db,
               "users",
-              `${sharedBoard?.user}`,
+              `${sharedBoardRef?.user}`,
               "tasks",
               `${task?.uid}`
             );
@@ -274,7 +274,7 @@ const Main = ({
       const taskDocRef = doc(
         db,
         "users",
-        `${sharedBoard?.user}`,
+        `${sharedBoardRef?.user}`,
         "tasks",
         `${updatedTaskId}`
       );
@@ -345,7 +345,7 @@ const Main = ({
         (currentUser: any) => currentUser.uid === user?.uid
       );
       // Find User Id (Inviter) of the Shared Board
-      const sharedBoard = currentUser?.sharedBoards?.find(
+      const sharedBoardRef = currentUser?.sharedBoardRefs?.find(
         (board: any) => board?.board === boardId
       );
 
@@ -355,7 +355,7 @@ const Main = ({
           const taskDocRef = doc(
             db,
             "users",
-            `${sharedBoard?.user}`,
+            `${sharedBoardRef?.user}`,
             "tasks",
             `${draggedTaskId}`
           );
@@ -383,7 +383,7 @@ const Main = ({
               const taskDocRef = doc(
                 db,
                 "users",
-                `${sharedBoard?.user}`,
+                `${sharedBoardRef?.user}`,
                 "tasks",
                 `${task?.uid}`
               );
@@ -403,7 +403,7 @@ const Main = ({
               const taskDocRef = doc(
                 db,
                 "users",
-                `${sharedBoard?.user}`,
+                `${sharedBoardRef?.user}`,
                 "tasks",
                 `${task?.uid}`
               );
@@ -495,13 +495,13 @@ const Main = ({
         (currentUser: any) => currentUser.uid === user?.uid
       );
       // Find User Id (Inviter) of the Shared Board
-      const sharedBoard = currentUser?.sharedBoards?.find(
+      const sharedBoardRef = currentUser?.sharedBoardRefs?.find(
         (board: any) => board?.board === boardId
       );
       newColumnDocRef = doc(
         db,
         "users",
-        `${sharedBoard?.user}`,
+        `${sharedBoardRef?.user}`,
         "columns",
         `${uuid}`
       );

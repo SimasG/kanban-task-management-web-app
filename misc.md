@@ -2748,3 +2748,33 @@ setSubmitting(true);
 };
 
     // if (boards?.length > 0 && sharedBoards?.length <= 0) return;
+
+
+    // 4. Delete Board reference from sharedBoardRefs array for every invitee (if there are invitees)
+    let sharedBoardRefsArray: SharedBoardRef[] = [];
+    users?.map((user: UserSchema) => {
+      user?.sharedBoardRefs?.map((sharedBoardRef: SharedBoardRef) => {
+        if (!sharedBoardRef?.board.includes(activeBoard?.uid)) return;
+
+        const filteredSharedBoardRefs =
+
+        // const userDocRef = doc(db, "users", `${user?.uid}`)
+        // batch.update(userDocRef, {
+
+        // })
+      });
+      // sharedBoardRefsArray.push(user?.sharedBoardRefs);
+    });
+
+    // sharedBoardRefsArray?.map((sharedBoardRefs: SharedBoardRef[]) => {
+    //   sharedBoardRefs?.map((sharedBoardRef: SharedBoardRef) => {
+    //     console.log("sharedBoardRef?.board:", sharedBoardRef?.board);
+    //     if (sharedBoardRefs?.includes(activeBoard?.uid)) {
+    //       console.log(
+    //         "Detected that the activeBoard to be deleted has been shared!"
+    //       );
+    //     }
+    //   });
+    // });
+
+    const selectedBoard = boards?.find((board: any) => board?.uid === boardId);

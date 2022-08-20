@@ -1,4 +1,11 @@
-import { doc, increment, updateDoc, writeBatch } from "firebase/firestore";
+import {
+  doc,
+  DocumentData,
+  DocumentReference,
+  increment,
+  updateDoc,
+  writeBatch,
+} from "firebase/firestore";
 import type { NextPage } from "next";
 import React, { useContext, useEffect, useState } from "react";
 import AddNewTaskModal from "../components/AddNewTaskModal";
@@ -17,7 +24,7 @@ import { PropagateLoader } from "react-spinners";
 import useFetchFsSharedBoards from "../lib/hooks/useFetchFsSharedBoards";
 import useFetchFsUsers from "../lib/hooks/useFetchFsUsers";
 import toast from "react-hot-toast";
-import { BoardSchema } from "../lib/types";
+import { BoardSchema, SharedBoardRef, UserSchema } from "../lib/types";
 
 const Home: NextPage = () => {
   const user = useContext(UserContext);
@@ -39,13 +46,13 @@ const Home: NextPage = () => {
   const [isOpen, setIsOpen] = useState(true); // SideNav
 
   // Creating shared Board Ids array to identify whether the Board manipulated is personal or shared
-  let sharedBoardIds: string[] = [];
+  let sharedBoardIds: any[] = []; // *TypeScript* How do I change sharedBoardIds type to accommodate arrays of strings, null | undefined values?
   sharedBoards?.map((board: BoardSchema) => {
     sharedBoardIds.push(board?.uid);
   });
 
   // Is it better to have these as a separate state, or smth else altogether?
-  let activeBoard: BoardSchema | undefined;
+  let activeBoard: BoardSchema;
   activeBoard = allBoards?.find((board: BoardSchema) => board?.uid === boardId);
 
   // Setting activeBoard amongst personal Boards
@@ -68,7 +75,7 @@ const Home: NextPage = () => {
 
   const updateBoardName = async (uid: string, newName: string) => {
     if (newName === "") return;
-    let boardDocRef: any;
+    let boardDocRef: DocumentReference<DocumentData>; // *TypeScript* Should I even include "<DocumentData>"?
 
     if (sharedBoardIds.includes(boardId)) {
       // Updating shared Board Name
@@ -76,11 +83,12 @@ const Home: NextPage = () => {
       const currentUser = users?.find(
         (currentUser: any) => currentUser.uid === user?.uid
       );
+
       // Find User Id (Inviter) of the Shared Board
-      const sharedBoard = currentUser?.sharedBoards?.find(
+      const sharedBoardRef = currentUser?.sharedBoardRefs?.find(
         (board: any) => board?.board === boardId
       );
-      boardDocRef = doc(db, "users", `${sharedBoard?.user}`, "boards", uid);
+      boardDocRef = doc(db, "users", `${sharedBoardRef?.user}`, "boards", uid);
     } else {
       // Updating personal Board Name
       boardDocRef = doc(db, "users", `${user?.uid}`, "boards", uid);
@@ -93,7 +101,7 @@ const Home: NextPage = () => {
 
   const handleDeleteBoard = async (boardId: string | null | undefined) => {
     const batch = writeBatch(db);
-    // Delete Board
+    // 1. Delete Board
     const boardDocRef = doc(
       db,
       "users",
@@ -108,7 +116,7 @@ const Home: NextPage = () => {
       : setBoardId(boards?.[0]?.uid);
     batch.delete(boardDocRef);
 
-    // Delete Columns in the Board
+    // 2. Delete Columns in the Board
     const columnsToDelete = columns?.filter(
       (column: any) => column?.board === boardId
     );
@@ -123,7 +131,7 @@ const Home: NextPage = () => {
       batch.delete(columnDocRef);
     });
 
-    // Decrement indexes of Boards that come after deleted Board
+    // 3. Decrement indexes of Boards that come after deleted Board
     boards?.map((board: any) => {
       if (board?.index <= activeBoard?.index) return;
       const boardDocRef = doc(
@@ -136,8 +144,25 @@ const Home: NextPage = () => {
       batch.update(boardDocRef, { index: increment(-1) });
     });
 
-    const selectedBoard = boards?.find((board: any) => board?.uid === boardId);
-    toast.success(`${selectedBoard?.title} has been deleted`);
+    // 4. Delete Board reference from sharedBoardRefs array for every invitee (if there are invitees)
+    users?.map((user: UserSchema) => {
+      user?.sharedBoardRefs?.map((sharedBoardRef: SharedBoardRef) => {
+        if (!sharedBoardRef?.board.includes(activeBoard?.uid)) return;
+
+        const filteredSharedBoardRefs = user?.sharedBoardRefs?.filter(
+          (sharedBoardRef: SharedBoardRef) =>
+            sharedBoardRef?.board !== activeBoard?.uid
+        );
+
+        const userDocRef = doc(db, "users", `${user?.uid}`);
+        batch.update(userDocRef, {
+          ...(typeof user === "object" && user),
+          sharedBoardRefs: filteredSharedBoardRefs,
+        });
+      });
+    });
+
+    toast.success(`${activeBoard?.title} has been deleted`);
 
     await batch.commit();
   };

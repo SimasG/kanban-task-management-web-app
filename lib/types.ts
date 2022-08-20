@@ -5,11 +5,7 @@ export type UserSchema = {
   email: string;
   isActive: boolean;
   photoURL: string;
-  sharedBoards: {
-    board: string;
-    email: string;
-    user: string;
-  }[];
+  sharedBoardRefs: SharedBoardRef[];
   uid: string;
 };
 
@@ -21,6 +17,13 @@ export type BoardSchema = {
   title: string;
   uid: string;
 };
+
+export type SharedBoardRef = {
+  board: string;
+  email: string;
+  user: string;
+};
+
 export type EmailFormErrorsSchema = {
   email: string;
 };

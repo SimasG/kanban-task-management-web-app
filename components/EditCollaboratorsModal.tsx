@@ -50,19 +50,19 @@ const ShareModal = ({
       collaborators: filteredCollaborators,
     });
 
-    // ** 2. Update sharedBoards array in the invitee's userDoc
+    // ** 2. Update sharedBoardRefs array in the invitee's userDoc
     const inviteeUserDoc = users?.find(
       (user: any) => user?.uid === inviteeUserId
     );
 
-    const filteredSharedBoards = inviteeUserDoc?.sharedBoards?.filter(
+    const filteredSharedBoardRefs = inviteeUserDoc?.sharedBoardRefs?.filter(
       (sharedBoard: any) => sharedBoard?.board !== boardId
     );
 
     const userDocRef = doc(db, "users", `${inviteeUserId}`);
     batch.update(userDocRef, {
       ...(typeof inviteeUserDoc === "object" && inviteeUserDoc),
-      sharedBoards: filteredSharedBoards,
+      sharedBoardRefs: filteredSharedBoardRefs,
     });
 
     await batch.commit();

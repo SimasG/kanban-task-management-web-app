@@ -95,13 +95,13 @@ const EditTaskModal = ({
         (currentUser: any) => currentUser.uid === user?.uid
       );
       // Find User Id (Inviter) of the Shared Board
-      const sharedBoard = currentUser?.sharedBoards?.find(
+      const sharedBoardRef = currentUser?.sharedBoardRefs?.find(
         (board: any) => board?.board === boardId
       );
       taskDocRef = doc(
         db,
         "users",
-        `${sharedBoard?.user}`,
+        `${sharedBoardRef?.user}`,
         "tasks",
         `${taskId}`
       );

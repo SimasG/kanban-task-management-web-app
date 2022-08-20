@@ -17,7 +17,7 @@ const useFetchFsColumns = (
   );
 
   let sharedBoardIds: any = [];
-  currentUser?.sharedBoards?.map((board: any) =>
+  currentUser?.sharedBoardRefs?.map((board: any) =>
     sharedBoardIds.push(board?.board)
   );
 
@@ -25,13 +25,13 @@ const useFetchFsColumns = (
 
   if (sharedBoardIds.includes(boardId)) {
     // Fetch Columns from a shared Board
-    const sharedBoard = currentUser?.sharedBoards?.find(
+    const sharedBoardRef = currentUser?.sharedBoardRefs?.find(
       (board: any) => board?.board === boardId
     );
     const columnsCollectionRef = collection(
       db,
       "users",
-      `${sharedBoard?.user}`,
+      `${sharedBoardRef?.user}`,
       "columns"
     );
     q = query(columnsCollectionRef, where("board", "==", `${boardId}`));

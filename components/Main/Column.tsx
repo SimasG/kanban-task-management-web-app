@@ -54,13 +54,13 @@ const Column = ({
         (currentUser: any) => currentUser.uid === user?.uid
       );
       // Find User Id (Inviter) of the Shared Board
-      const sharedBoard = currentUser?.sharedBoards?.find(
+      const sharedBoardRef = currentUser?.sharedBoardRefs?.find(
         (board: any) => board?.board === boardId
       );
       const columnDocRef = doc(
         db,
         "users",
-        `${sharedBoard?.user}`,
+        `${sharedBoardRef?.user}`,
         "columns",
         `${columnId}`
       );
@@ -86,7 +86,7 @@ const Column = ({
         (currentUser: any) => currentUser.uid === user?.uid
       );
       // Find User Id (Inviter) of the Shared Board
-      const sharedBoard = currentUser?.sharedBoards?.find(
+      const sharedBoardRef = currentUser?.sharedBoardRefs?.find(
         (board: any) => board?.board === boardId
       );
 
@@ -95,7 +95,7 @@ const Column = ({
       const columnDocRef = doc(
         db,
         "users",
-        `${sharedBoard?.user}`,
+        `${sharedBoardRef?.user}`,
         "columns",
         `${columnId}`
       );
@@ -109,7 +109,7 @@ const Column = ({
         const taskDocRef = doc(
           db,
           "users",
-          `${sharedBoard?.user}`,
+          `${sharedBoardRef?.user}`,
           "tasks",
           `${task?.uid}`
         );

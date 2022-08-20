@@ -80,10 +80,16 @@ const AddNewTaskModal = ({
         (currentUser: any) => currentUser.uid === user?.uid
       );
       // Find User Id (Inviter) of the Shared Board
-      const sharedBoard = currentUser?.sharedBoards?.find(
+      const sharedBoardRef = currentUser?.sharedBoardRefs?.find(
         (board: any) => board?.board === boardId
       );
-      taskDocRef = doc(db, "users", `${sharedBoard?.user}`, "tasks", `${uid}`);
+      taskDocRef = doc(
+        db,
+        "users",
+        `${sharedBoardRef?.user}`,
+        "tasks",
+        `${uid}`
+      );
     } else {
       // Add New Task in personal Board
       taskDocRef = doc(db, "users", `${user?.uid}`, "tasks", `${uid}`);
