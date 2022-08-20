@@ -45,7 +45,7 @@ const Login = (users: any) => {
           await setDoc(doc(db, "users", `${user.uid}`), {
             uid: user.uid,
             email: user.email,
-            timestamp: serverTimestamp(),
+            createdAt: serverTimestamp(),
             sharedBoards: [],
             isActive: true,
             photoURL: user?.photoURL,

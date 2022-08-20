@@ -92,7 +92,7 @@ const ShareModal = ({
       const uuid = uuidv4();
       batch.set(doc(db, "users", `${uuid}`), {
         email: values?.email,
-        timestamp: serverTimestamp(),
+        createdAt: serverTimestamp(),
         sharedBoards: [
           {
             board: boardId,

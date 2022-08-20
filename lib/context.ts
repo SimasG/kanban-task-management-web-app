@@ -16,5 +16,4 @@
 import { createContext } from "react";
 import { User } from "firebase/auth";
 
-// When is UserContext argument undefined?
 export const UserContext = createContext<User | null | undefined>(null);

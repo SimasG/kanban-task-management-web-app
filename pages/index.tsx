@@ -17,15 +17,16 @@ import { PropagateLoader } from "react-spinners";
 import useFetchFsSharedBoards from "../lib/hooks/useFetchFsSharedBoards";
 import useFetchFsUsers from "../lib/hooks/useFetchFsUsers";
 import toast from "react-hot-toast";
+import { BoardSchema } from "../lib/types";
 
 const Home: NextPage = () => {
   const user = useContext(UserContext);
-  const users = useFetchFsUsers();
-  // ** How could I change "boards" type from "DocumentData[] | undefined" (coming from
-  // **  useCollectionData hook) to "BoardSchema[] | undefined"?
-  const boards: any = useFetchFsBoards(user?.uid); // Personal Boards
+  // ** How could I change "users" & "boards" type from "DocumentData[] | undefined" (coming from
+  // ** useCollectionData hook) to "UserSchema[] | undefined" "BoardSchema[] | undefined" respectively?
+  const users = useFetchFsUsers(); // *TypeScript*
+  const boards: any = useFetchFsBoards(user?.uid); // Personal Boards // *TypeScript*
   const sharedBoards: any = useFetchFsSharedBoards(); // Boards are fetched from the *owner's* Firebase doc path
-  const allBoards = boards?.concat(sharedBoards);
+  const allBoards: BoardSchema = boards?.concat(sharedBoards);
 
   // ** STATES
   const [showAddTaskModal, setShowAddTaskModal] = useState(false);
@@ -38,12 +39,14 @@ const Home: NextPage = () => {
   const [isOpen, setIsOpen] = useState(true); // SideNav
 
   // Creating shared Board Ids array to identify whether the Board manipulated is personal or shared
-  let sharedBoardIds: any = [];
-  sharedBoards?.map((board: any) => sharedBoardIds.push(board?.uid));
+  let sharedBoardIds: string[] = [];
+  sharedBoards?.map((board: BoardSchema) => {
+    sharedBoardIds.push(board?.uid);
+  });
 
   // Is it better to have these as a separate state, or smth else altogether?
-  let activeBoard: any;
-  activeBoard = allBoards?.find((board: any) => board?.uid === boardId);
+  let activeBoard: BoardSchema | undefined;
+  activeBoard = allBoards?.find((board: BoardSchema) => board?.uid === boardId);
 
   // Setting activeBoard amongst personal Boards
   useEffect(() => {
@@ -60,8 +63,8 @@ const Home: NextPage = () => {
   }, [boards, sharedBoards]);
 
   // ** Do these hooks re-fetch *all* the documents on each re-render (not just the new/updated ones)?
-  const columns: any = useFetchFsColumns(boardId, users);
-  const tasks: any = useFetchFsTasks(boardId, users);
+  const columns: any = useFetchFsColumns(boardId, users); // *TypeScript*
+  const tasks: any = useFetchFsTasks(boardId, users); // *TypeScript*
 
   const updateBoardName = async (uid: string, newName: string) => {
     if (newName === "") return;

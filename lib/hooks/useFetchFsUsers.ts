@@ -6,9 +6,9 @@ const useFetchFsUsers = () => {
   // Fetch Users Collection
   const q = query(collection(db, "users"));
 
-  const data = useCollectionData(q)?.[0];
+  const users = useCollectionData(q)?.[0];
 
-  return data;
+  return users;
 };
 
 export default useFetchFsUsers;
