@@ -1,39 +1,31 @@
-import { useContext, useEffect, useState } from "react";
-import { UserContext } from "../../lib/context";
+import { useEffect, useState } from "react";
 import { AiOutlineUserAdd } from "react-icons/ai";
 import Collaborators from "../Collaborators";
+import { BoardSchema, UserSchema } from "../../lib/types";
 
 type MainProps = {
-  activeBoard: any;
-  boards: any;
+  activeBoard: BoardSchema;
   boardId: string | null | undefined;
-  setBoardId: React.Dispatch<React.SetStateAction<string | null | undefined>>;
   setShowAddTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
   updateBoardName: (uid: string, newName: string) => Promise<void>;
-  columns: any;
   setShowShareModal: React.Dispatch<React.SetStateAction<boolean>>;
-  sharedBoardIds: any;
-  handleDeleteBoard: any;
-  users: any;
-  allBoards: any;
+  sharedBoardIds: (string | null | undefined)[];
+  handleDeleteBoard: (boardId: string | null | undefined) => Promise<void>;
+  users: UserSchema[]; // *TypeScript* Why can I use "UserSchema[]" this time tho?
+  allBoards: BoardSchema[];
 };
 
 const TopSettings = ({
   activeBoard,
-  boards,
   boardId,
-  setBoardId,
   setShowAddTaskModal,
   updateBoardName,
-  columns,
   setShowShareModal,
   sharedBoardIds,
   handleDeleteBoard,
   users,
   allBoards,
 }: MainProps) => {
-  const user = useContext(UserContext);
-  // console.log("user:", user);
   const [readOnlyState, setReadOnlyState] = useState(false);
 
   useEffect(() => {

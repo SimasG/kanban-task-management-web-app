@@ -26,7 +26,6 @@ import {
 
 type MainProps = {
   activeBoard: BoardSchema;
-  boards: BoardSchema[];
   boardId: string | null | undefined;
   setBoardId: React.Dispatch<React.SetStateAction<string | null | undefined>>;
   tasks: any; // *TypeScript* Why does "TaskSchema[]" make "draggedTask" be of type "TaskSchema | undefined"?
@@ -38,14 +37,13 @@ type MainProps = {
   isOpen: boolean;
   setShowShareModal: React.Dispatch<React.SetStateAction<boolean>>;
   sharedBoardIds: (string | null | undefined)[];
-  users: any; // *TypeScript* Why does "TaskSchema[]" become "TaskSchema | undefined"?
-  handleDeleteBoard: (boardId: string | null | undefined) => void;
-  allBoards: BoardSchema[];
+  users: any; // *TypeScript* Why does "UserSchema[]" become "UserSchema | undefined"?
+  handleDeleteBoard: (boardId: string | null | undefined) => Promise<void>;
+  allBoards: BoardSchema[]; // *TypeScript* Why can I use "BoardSchema[]" this time tho?
 };
 
 const Main = ({
   activeBoard,
-  boards,
   boardId,
   setBoardId,
   tasks,
@@ -541,12 +539,9 @@ const Main = ({
     >
       <TopSettings
         activeBoard={activeBoard}
-        boards={boards}
         boardId={boardId}
-        setBoardId={setBoardId}
         setShowAddTaskModal={setShowAddTaskModal}
         updateBoardName={updateBoardName}
-        columns={columns}
         setShowShareModal={setShowShareModal}
         sharedBoardIds={sharedBoardIds}
         handleDeleteBoard={handleDeleteBoard}

@@ -2,19 +2,32 @@ import { Formik } from "formik";
 import * as Yup from "yup";
 import { v4 as uuidv4 } from "uuid";
 import FormikForm from "./form/FormikForm";
-import { doc, setDoc, Timestamp } from "firebase/firestore";
+import {
+  doc,
+  DocumentData,
+  DocumentReference,
+  setDoc,
+  Timestamp,
+} from "firebase/firestore";
 import { db } from "../lib/firebase";
 import { useContext } from "react";
 import { UserContext } from "../lib/context";
 import toast from "react-hot-toast";
+import {
+  ColumnSchema,
+  initialValuesProps,
+  SharedBoardRef,
+  TaskSchema,
+  UserSchema,
+} from "../lib/types";
 
 type IndexProps = {
   boardId: string | null | undefined;
   setShowAddTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
-  tasks: any;
-  columns: any;
-  sharedBoardIds: any;
-  users: any;
+  tasks: TaskSchema[];
+  columns: ColumnSchema[];
+  sharedBoardIds: (string | null | undefined)[];
+  users: UserSchema[];
 };
 
 const AddNewTaskModal = ({
@@ -25,14 +38,6 @@ const AddNewTaskModal = ({
   sharedBoardIds,
   users,
 }: IndexProps) => {
-  type initialValuesProps = {
-    title: string;
-    description?: string;
-    subtasks?: {}[];
-    status: number | undefined;
-    index: number | undefined;
-  };
-
   const user = useContext(UserContext);
 
   const initialValues: initialValuesProps = {
@@ -45,8 +50,8 @@ const AddNewTaskModal = ({
         checked: false,
       },
     ],
-    status: undefined,
-    index: undefined,
+    status: undefined, // *TypeScript* Not too happy with the "undefined" default value
+    index: undefined, // *TypeScript* Not too happy with the "undefined" default value
   };
 
   const validationSchema = Yup.object({
@@ -61,27 +66,29 @@ const AddNewTaskModal = ({
   });
 
   // Add New Task
-  const onSubmit = async (values: any, actions: any) => {
+  const onSubmit = async (values: TaskSchema, actions: any) => {
+    // *TypeScript* How do I get the "actions" type? It's fat and formik says it's TS-friendly
     const { setSubmitting, resetForm } = actions;
+
     setSubmitting(true);
     // Identifying Column id, to which the Task should be added.
     const selectedColumn = columns?.find(
-      (column: any) => column?.status === parseInt(values?.status)
+      (column: ColumnSchema) => column?.status === values?.status
     );
 
     const uid = uuidv4();
-    let taskDocRef: any;
+    let taskDocRef: DocumentReference<DocumentData>;
 
     if (sharedBoardIds.includes(boardId)) {
       // Add New Task in shared Board
 
       // Finding Current User (Invitee) Firebase Doc
       const currentUser = users?.find(
-        (currentUser: any) => currentUser.uid === user?.uid
+        (currentUser: UserSchema) => currentUser.uid === user?.uid
       );
       // Find User Id (Inviter) of the Shared Board
       const sharedBoardRef = currentUser?.sharedBoardRefs?.find(
-        (board: any) => board?.board === boardId
+        (boardRef: SharedBoardRef) => boardRef?.board === boardId
       );
       taskDocRef = doc(
         db,
@@ -96,14 +103,14 @@ const AddNewTaskModal = ({
     }
 
     const chosenColumnTasks = tasks?.filter(
-      (task: any) => task?.status === parseInt(values?.status)
+      (task: TaskSchema) => task?.status === values?.status
     );
 
     await setDoc(taskDocRef, {
       // Using type guard to ensure that we're always spreading an object
       ...(typeof values === "object" ? values : {}),
-      index: parseInt(chosenColumnTasks?.length),
-      status: parseInt(values?.status),
+      index: chosenColumnTasks?.length,
+      status: values?.status,
       uid: uid,
       createdAt: Timestamp.fromDate(new Date()),
       board: boardId,
@@ -118,7 +125,7 @@ const AddNewTaskModal = ({
 
   return (
     <Formik
-      initialValues={initialValues}
+      initialValues={initialValues} // *TypeScript* Pls fix
       validationSchema={validationSchema}
       onSubmit={onSubmit}
     >

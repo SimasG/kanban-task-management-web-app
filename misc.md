@@ -2778,3 +2778,7 @@ setSubmitting(true);
     // });
 
     const selectedBoard = boards?.find((board: any) => board?.uid === boardId);
+
+      // index: parseInt(chosenColumnTasks?.length), -> *Do we have to parseInt a value that's already a number?*
+
+      // (column: any) => column?.status === parseInt(values?.status)

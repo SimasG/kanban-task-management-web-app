@@ -1,6 +1,7 @@
 import { FieldValue } from "firebase/firestore";
 
 export type UserSchema = {
+  find(arg0: (user: UserSchema) => boolean): any;
   createdAt: FieldValue;
   email: string;
   isActive: boolean;
@@ -28,6 +29,7 @@ export type ColumnSchema = {
 };
 
 export type TaskSchema = {
+  filter(arg0: (task: any) => boolean): TaskSchema[];
   board: string;
   column: string;
   createdAt: FieldValue;
@@ -53,4 +55,12 @@ export type SharedBoardRef = {
 
 export type EmailFormErrorsSchema = {
   email: string;
+};
+
+export type initialValuesProps = {
+  title: string;
+  description: string;
+  subtasks: SubtaskSchema[];
+  status: number | undefined;
+  index: number | undefined;
 };

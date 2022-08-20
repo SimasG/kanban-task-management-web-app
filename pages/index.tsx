@@ -30,7 +30,7 @@ const Home: NextPage = () => {
   const user = useContext(UserContext);
   // ** How could I change "users" & "boards" type from "DocumentData[] | undefined" (coming from
   // ** useCollectionData hook) to "UserSchema[] | undefined" "BoardSchema[] | undefined" respectively?
-  const users = useFetchFsUsers(); // *TypeScript*
+  const users: any = useFetchFsUsers(); // *TypeScript*
   const boards: any = useFetchFsBoards(user?.uid); // Personal Boards // *TypeScript*
   const sharedBoards: any = useFetchFsSharedBoards(); // Boards are fetched from the *owner's* Firebase doc path
   const allBoards: any = boards?.concat(sharedBoards); // *TypeScript* why "BoardSchema[]" throws errors + why "BoardSchema" doesn't?
@@ -99,7 +99,7 @@ const Home: NextPage = () => {
     });
   };
 
-  let handleDeleteBoard: (boardId: string | null | undefined) => void; // *TypeScript* is there a way to export this type declaration instead of writing it here?
+  let handleDeleteBoard: (boardId: string | null | undefined) => Promise<void>; // *TypeScript* is there a way to export this type declaration instead of writing it here?
   handleDeleteBoard = async (boardId: string | null | undefined) => {
     const batch = writeBatch(db);
     // 1. Delete Board
@@ -201,7 +201,6 @@ const Home: NextPage = () => {
             />
             <Main
               activeBoard={activeBoard}
-              boards={boards}
               boardId={boardId}
               setBoardId={setBoardId}
               tasks={tasks}
