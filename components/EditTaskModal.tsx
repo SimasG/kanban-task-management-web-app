@@ -3,19 +3,32 @@ import * as Yup from "yup";
 import { v4 as uuidv4 } from "uuid";
 import EditTaskFormikForm from "./form/EditTaskFormikForm";
 import { useContext, useEffect, useState } from "react";
-import { doc, Timestamp, updateDoc } from "firebase/firestore";
+import {
+  doc,
+  DocumentData,
+  DocumentReference,
+  Timestamp,
+  updateDoc,
+} from "firebase/firestore";
 import { db } from "../lib/firebase";
 import { UserContext } from "../lib/context";
 import toast from "react-hot-toast";
+import {
+  ColumnSchema,
+  FormikValuesSchema,
+  SharedBoardRef,
+  TaskSchema,
+  UserSchema,
+} from "../lib/types";
 
 type IndexProps = {
   boardId: string | null | undefined;
   taskId: string | null | undefined;
   setShowEditTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
-  tasks: any;
-  columns: any;
-  sharedBoardIds: any;
-  users: any;
+  tasks: TaskSchema[];
+  columns: ColumnSchema[];
+  sharedBoardIds: (string | null | undefined)[];
+  users: UserSchema[];
 };
 
 const EditTaskModal = ({
@@ -28,9 +41,9 @@ const EditTaskModal = ({
   users,
 }: IndexProps) => {
   const user = useContext(UserContext);
-  const [data, setData] = useState<any>();
+  const [data, setData] = useState<TaskSchema>();
 
-  const selectedTask = tasks?.filter((task: any) => task?.uid === taskId)?.[0];
+  const selectedTask = tasks?.find((task: TaskSchema) => task?.uid === taskId);
 
   type initialValuesProps = {
     title: string;
@@ -73,30 +86,31 @@ const EditTaskModal = ({
     status: Yup.string().required("Status is Required!"),
   });
 
-  const onSubmit = (values: any, actions: any) => {
+  const onSubmit = (values: FormikValuesSchema, actions: any) => {
     const { setSubmitting, resetForm } = actions;
+
     // Why do I have to convert "values.status" to number? I thought it's supposed to be a number by default
     updateTask(values, setSubmitting, resetForm);
   };
 
   const updateTask = async (
-    values: any,
-    setSubmitting: any,
-    resetForm: any
+    values: FormikValuesSchema,
+    setSubmitting: any, // *TypeScript* Would like to specify type once "actions" type is specified
+    resetForm: any // *TypeScript* Would like to specify type once "actions" type is specified
   ) => {
     setSubmitting(true);
-    let taskDocRef: any;
+    let taskDocRef: DocumentReference<DocumentData>;
 
     if (sharedBoardIds.includes(boardId)) {
       // Edit Task in shared Board
 
       // Finding Current User (Invitee) Firebase Doc
       const currentUser = users?.find(
-        (currentUser: any) => currentUser.uid === user?.uid
+        (currentUser: UserSchema) => currentUser.uid === user?.uid
       );
       // Find User Id (Inviter) of the Shared Board
       const sharedBoardRef = currentUser?.sharedBoardRefs?.find(
-        (board: any) => board?.board === boardId
+        (sharedBoardRef: SharedBoardRef) => sharedBoardRef?.board === boardId
       );
       taskDocRef = doc(
         db,

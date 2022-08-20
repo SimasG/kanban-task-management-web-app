@@ -1,17 +1,20 @@
 import { ErrorMessage, Field, FieldArray, Form } from "formik";
 import FormikControl from "./FormikControl";
 import { v4 as uuidv4 } from "uuid";
+import { ColumnSchema } from "../../lib/types";
 
 type IndexProps = {
-  formik: any;
-  columns: any;
+  formik: any; // *TypeScript* Wish I could specify a type of the formik object
+  columns: ColumnSchema[];
   setShowAddTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const FormikForm = ({ formik, columns, setShowAddTaskModal }: IndexProps) => {
   // "value: ''" will automatically make this option invalid (falsy value) and throw an error
-  let dropdownOptions: any = [{ key: "Select an option", value: "" }];
-  columns?.map((column: any) => {
+  let dropdownOptions: { key: string; value: string }[] = [
+    { key: "Select an option", value: "" },
+  ];
+  columns?.map((column: ColumnSchema) => {
     dropdownOptions.push({
       key: `${column?.title.toUpperCase()}`,
       value: `${column?.status}`,

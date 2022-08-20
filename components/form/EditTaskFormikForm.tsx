@@ -7,16 +7,22 @@ import { useContext } from "react";
 import { UserContext } from "../../lib/context";
 import toast from "react-hot-toast";
 import { Checkbox } from "@mantine/core";
+import {
+  ColumnSchema,
+  SharedBoardRef,
+  TaskSchema,
+  UserSchema,
+} from "../../lib/types";
 
 type IndexProps = {
   boardId: string | null | undefined;
   taskId: string | null | undefined;
   setShowEditTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
-  tasks: any;
+  tasks: TaskSchema[];
   formik: any;
-  columns: any;
-  sharedBoardIds: any;
-  users: any;
+  columns: ColumnSchema[];
+  sharedBoardIds: (string | null | undefined)[];
+  users: UserSchema[];
 };
 
 const FormikForm = ({
@@ -32,8 +38,10 @@ const FormikForm = ({
   const user = useContext(UserContext);
 
   // "value: ''" will automatically make this option invalid (falsy value) and throw an error
-  let dropdownOptions: any = [{ key: "Select an option", value: "" }];
-  columns?.map((column: any) => {
+  let dropdownOptions: { key: string; value: string }[] = [
+    { key: "Select an option", value: "" },
+  ];
+  columns?.map((column: ColumnSchema) => {
     dropdownOptions.push({
       key: `${column?.title.toUpperCase()}`,
       value: `${column?.status}`,
@@ -44,14 +52,14 @@ const FormikForm = ({
 
   // Identifying source Column id, from which the Task should be removed
   const sourceColumn = columns?.find(
-    (column: any) => column?.status === parseInt(initialValues?.status)
+    (column: ColumnSchema) => column?.status === parseInt(initialValues?.status)
   );
 
   const deleteTask = async () => {
     const batch = writeBatch(db);
 
     const selectedColumnTasks = tasks?.filter(
-      (task: any) => task?.status === initialValues?.status
+      (task: TaskSchema) => task?.status === initialValues?.status
     );
 
     if (sharedBoardIds.includes(boardId)) {
@@ -59,11 +67,11 @@ const FormikForm = ({
 
       // Finding Current User (Invitee) Firebase Doc
       const currentUser = users?.find(
-        (currentUser: any) => currentUser.uid === user?.uid
+        (currentUser: UserSchema) => currentUser.uid === user?.uid
       );
       // Find User Id (Inviter) of the Shared Board
       const sharedBoardRef = currentUser?.sharedBoardRefs?.find(
-        (board: any) => board?.board === boardId
+        (sharedBoardRef: SharedBoardRef) => sharedBoardRef?.board === boardId
       );
 
       // Delete chosen Task
@@ -77,7 +85,7 @@ const FormikForm = ({
       batch.delete(taskRef);
 
       // Decrement indexes of Tasks that came after the deleted Task
-      selectedColumnTasks.map((task: any) => {
+      selectedColumnTasks.map((task: TaskSchema) => {
         if (task?.index <= initialValues?.index) return;
         const taskDocRef = doc(
           db,
@@ -96,7 +104,7 @@ const FormikForm = ({
       batch.delete(taskRef);
 
       // Decrement indexes of Tasks that came after the deleted Task
-      selectedColumnTasks.map((task: any) => {
+      selectedColumnTasks.map((task: TaskSchema) => {
         if (task?.index <= initialValues?.index) return;
         const taskDocRef = doc(
           db,
