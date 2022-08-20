@@ -11,12 +11,13 @@ import toast from "react-hot-toast";
 import { UserContext } from "../lib/context";
 import { db } from "../lib/firebase";
 import { v4 as uuidv4 } from "uuid";
+import { BoardSchema, SharedBoardRef, UserSchema } from "../lib/types";
 
 type IndexProps = {
   setShowShareModal: React.Dispatch<React.SetStateAction<boolean>>;
   boardId: string | null | undefined;
-  users: DocumentData[] | undefined;
-  activeBoard: any;
+  users: any; // *TypeScript* Should be "UserSchema[]"
+  activeBoard: any; // *TypeScript* Should be "BoardSchema"
 };
 
 const ShareModal = ({
@@ -25,9 +26,10 @@ const ShareModal = ({
   users,
   activeBoard,
 }: IndexProps) => {
-  const user: any = useContext(UserContext);
+  const user = useContext(UserContext);
 
-  const onSubmit = async (values: any, actions: any) => {
+  const onSubmit = async (values: { email: string }, actions: any) => {
+    // *TypeScript* Same question wrt "actions"
     const { setSubmitting, resetForm } = actions;
     setSubmitting(true);
 
@@ -35,7 +37,7 @@ const ShareModal = ({
 
     // Finding userDoc of the user with the specified email
     const userDoc = users?.find(
-      (existingUser: any) => existingUser?.email === values?.email
+      (existingUser: UserSchema) => existingUser?.email === values?.email
     );
 
     // ** Logic for active existing users OR passive invited users who've been invited to join >=1 Board before
@@ -46,13 +48,13 @@ const ShareModal = ({
       // + Ensure invitee's userDoc doesn't already have this Board
       // Finding invitee's Firebase Doc
       const inviteeUser = users?.find(
-        (user: any) => user?.email === values?.email
+        (user: UserSchema) => user?.email === values?.email
       );
 
       if (
         activeBoard?.collaborators.includes(values?.email) &&
         inviteeUser?.sharedBoardRefs?.find(
-          (sharedBoardRef: any) => sharedBoardRef?.board === boardId
+          (sharedBoardRef: SharedBoardRef) => sharedBoardRef?.board === boardId
         )
       ) {
         toast.error("This user has already been invited to this Board");
@@ -118,7 +120,11 @@ const ShareModal = ({
 
       // 3. Send invite email (generic link sent)
       // Data to be used in the invite email
-      const data: any = {
+      const data: {
+        email: string;
+        inviterEmail: string | null | undefined;
+        boardTitle: string;
+      } = {
         ...values,
         inviterEmail: user?.email,
         boardTitle: activeBoard?.title,

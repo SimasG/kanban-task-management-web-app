@@ -4,11 +4,12 @@ import { useContext } from "react";
 import toast from "react-hot-toast";
 import { UserContext } from "../lib/context";
 import { db } from "../lib/firebase";
+import { BoardSchema, SharedBoardRef, UserSchema } from "../lib/types";
 
 type IndexProps = {
   setShowEditCollabsModal: React.Dispatch<React.SetStateAction<boolean>>;
-  users: any;
-  activeBoard: any;
+  users: UserSchema[];
+  activeBoard: BoardSchema;
   boardId: string | null | undefined;
 };
 
@@ -18,11 +19,11 @@ const ShareModal = ({
   activeBoard,
   boardId,
 }: IndexProps) => {
-  const user: any = useContext(UserContext);
+  const user = useContext(UserContext);
 
   // Filtering users whose emails are in the collaborators' array
-  let collaboratorUsers: any = [];
-  users?.filter((user: any) => {
+  let collaboratorUsers: UserSchema[] = [];
+  users?.filter((user: UserSchema) => {
     activeBoard?.collaborators.includes(user?.email) &&
       collaboratorUsers.push(user);
   });
@@ -35,7 +36,7 @@ const ShareModal = ({
 
     // ** 1. Update collaborators array in the inviter's (current User) boardDoc
     const filteredCollaborators = activeBoard.collaborators?.filter(
-      (collaborator: any) => collaborator !== inviteeEmail
+      (collaborator: string) => collaborator !== inviteeEmail
     );
 
     const boardDocRef = doc(
@@ -52,11 +53,11 @@ const ShareModal = ({
 
     // ** 2. Update sharedBoardRefs array in the invitee's userDoc
     const inviteeUserDoc = users?.find(
-      (user: any) => user?.uid === inviteeUserId
+      (user: UserSchema) => user?.uid === inviteeUserId
     );
 
     const filteredSharedBoardRefs = inviteeUserDoc?.sharedBoardRefs?.filter(
-      (sharedBoard: any) => sharedBoard?.board !== boardId
+      (sharedBoard: SharedBoardRef) => sharedBoard?.board !== boardId
     );
 
     const userDocRef = doc(db, "users", `${inviteeUserId}`);
@@ -83,7 +84,7 @@ const ShareModal = ({
         </h1>
 
         <div className="flex-col justify-start items-center gap-2 md:gap-4">
-          {collaboratorUsers?.map((user: any, index: number) => {
+          {collaboratorUsers?.map((user: UserSchema) => {
             return (
               <div
                 key={user?.uid}

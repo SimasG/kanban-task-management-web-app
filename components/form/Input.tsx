@@ -1,6 +1,7 @@
 import { Field, ErrorMessage } from "formik";
 
 const Input = ({ label, name, type, ...rest }: any) => {
+  // *TypeScript* How would you approach this one?
   return (
     <div key={name} className="flex flex-col justify-between gap-2">
       <label

@@ -10,6 +10,7 @@ import { Checkbox } from "@mantine/core";
 import {
   ColumnSchema,
   SharedBoardRef,
+  SubtaskSchema,
   TaskSchema,
   UserSchema,
 } from "../../lib/types";
@@ -180,7 +181,7 @@ const FormikForm = ({
             <FieldArray name="subtasks">
               {(fieldArrayProps) => {
                 const { push, remove, form } = fieldArrayProps;
-                const { values, handleChange, errors } = form;
+                const { values, handleChange } = form;
                 const { subtasks } = values;
                 return (
                   <div className="flex flex-col justify-between gap-3">
@@ -190,7 +191,7 @@ const FormikForm = ({
                     >
                       Subtasks
                     </label>
-                    {subtasks.map((subtask: any, index: number) => {
+                    {subtasks.map((subtask: SubtaskSchema, index: number) => {
                       return (
                         <div key={subtask?.uid} className="flex flex-col gap-2">
                           <div className="flex justify-between items-center">

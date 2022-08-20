@@ -27,7 +27,6 @@ import {
 type MainProps = {
   activeBoard: BoardSchema;
   boardId: string | null | undefined;
-  setBoardId: React.Dispatch<React.SetStateAction<string | null | undefined>>;
   tasks: any; // *TypeScript* Why does "TaskSchema[]" make "draggedTask" be of type "TaskSchema | undefined"?
   setTaskId: React.Dispatch<React.SetStateAction<string | null | undefined>>;
   setShowAddTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
@@ -45,7 +44,6 @@ type MainProps = {
 const Main = ({
   activeBoard,
   boardId,
-  setBoardId,
   tasks,
   setTaskId,
   setShowAddTaskModal,
@@ -563,7 +561,7 @@ const Main = ({
                 ref={provided.innerRef}
                 className="flex justify-start items-start gap-6"
               >
-                {columns?.map((column: any, index: number) => (
+                {columns?.map((column: ColumnSchema, index: number) => (
                   <Column
                     key={column?.uid}
                     setTaskId={setTaskId}

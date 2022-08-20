@@ -84,3 +84,17 @@ export type DefaultColumn = {
   status: number;
   title: string;
 };
+
+export type FormikControlSchema = {
+  control: string;
+  name: string;
+  id?: string;
+  placeholder?: string;
+  type?: string;
+  label?: string;
+  className?: string;
+  options?: {
+    key: string;
+    value: string;
+  }[];
+};

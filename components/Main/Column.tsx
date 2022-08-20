@@ -10,19 +10,25 @@ import toast from "react-hot-toast";
 import { UserContext } from "../../lib/context";
 import { db } from "../../lib/firebase";
 import { defaultColumns } from "../../lib/helpers";
+import {
+  SharedBoardRef,
+  SubtaskSchema,
+  TaskSchema,
+  UserSchema,
+} from "../../lib/types";
 
 type ColumnProps = {
   setTaskId: React.Dispatch<React.SetStateAction<string | null | undefined>>;
   setShowEditTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
-  tasks: any;
+  tasks: TaskSchema[];
   columnStatus: number;
   columnTitle: string;
   boardId: string | null | undefined;
   index: number;
   columnId: string;
   columnColor: string;
-  sharedBoardIds: any;
-  users: any;
+  sharedBoardIds: (string | null | undefined)[];
+  users: UserSchema;
 };
 
 const Column = ({
@@ -43,7 +49,7 @@ const Column = ({
   const [hover, setHover] = useState(false);
 
   const taskCount = tasks?.filter(
-    (task: any) => task?.status === columnStatus
+    (task: TaskSchema) => task?.status === columnStatus
   ).length;
 
   const changeColumnTitle = async (newTitle: string) => {
@@ -51,11 +57,11 @@ const Column = ({
       console.log("Update shared Column Title");
       // Finding Current User (Invitee) Firebase Doc
       const currentUser = users?.find(
-        (currentUser: any) => currentUser.uid === user?.uid
+        (currentUser: UserSchema) => currentUser.uid === user?.uid
       );
       // Find User Id (Inviter) of the Shared Board
       const sharedBoardRef = currentUser?.sharedBoardRefs?.find(
-        (board: any) => board?.board === boardId
+        (sharedBoardRef: SharedBoardRef) => sharedBoardRef?.board === boardId
       );
       const columnDocRef = doc(
         db,
@@ -83,11 +89,11 @@ const Column = ({
       console.log("Delete Column in a shared Board");
       // Finding Current User (Invitee) Firebase Doc
       const currentUser = users?.find(
-        (currentUser: any) => currentUser.uid === user?.uid
+        (currentUser: UserSchema) => currentUser.uid === user?.uid
       );
       // Find User Id (Inviter) of the Shared Board
       const sharedBoardRef = currentUser?.sharedBoardRefs?.find(
-        (board: any) => board?.board === boardId
+        (sharedBoardRef: SharedBoardRef) => sharedBoardRef?.board === boardId
       );
 
       // Deleting the Column & Tasks that are in the Column
@@ -102,10 +108,10 @@ const Column = ({
       batch.delete(columnDocRef);
 
       const tasksToDelete = tasks?.filter(
-        (task: any) => task?.status === columnStatus
+        (task: TaskSchema) => task?.status === columnStatus
       );
 
-      tasksToDelete.map((task: any) => {
+      tasksToDelete.map((task: TaskSchema) => {
         const taskDocRef = doc(
           db,
           "users",
@@ -131,10 +137,10 @@ const Column = ({
       batch.delete(columnDocRef);
 
       const tasksToDelete = tasks?.filter(
-        (task: any) => task?.status === columnStatus
+        (task: TaskSchema) => task?.status === columnStatus
       );
 
-      tasksToDelete.map((task: any) => {
+      tasksToDelete.map((task: TaskSchema) => {
         const taskDocRef = doc(
           db,
           "users",
@@ -248,10 +254,12 @@ const Column = ({
                   {...provided.droppableProps}
                 >
                   {tasks
-                    ?.filter((task: any) => task?.status === columnStatus)
-                    ?.map((task: any, index: number) => {
+                    ?.filter(
+                      (task: TaskSchema) => task?.status === columnStatus
+                    )
+                    ?.map((task: TaskSchema, index: number) => {
                       let checkedNumber = 0;
-                      task.subtasks.map((subtask: any) => {
+                      task.subtasks.map((subtask: SubtaskSchema) => {
                         subtask.checked && checkedNumber++;
                       });
                       return (
@@ -260,7 +268,7 @@ const Column = ({
                           draggableId={task.uid}
                           index={index}
                         >
-                          {(provided: DraggableProvided, snapshot: any) => {
+                          {(provided: DraggableProvided) => {
                             return (
                               <div
                                 onClick={(e) => {

@@ -1,7 +1,7 @@
 import { ErrorMessage, Field, FieldArray, Form } from "formik";
 import FormikControl from "./FormikControl";
 import { v4 as uuidv4 } from "uuid";
-import { ColumnSchema } from "../../lib/types";
+import { ColumnSchema, SubtaskSchema } from "../../lib/types";
 
 type IndexProps = {
   formik: any; // *TypeScript* Wish I could specify a type of the formik object
@@ -69,13 +69,13 @@ const FormikForm = ({ formik, columns, setShowAddTaskModal }: IndexProps) => {
               name="description"
               placeholder="e.g. The homepage of UReason should be redesigned to fit in with the modern web standards. 
         The homepage of UReason should be redesigned to fit in with the modern web standards."
-              className="resize-none "
+              className="resize-none"
             />
             {/* Subtask Container */}
             <FieldArray name="subtasks">
               {(fieldArrayProps) => {
                 const { push, remove, form } = fieldArrayProps;
-                const { values, handleChange, errors } = form;
+                const { values } = form;
                 const { subtasks } = values;
                 return (
                   <div className="flex flex-col justify-between gap-3">
@@ -85,7 +85,7 @@ const FormikForm = ({ formik, columns, setShowAddTaskModal }: IndexProps) => {
                     >
                       Subtasks
                     </label>
-                    {subtasks.map((subtask: any, index: number) => (
+                    {subtasks.map((subtask: SubtaskSchema, index: number) => (
                       <div key={subtask?.uid} className="flex flex-col gap-2">
                         <div className="flex justify-between items-center">
                           <Field
