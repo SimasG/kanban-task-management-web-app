@@ -1,5 +1,7 @@
 import {
   doc,
+  DocumentData,
+  DocumentReference,
   increment,
   runTransaction,
   setDoc,
@@ -17,6 +19,7 @@ import { colorArray } from "../../lib/helpers";
 import {
   BoardSchema,
   ColumnSchema,
+  SharedBoardRef,
   TaskSchema,
   UserSchema,
 } from "../../lib/types";
@@ -72,7 +75,7 @@ const Main = ({
 
     // Column DnD logic
     if (type === "column") {
-      let add: any;
+      let add: ColumnSchema;
       // Removing Column from array at source.index
       let newColumns = columns;
       add = newColumns?.[source.index];
@@ -127,16 +130,16 @@ const Main = ({
 
       // Finding Current User (Invitee) Firebase Doc
       const currentUser = users?.find(
-        (currentUser: any) => currentUser.uid === user?.uid
+        (currentUser: UserSchema) => currentUser.uid === user?.uid
       );
       // Find User Id (Inviter) of the Shared Board
       const sharedBoardRef = currentUser?.sharedBoardRefs?.find(
-        (board: any) => board?.board === boardId
+        (boardRef: SharedBoardRef) => boardRef?.board === boardId
       );
 
       const batch = writeBatch(db);
       // 1. Updating the indexes of affected Columns
-      columns?.map((column: any) => {
+      columns?.map((column: ColumnSchema) => {
         if (column.uid === draggedColumnId) return;
         if (destinationIndex > sourceIndex) {
           if (column.index > sourceIndex && column.index <= destinationIndex) {
@@ -180,7 +183,7 @@ const Main = ({
       console.log("Personal Column DnD");
       const batch = writeBatch(db);
       // 1. Updating the indexes of affected Columns
-      columns?.map((column: any) => {
+      columns?.map((column: ColumnSchema) => {
         if (column.uid === draggedColumnId) return;
         if (destinationIndex > sourceIndex) {
           if (column.index > sourceIndex && column.index <= destinationIndex) {
@@ -232,11 +235,11 @@ const Main = ({
     const batch = writeBatch(db);
 
     const sourceColumn = columns?.find(
-      (column: any) => column?.uid === sourceColumnId
+      (column: ColumnSchema) => column?.uid === sourceColumnId
     );
 
     const columnTasks = tasks?.filter(
-      (task: any) => task?.status === sourceColumn?.status
+      (task: TaskSchema) => task?.status === sourceColumn?.status
     );
 
     if (sharedBoardIds.includes(boardId)) {
@@ -244,14 +247,14 @@ const Main = ({
 
       // Finding Current User (Invitee) Firebase Doc
       const currentUser = users?.find(
-        (currentUser: any) => currentUser.uid === user?.uid
+        (currentUser: UserSchema) => currentUser.uid === user?.uid
       );
       // Find User Id (Inviter) of the Shared Board
       const sharedBoardRef = currentUser?.sharedBoardRefs?.find(
-        (board: any) => board?.board === boardId
+        (boardRef: SharedBoardRef) => boardRef?.board === boardId
       );
 
-      columnTasks?.map((task: any) => {
+      columnTasks?.map((task: TaskSchema) => {
         if (destinationIndex > sourceIndex) {
           // Decrement Tasks
           if (task.index > sourceIndex && task.index <= destinationIndex) {
@@ -294,7 +297,7 @@ const Main = ({
       await batch.commit();
     } else {
       // Task DnD in a personal Board (within Column)
-      columnTasks?.map((task: any) => {
+      columnTasks?.map((task: TaskSchema) => {
         if (destinationIndex > sourceIndex) {
           // Decrement Tasks
           if (task.index > sourceIndex && task.index <= destinationIndex) {
@@ -350,11 +353,11 @@ const Main = ({
 
       // Finding Current User (Invitee) Firebase Doc
       const currentUser = users?.find(
-        (currentUser: any) => currentUser.uid === user?.uid
+        (currentUser: UserSchema) => currentUser.uid === user?.uid
       );
       // Find User Id (Inviter) of the Shared Board
       const sharedBoardRef = currentUser?.sharedBoardRefs?.find(
-        (board: any) => board?.board === boardId
+        (boardRef: SharedBoardRef) => boardRef?.board === boardId
       );
 
       try {
@@ -369,7 +372,7 @@ const Main = ({
           );
 
           const destinationColumn = columns?.find(
-            (column: any) => column?.uid === destinationColumnId
+            (column: ColumnSchema) => column?.uid === destinationColumnId
           );
 
           transaction.update(taskDocRef, {
@@ -379,10 +382,10 @@ const Main = ({
 
           // ** 2. Decrement (by 1) the indexes of Tasks that came after dragged Task in source Column
           const sourceColumn = columns?.find(
-            (column: any) => column?.uid === sourceColumnId
+            (column: ColumnSchema) => column?.uid === sourceColumnId
           );
           const sourceColumnTasks = tasks?.filter(
-            (task: any) => task?.status === sourceColumn?.status
+            (task: TaskSchema) => task?.status === sourceColumn?.status
           );
 
           sourceColumnTasks?.map((task: any) => {
@@ -401,7 +404,7 @@ const Main = ({
 
           // ** 3. Increment (by 1) the indexes of Tasks that came after dragged Task in destination Column
           const destinationColumnTasks = tasks?.filter(
-            (task: any) => task?.status === destinationColumn?.status
+            (task: TaskSchema) => task?.status === destinationColumn?.status
           );
           destinationColumnTasks?.map((task: any) => {
             // |task.index reflects the Tasks' indexes before being updated with the dragged Task.
@@ -436,7 +439,7 @@ const Main = ({
           );
 
           const destinationColumn = columns?.find(
-            (column: any) => column?.uid === destinationColumnId
+            (column: ColumnSchema) => column?.uid === destinationColumnId
           );
 
           transaction.update(taskDocRef, {
@@ -446,13 +449,13 @@ const Main = ({
 
           // ** 2. Decrement (by 1) the indexes of Tasks that came after dragged Task in source Column
           const sourceColumn = columns?.find(
-            (column: any) => column?.uid === sourceColumnId
+            (column: ColumnSchema) => column?.uid === sourceColumnId
           );
           const sourceColumnTasks = tasks?.filter(
-            (task: any) => task?.status === sourceColumn?.status
+            (task: TaskSchema) => task?.status === sourceColumn?.status
           );
 
-          sourceColumnTasks?.map((task: any) => {
+          sourceColumnTasks?.map((task: TaskSchema) => {
             if (task.index > sourceIndex) {
               if (task.uid === draggedTaskId) return;
               const taskDocRef = doc(
@@ -468,7 +471,7 @@ const Main = ({
 
           // ** 3. Increment (by 1) the indexes of Tasks that came after dragged Task in destination Column
           const destinationColumnTasks = tasks?.filter(
-            (task: any) => task?.status === destinationColumn?.status
+            (task: TaskSchema) => task?.status === destinationColumn?.status
           );
           destinationColumnTasks?.map((task: any) => {
             // |task.index reflects the Tasks' indexes before being updated with the dragged Task.
@@ -495,16 +498,16 @@ const Main = ({
   const addNewColumn = async () => {
     if (!boardId || columns?.length === 0) return;
     const uuid = uuidv4();
-    let newColumnDocRef: any;
+    let newColumnDocRef: DocumentReference<DocumentData>; // *TypeScript* Should I even include "<DocumentData>"?;
 
     if (sharedBoardIds.includes(boardId)) {
       // Finding Current User (Invitee) Firebase Doc
       const currentUser = users?.find(
-        (currentUser: any) => currentUser.uid === user?.uid
+        (currentUser: UserSchema) => currentUser.uid === user?.uid
       );
       // Find User Id (Inviter) of the Shared Board
       const sharedBoardRef = currentUser?.sharedBoardRefs?.find(
-        (board: any) => board?.board === boardId
+        (boardRef: SharedBoardRef) => boardRef?.board === boardId
       );
       newColumnDocRef = doc(
         db,
