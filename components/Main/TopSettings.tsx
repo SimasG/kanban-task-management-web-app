@@ -5,19 +5,21 @@ import { BoardSchema, UserSchema } from "../../lib/types";
 
 type MainProps = {
   activeBoard: BoardSchema;
-  boardId: string | null | undefined;
+  activeBoardId: string | null | undefined;
   setShowAddTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
   updateBoardName: (uid: string, newName: string) => Promise<void>;
   setShowShareModal: React.Dispatch<React.SetStateAction<boolean>>;
   sharedBoardIds: (string | null | undefined)[];
-  handleDeleteBoard: (boardId: string | null | undefined) => Promise<void>;
+  handleDeleteBoard: (
+    activeBoardId: string | null | undefined
+  ) => Promise<void>;
   users: UserSchema[]; // *TypeScript* Why can I use "UserSchema[]" this time tho?
   allBoards: BoardSchema[];
 };
 
 const TopSettings = ({
   activeBoard,
-  boardId,
+  activeBoardId,
   setShowAddTaskModal,
   updateBoardName,
   setShowShareModal,
@@ -71,7 +73,7 @@ const TopSettings = ({
             + New Task
           </button>
           {/* Share Btn */}
-          {!sharedBoardIds.includes(boardId) && (
+          {!sharedBoardIds.includes(activeBoardId) && (
             <button
               onClick={(e) => handleShareBtn(e)}
               className="bg-fontPrimaryDark dark:hover:bg-fontTertiary text-fontTertiary dark:hover:text-fontPrimaryDark font-bold rounded-full py-2 px-2 md:px-3 lg:px-4 drop-shadow-lg hover:drop-shadow-xl flex justify-between items-center gap-1 text-xs md:text-sm lg:text-base"
@@ -90,9 +92,9 @@ const TopSettings = ({
             <span className="relative bottom-[3px]">+</span>
           </button>
           {/* Delete Board Btn */}
-          {!sharedBoardIds.includes(boardId) && (
+          {!sharedBoardIds.includes(activeBoardId) && (
             <svg
-              onClick={() => handleDeleteBoard(boardId)}
+              onClick={() => handleDeleteBoard(activeBoardId)}
               className="w-10 h-10 p-2 text-fontSecondary rounded cursor-pointer hover:bg-backgroundColorMain hover:dark:bg-darkBlue"
               fill="none"
               stroke="currentColor"

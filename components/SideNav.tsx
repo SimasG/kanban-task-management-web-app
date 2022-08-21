@@ -31,13 +31,17 @@ import {
 
 type SideNavProps = {
   boards: BoardSchema[];
-  boardId: string | null | undefined;
-  setBoardId: React.Dispatch<React.SetStateAction<string | null | undefined>>;
+  activeBoardId: string | null | undefined;
+  setActiveBoardId: React.Dispatch<
+    React.SetStateAction<string | null | undefined>
+  >;
   updateBoardName: (uid: string, newName: string) => Promise<void>;
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
   sharedBoards: BoardSchema[];
-  handleDeleteBoard: (boardId: string | null | undefined) => Promise<void>;
+  handleDeleteBoard: (
+    activeBoardId: string | null | undefined
+  ) => Promise<void>;
   activeBoard: BoardSchema;
   users: UserSchema[];
   setShowEditCollabsModal: React.Dispatch<React.SetStateAction<boolean>>;
@@ -46,8 +50,8 @@ type SideNavProps = {
 const SideNav = ({
   boards,
   sharedBoards,
-  boardId,
-  setBoardId,
+  activeBoardId,
+  setActiveBoardId,
   updateBoardName,
   isOpen,
   setIsOpen,
@@ -74,7 +78,7 @@ const SideNav = ({
       index: boards?.length,
       collaborators: [],
     });
-    setBoardId(uuid);
+    setActiveBoardId(uuid);
 
     // Create 3 default Columns
     defaultColumns?.map((column: DefaultColumn) => {
@@ -138,7 +142,7 @@ const SideNav = ({
 
     // ** Changing indexes of Boards affected
     boards?.map((board: BoardSchema) => {
-      if (board.uid === boardId) return;
+      if (board.uid === activeBoardId) return;
       if (destinationIndex > sourceIndex) {
         // Decrement Boards
         if (board.index > sourceIndex && board.index <= destinationIndex) {
@@ -204,7 +208,8 @@ const SideNav = ({
 
     // Filtering out the shared Board
     const filteredSharedBoardRefs = inviteeUserDoc?.sharedBoardRefs?.filter(
-      (sharedBoardRef: SharedBoardRef) => sharedBoardRef?.board !== boardId
+      (sharedBoardRef: SharedBoardRef) =>
+        sharedBoardRef?.board !== activeBoardId
     );
 
     const userDocRef = doc(db, "users", `${user?.uid}`);
@@ -215,7 +220,8 @@ const SideNav = ({
 
     // 2. Update collaborators array in the inviter's boardDoc
     const currentSharedBoard = inviteeUserDoc?.sharedBoardRefs?.find(
-      (sharedBoardRef: SharedBoardRef) => sharedBoardRef?.board === boardId
+      (sharedBoardRef: SharedBoardRef) =>
+        sharedBoardRef?.board === activeBoardId
     );
 
     const filteredCollaborators = activeBoard.collaborators?.filter(
@@ -307,14 +313,14 @@ const SideNav = ({
                                         // Single Board
                                         <div
                                           onClick={() => {
-                                            setBoardId(board.uid);
+                                            setActiveBoardId(board.uid);
                                           }}
                                           ref={provided.innerRef}
                                           {...provided.draggableProps}
                                           {...provided.dragHandleProps}
                                           // hover:static hover:z-[-1]
                                           className={`board rounded-r-full ${
-                                            board.uid === boardId
+                                            board.uid === activeBoardId
                                               ? snapshot.isDragging
                                                 ? " bg-fontTertiary bg-opacity-60 select-none text-fontPrimaryDark drop-shadow-lg hover:drop-shadow-xl"
                                                 : " bg-fontTertiary text-fontPrimaryDark opacity-100 drop-shadow-lg hover:drop-shadow-xl"
@@ -354,7 +360,9 @@ const SideNav = ({
                                               <button
                                                 className="w-[100%] text-left hover:bg-[#eef2f7] cursor-pointer block p-2 text-fontPrimary"
                                                 onClick={() => {
-                                                  handleDeleteBoard(boardId);
+                                                  handleDeleteBoard(
+                                                    activeBoardId
+                                                  );
                                                 }}
                                               >
                                                 Delete Board
@@ -412,13 +420,13 @@ const SideNav = ({
                                       // Single Board
                                       <div
                                         onClick={() => {
-                                          setBoardId(board.uid);
+                                          setActiveBoardId(board.uid);
                                         }}
                                         ref={provided.innerRef}
                                         {...provided.draggableProps}
                                         {...provided.dragHandleProps}
                                         className={`board rounded-r-full ${
-                                          board.uid === boardId
+                                          board.uid === activeBoardId
                                             ? snapshot.isDragging
                                               ? " bg-fontTertiary bg-opacity-60 select-none text-fontPrimaryDark drop-shadow-lg hover:drop-shadow-xl"
                                               : " bg-fontTertiary text-fontPrimaryDark opacity-100 drop-shadow-lg hover:drop-shadow-xl"

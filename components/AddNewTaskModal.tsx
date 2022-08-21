@@ -23,7 +23,7 @@ import {
 } from "../lib/types";
 
 type IndexProps = {
-  boardId: string | null | undefined;
+  activeBoardId: string | null | undefined;
   setShowAddTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
   tasks: TaskSchema[];
   columns: ColumnSchema[];
@@ -32,7 +32,7 @@ type IndexProps = {
 };
 
 const AddNewTaskModal = ({
-  boardId,
+  activeBoardId,
   setShowAddTaskModal,
   tasks,
   columns,
@@ -80,7 +80,7 @@ const AddNewTaskModal = ({
     const uid = uuidv4();
     let taskDocRef: DocumentReference<DocumentData>;
 
-    if (sharedBoardIds.includes(boardId)) {
+    if (sharedBoardIds.includes(activeBoardId)) {
       // Add New Task in shared Board
 
       // Finding Current User (Invitee) Firebase Doc
@@ -89,7 +89,7 @@ const AddNewTaskModal = ({
       );
       // Find User Id (Inviter) of the Shared Board
       const sharedBoardRef = currentUser?.sharedBoardRefs?.find(
-        (boardRef: SharedBoardRef) => boardRef?.board === boardId
+        (boardRef: SharedBoardRef) => boardRef?.board === activeBoardId
       );
       taskDocRef = doc(
         db,
@@ -114,7 +114,7 @@ const AddNewTaskModal = ({
       status: parseInt(values?.status),
       uid: uid,
       createdAt: Timestamp.fromDate(new Date()),
-      board: boardId,
+      board: activeBoardId,
       column: selectedColumn?.uid,
     });
 

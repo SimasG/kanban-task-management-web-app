@@ -5,7 +5,7 @@ import { UserContext } from "../context";
 import { db } from "../firebase";
 
 const useFetchFsTasks = (
-  boardId: string | null | undefined,
+  activeBoardId: string | null | undefined,
   users: DocumentData[] | undefined
 ) => {
   // User Object
@@ -25,10 +25,10 @@ const useFetchFsTasks = (
 
   let q: any;
 
-  if (sharedBoardIds.includes(boardId)) {
+  if (sharedBoardIds.includes(activeBoardId)) {
     // Fetching Tasks from shared Board
     const sharedBoardRef = currentUser?.sharedBoardRefs?.find(
-      (board: any) => board?.board === boardId
+      (board: any) => board?.board === activeBoardId
     );
     const columnsCollectionRef = collection(
       db,
@@ -37,7 +37,7 @@ const useFetchFsTasks = (
       "tasks"
     );
 
-    q = query(columnsCollectionRef, where("board", "==", `${boardId}`));
+    q = query(columnsCollectionRef, where("board", "==", `${activeBoardId}`));
   } else {
     // Fetching Tasks from personal Board
     const columnsCollectionRef = collection(
@@ -47,7 +47,7 @@ const useFetchFsTasks = (
       "tasks"
     );
 
-    q = query(columnsCollectionRef, where("board", "==", `${boardId}`));
+    q = query(columnsCollectionRef, where("board", "==", `${activeBoardId}`));
   }
 
   const tasks = useCollectionData(q)[0];

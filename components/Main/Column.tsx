@@ -23,7 +23,7 @@ type ColumnProps = {
   tasks: TaskSchema[];
   columnStatus: number;
   columnTitle: string;
-  boardId: string | null | undefined;
+  activeBoardId: string | null | undefined;
   index: number;
   columnId: string;
   columnColor: string;
@@ -38,7 +38,7 @@ const Column = ({
   columnStatus,
   columnTitle,
   columnId,
-  boardId,
+  activeBoardId,
   index,
   columnColor,
   sharedBoardIds,
@@ -53,7 +53,7 @@ const Column = ({
   ).length;
 
   const changeColumnTitle = async (newTitle: string) => {
-    if (sharedBoardIds.includes(boardId)) {
+    if (sharedBoardIds.includes(activeBoardId)) {
       console.log("Update shared Column Title");
       // Finding Current User (Invitee) Firebase Doc
       const currentUser = users?.find(
@@ -61,7 +61,8 @@ const Column = ({
       );
       // Find User Id (Inviter) of the Shared Board
       const sharedBoardRef = currentUser?.sharedBoardRefs?.find(
-        (sharedBoardRef: SharedBoardRef) => sharedBoardRef?.board === boardId
+        (sharedBoardRef: SharedBoardRef) =>
+          sharedBoardRef?.board === activeBoardId
       );
       const columnDocRef = doc(
         db,
@@ -85,7 +86,7 @@ const Column = ({
   };
 
   const deleteColumn = async () => {
-    if (sharedBoardIds.includes(boardId)) {
+    if (sharedBoardIds.includes(activeBoardId)) {
       console.log("Delete Column in a shared Board");
       // Finding Current User (Invitee) Firebase Doc
       const currentUser = users?.find(
@@ -93,7 +94,8 @@ const Column = ({
       );
       // Find User Id (Inviter) of the Shared Board
       const sharedBoardRef = currentUser?.sharedBoardRefs?.find(
-        (sharedBoardRef: SharedBoardRef) => sharedBoardRef?.board === boardId
+        (sharedBoardRef: SharedBoardRef) =>
+          sharedBoardRef?.board === activeBoardId
       );
 
       // Deleting the Column & Tasks that are in the Column

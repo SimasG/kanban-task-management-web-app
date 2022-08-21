@@ -11,7 +11,7 @@ const Index = () => {
   console.log("router:", router);
 
   const selectedBoard = boards?.find(
-    (board: any) => board?.uid === router.query.boardId
+    (board: any) => board?.uid === router.query.activeBoardId
   );
   console.log("selectedBoard:", selectedBoard);
 

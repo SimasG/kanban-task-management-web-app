@@ -26,7 +26,7 @@ import {
 
 type MainProps = {
   activeBoard: BoardSchema;
-  boardId: string | null | undefined;
+  activeBoardId: string | null | undefined;
   tasks: any; // *TypeScript* Why does "TaskSchema[]" make "draggedTask" be of type "TaskSchema | undefined"?
   setTaskId: React.Dispatch<React.SetStateAction<string | null | undefined>>;
   setShowAddTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
@@ -37,13 +37,15 @@ type MainProps = {
   setShowShareModal: React.Dispatch<React.SetStateAction<boolean>>;
   sharedBoardIds: (string | null | undefined)[];
   users: any; // *TypeScript* Why does "UserSchema[]" become "UserSchema | undefined"?
-  handleDeleteBoard: (boardId: string | null | undefined) => Promise<void>;
+  handleDeleteBoard: (
+    activeBoardId: string | null | undefined
+  ) => Promise<void>;
   allBoards: BoardSchema[]; // *TypeScript* Why can I use "BoardSchema[]" this time tho?
 };
 
 const Main = ({
   activeBoard,
-  boardId,
+  activeBoardId,
   tasks,
   setTaskId,
   setShowAddTaskModal,
@@ -121,7 +123,7 @@ const Main = ({
     sourceIndex: number,
     destinationIndex: number
   ) => {
-    if (sharedBoardIds.includes(boardId)) {
+    if (sharedBoardIds.includes(activeBoardId)) {
       console.log("Shared Column DnD");
 
       // Finding Current User (Invitee) Firebase Doc
@@ -130,7 +132,7 @@ const Main = ({
       );
       // Find User Id (Inviter) of the Shared Board
       const sharedBoardRef = currentUser?.sharedBoardRefs?.find(
-        (boardRef: SharedBoardRef) => boardRef?.board === boardId
+        (boardRef: SharedBoardRef) => boardRef?.board === activeBoardId
       );
 
       const batch = writeBatch(db);
@@ -238,7 +240,7 @@ const Main = ({
       (task: TaskSchema) => task?.status === sourceColumn?.status
     );
 
-    if (sharedBoardIds.includes(boardId)) {
+    if (sharedBoardIds.includes(activeBoardId)) {
       // Task DnD in a shared Board (within Column)
 
       // Finding Current User (Invitee) Firebase Doc
@@ -247,7 +249,7 @@ const Main = ({
       );
       // Find User Id (Inviter) of the Shared Board
       const sharedBoardRef = currentUser?.sharedBoardRefs?.find(
-        (boardRef: SharedBoardRef) => boardRef?.board === boardId
+        (boardRef: SharedBoardRef) => boardRef?.board === activeBoardId
       );
 
       columnTasks?.map((task: TaskSchema) => {
@@ -344,7 +346,7 @@ const Main = ({
     sourceColumnId: string,
     destinationColumnId: string
   ) => {
-    if (sharedBoardIds.includes(boardId)) {
+    if (sharedBoardIds.includes(activeBoardId)) {
       console.log("Task DnD in a shared Board (between Columns)");
 
       // Finding Current User (Invitee) Firebase Doc
@@ -353,7 +355,7 @@ const Main = ({
       );
       // Find User Id (Inviter) of the Shared Board
       const sharedBoardRef = currentUser?.sharedBoardRefs?.find(
-        (boardRef: SharedBoardRef) => boardRef?.board === boardId
+        (boardRef: SharedBoardRef) => boardRef?.board === activeBoardId
       );
 
       try {
@@ -492,18 +494,18 @@ const Main = ({
   };
 
   const addNewColumn = async () => {
-    if (!boardId || columns?.length === 0) return;
+    if (!activeBoardId || columns?.length === 0) return;
     const uuid = uuidv4();
     let newColumnDocRef: DocumentReference<DocumentData>; // *TypeScript* Should I even include "<DocumentData>"?;
 
-    if (sharedBoardIds.includes(boardId)) {
+    if (sharedBoardIds.includes(activeBoardId)) {
       // Finding Current User (Invitee) Firebase Doc
       const currentUser = users?.find(
         (currentUser: UserSchema) => currentUser.uid === user?.uid
       );
       // Find User Id (Inviter) of the Shared Board
       const sharedBoardRef = currentUser?.sharedBoardRefs?.find(
-        (boardRef: SharedBoardRef) => boardRef?.board === boardId
+        (boardRef: SharedBoardRef) => boardRef?.board === activeBoardId
       );
       newColumnDocRef = doc(
         db,
@@ -523,7 +525,7 @@ const Main = ({
       title: "todo",
       uid: uuid,
       color: colorArray[random],
-      board: boardId,
+      board: activeBoardId,
     });
   };
 
@@ -537,7 +539,7 @@ const Main = ({
     >
       <TopSettings
         activeBoard={activeBoard}
-        boardId={boardId}
+        activeBoardId={activeBoardId}
         setShowAddTaskModal={setShowAddTaskModal}
         updateBoardName={updateBoardName}
         setShowShareModal={setShowShareModal}
@@ -571,7 +573,7 @@ const Main = ({
                     columnTitle={column?.title}
                     columnId={column?.uid}
                     columnColor={column?.color}
-                    boardId={boardId}
+                    activeBoardId={activeBoardId}
                     index={index}
                     sharedBoardIds={sharedBoardIds}
                     users={users}

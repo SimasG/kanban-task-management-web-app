@@ -5,7 +5,7 @@ import { UserContext } from "../context";
 import { db } from "../firebase";
 
 const useFetchFsColumns = (
-  boardId: string | null | undefined,
+  activeBoardId: string | null | undefined,
   users: DocumentData[] | undefined
 ) => {
   // User Object
@@ -23,10 +23,10 @@ const useFetchFsColumns = (
 
   let q: any;
 
-  if (sharedBoardIds.includes(boardId)) {
+  if (sharedBoardIds.includes(activeBoardId)) {
     // Fetch Columns from a shared Board
     const sharedBoardRef = currentUser?.sharedBoardRefs?.find(
-      (board: any) => board?.board === boardId
+      (board: any) => board?.board === activeBoardId
     );
     const columnsCollectionRef = collection(
       db,
@@ -34,7 +34,7 @@ const useFetchFsColumns = (
       `${sharedBoardRef?.user}`,
       "columns"
     );
-    q = query(columnsCollectionRef, where("board", "==", `${boardId}`));
+    q = query(columnsCollectionRef, where("board", "==", `${activeBoardId}`));
   } else {
     // Fetch Columns from a personal Board
     const columnsCollectionRef = collection(
@@ -43,15 +43,13 @@ const useFetchFsColumns = (
       `${user?.uid}`,
       "columns"
     );
-    q = query(columnsCollectionRef, where("board", "==", `${boardId}`));
+    q = query(columnsCollectionRef, where("board", "==", `${activeBoardId}`));
   }
 
   const columnData = useCollectionData(q)[0];
   const sortedColumnData = columnData?.sort(
     (a: any, b: any) => a.index - b.index
   );
-
-  // console.log("freshly fetched columns:", sortedColumnData);
 
   return sortedColumnData;
 };

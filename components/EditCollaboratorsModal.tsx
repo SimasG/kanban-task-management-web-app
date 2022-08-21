@@ -10,14 +10,14 @@ type IndexProps = {
   setShowEditCollabsModal: React.Dispatch<React.SetStateAction<boolean>>;
   users: UserSchema[];
   activeBoard: BoardSchema;
-  boardId: string | null | undefined;
+  activeBoardId: string | null | undefined;
 };
 
 const ShareModal = ({
   setShowEditCollabsModal,
   users,
   activeBoard,
-  boardId,
+  activeBoardId,
 }: IndexProps) => {
   const user = useContext(UserContext);
 
@@ -44,7 +44,7 @@ const ShareModal = ({
       "users",
       `${user?.uid}`,
       "boards",
-      `${boardId}`
+      `${activeBoardId}`
     );
     batch.update(boardDocRef, {
       ...activeBoard,
@@ -57,7 +57,7 @@ const ShareModal = ({
     );
 
     const filteredSharedBoardRefs = inviteeUserDoc?.sharedBoardRefs?.filter(
-      (sharedBoard: SharedBoardRef) => sharedBoard?.board !== boardId
+      (sharedBoard: SharedBoardRef) => sharedBoard?.board !== activeBoardId
     );
 
     const userDocRef = doc(db, "users", `${inviteeUserId}`);

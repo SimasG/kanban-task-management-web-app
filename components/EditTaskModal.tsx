@@ -22,7 +22,7 @@ import {
 } from "../lib/types";
 
 type IndexProps = {
-  boardId: string | null | undefined;
+  activeBoardId: string | null | undefined;
   taskId: string | null | undefined;
   setShowEditTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
   tasks: TaskSchema[];
@@ -32,7 +32,7 @@ type IndexProps = {
 };
 
 const EditTaskModal = ({
-  boardId,
+  activeBoardId,
   taskId,
   setShowEditTaskModal,
   tasks,
@@ -101,7 +101,7 @@ const EditTaskModal = ({
     setSubmitting(true);
     let taskDocRef: DocumentReference<DocumentData>;
 
-    if (sharedBoardIds.includes(boardId)) {
+    if (sharedBoardIds.includes(activeBoardId)) {
       // Edit Task in shared Board
 
       // Finding Current User (Invitee) Firebase Doc
@@ -110,7 +110,8 @@ const EditTaskModal = ({
       );
       // Find User Id (Inviter) of the Shared Board
       const sharedBoardRef = currentUser?.sharedBoardRefs?.find(
-        (sharedBoardRef: SharedBoardRef) => sharedBoardRef?.board === boardId
+        (sharedBoardRef: SharedBoardRef) =>
+          sharedBoardRef?.board === activeBoardId
       );
       taskDocRef = doc(
         db,
@@ -148,7 +149,7 @@ const EditTaskModal = ({
       {(formik) => {
         return (
           <EditTaskFormikForm
-            boardId={boardId}
+            activeBoardId={activeBoardId}
             taskId={taskId}
             setShowEditTaskModal={setShowEditTaskModal}
             tasks={tasks}

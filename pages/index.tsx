@@ -30,7 +30,7 @@ const Home: NextPage = () => {
   const user = useContext(UserContext);
   // ** How could I change "users" & "boards" type from "DocumentData[] | undefined" (coming from
   // ** useCollectionData hook) to "UserSchema[] | undefined" "BoardSchema[] | undefined" respectively?
-  const users: any = useFetchFsUsers(); // *TypeScript*
+  const users: any = useFetchFsUsers(); // *TypeScript* HACKED
   const boards: any = useFetchFsBoards(user?.uid); // Personal Boards // *TypeScript*
   const sharedBoards: any = useFetchFsSharedBoards(); // Boards are fetched from the *owner's* Firebase doc path
   const allBoards: any = boards?.concat(sharedBoards); // *TypeScript* why "BoardSchema[]" throws errors + why "BoardSchema" doesn't?
@@ -40,7 +40,9 @@ const Home: NextPage = () => {
   const [showEditTaskModal, setShowEditTaskModal] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
   const [showEditCollabsModal, setShowEditCollabsModal] = useState(false);
-  const [boardId, setBoardId] = useState<string | null | undefined>(null);
+  const [activeBoardId, setActiveBoardId] = useState<string | null | undefined>(
+    null
+  );
   const [taskId, setTaskId] = useState<string | null | undefined>(null);
   // const [fetching, setFetching] = useState(false);
   const [isOpen, setIsOpen] = useState(true); // SideNav
@@ -53,31 +55,33 @@ const Home: NextPage = () => {
 
   // Is it better to have these as a separate state, or smth else altogether?
   let activeBoard: BoardSchema;
-  activeBoard = allBoards?.find((board: BoardSchema) => board?.uid === boardId);
+  activeBoard = allBoards?.find(
+    (board: BoardSchema) => board?.uid === activeBoardId
+  );
 
   // Setting activeBoard amongst personal Boards
   useEffect(() => {
     // setFetching(true);
     if (boards?.length >= 0 && activeBoard) return;
-    setBoardId(boards?.[0]?.uid);
+    setActiveBoardId(boards?.[0]?.uid);
     // setFetching(false);
   }, [activeBoard, boards]);
 
   // Setting activeBoard amongst shared Boards
   useEffect(() => {
     if (boards?.length > 0) return;
-    setBoardId(sharedBoards?.[0]?.uid);
+    setActiveBoardId(sharedBoards?.[0]?.uid);
   }, [boards, sharedBoards]);
 
   // ** Do these hooks re-fetch *all* the documents on each re-render (not just the new/updated ones)?
-  const columns: any = useFetchFsColumns(boardId, users); // *TypeScript*
-  const tasks: any = useFetchFsTasks(boardId, users); // *TypeScript*
+  const columns: any = useFetchFsColumns(activeBoardId, users); // *TypeScript*
+  const tasks: any = useFetchFsTasks(activeBoardId, users); // *TypeScript*
 
   const updateBoardName = async (uid: string, newName: string) => {
     if (newName === "") return;
     let boardDocRef: DocumentReference<DocumentData>; // *TypeScript* Should I even include "<DocumentData>"?
 
-    if (sharedBoardIds.includes(boardId)) {
+    if (sharedBoardIds.includes(activeBoardId)) {
       // Updating shared Board Name
       // Finding Current User (Invitee) Firebase Doc
       const currentUser = users?.find(
@@ -86,7 +90,7 @@ const Home: NextPage = () => {
 
       // Find User Id (Inviter) of the Shared Board
       const sharedBoardRef = currentUser?.sharedBoardRefs?.find(
-        (board: any) => board?.board === boardId
+        (board: any) => board?.board === activeBoardId
       );
       boardDocRef = doc(db, "users", `${sharedBoardRef?.user}`, "boards", uid);
     } else {
@@ -99,8 +103,10 @@ const Home: NextPage = () => {
     });
   };
 
-  let handleDeleteBoard: (boardId: string | null | undefined) => Promise<void>; // *TypeScript* is there a way to export this type declaration instead of writing it here?
-  handleDeleteBoard = async (boardId: string | null | undefined) => {
+  let handleDeleteBoard: (
+    activeBoardId: string | null | undefined
+  ) => Promise<void>; // *TypeScript* is there a way to export this type declaration instead of writing it here?
+  handleDeleteBoard = async (activeBoardId: string | null | undefined) => {
     const batch = writeBatch(db);
     // 1. Delete Board
     const boardDocRef = doc(
@@ -108,18 +114,18 @@ const Home: NextPage = () => {
       "users",
       `${user?.uid}`,
       "boards",
-      `${boardId}`
+      `${activeBoardId}`
     );
     // If the first Board in the array is deleted, setId to the second Board (which will become the
     // first once the first one is removed from FS). Else, remove the first Board in the array.
-    boards?.[0]?.uid === boardId
-      ? setBoardId(boards?.[1]?.uid)
-      : setBoardId(boards?.[0]?.uid);
+    boards?.[0]?.uid === activeBoardId
+      ? setActiveBoardId(boards?.[1]?.uid)
+      : setActiveBoardId(boards?.[0]?.uid);
     batch.delete(boardDocRef);
 
     // 2. Delete Columns in the Board
     const columnsToDelete = columns?.filter(
-      (column: any) => column?.board === boardId
+      (column: any) => column?.board === activeBoardId
     );
     columnsToDelete?.map((column: any) => {
       const columnDocRef = doc(
@@ -188,8 +194,8 @@ const Home: NextPage = () => {
           >
             <SideNav
               boards={boards}
-              boardId={boardId}
-              setBoardId={setBoardId}
+              activeBoardId={activeBoardId}
+              setActiveBoardId={setActiveBoardId}
               updateBoardName={updateBoardName}
               isOpen={isOpen}
               setIsOpen={setIsOpen}
@@ -201,7 +207,7 @@ const Home: NextPage = () => {
             />
             <Main
               activeBoard={activeBoard}
-              boardId={boardId}
+              activeBoardId={activeBoardId}
               tasks={tasks}
               setTaskId={setTaskId}
               setShowAddTaskModal={setShowAddTaskModal}
@@ -217,7 +223,7 @@ const Home: NextPage = () => {
             />
             {showAddTaskModal && (
               <AddNewTaskModal
-                boardId={boardId}
+                activeBoardId={activeBoardId}
                 setShowAddTaskModal={setShowAddTaskModal}
                 tasks={tasks}
                 columns={columns}
@@ -227,7 +233,7 @@ const Home: NextPage = () => {
             )}
             {showEditTaskModal && (
               <EditTaskModal
-                boardId={boardId}
+                activeBoardId={activeBoardId}
                 taskId={taskId}
                 setShowEditTaskModal={setShowEditTaskModal}
                 tasks={tasks}
@@ -239,7 +245,7 @@ const Home: NextPage = () => {
             {showShareModal && (
               <ShareModal
                 setShowShareModal={setShowShareModal}
-                boardId={boardId}
+                activeBoardId={activeBoardId}
                 users={users}
                 activeBoard={activeBoard}
               />
@@ -249,7 +255,7 @@ const Home: NextPage = () => {
                 setShowEditCollabsModal={setShowEditCollabsModal}
                 users={users}
                 activeBoard={activeBoard}
-                boardId={boardId}
+                activeBoardId={activeBoardId}
               />
             )}
           </div>

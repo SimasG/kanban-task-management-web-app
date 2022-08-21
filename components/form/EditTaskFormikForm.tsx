@@ -16,7 +16,7 @@ import {
 } from "../../lib/types";
 
 type IndexProps = {
-  boardId: string | null | undefined;
+  activeBoardId: string | null | undefined;
   taskId: string | null | undefined;
   setShowEditTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
   tasks: TaskSchema[];
@@ -27,7 +27,7 @@ type IndexProps = {
 };
 
 const FormikForm = ({
-  boardId,
+  activeBoardId,
   taskId,
   setShowEditTaskModal,
   tasks,
@@ -63,7 +63,7 @@ const FormikForm = ({
       (task: TaskSchema) => task?.status === initialValues?.status
     );
 
-    if (sharedBoardIds.includes(boardId)) {
+    if (sharedBoardIds.includes(activeBoardId)) {
       // Delete Task in shared Board
 
       // Finding Current User (Invitee) Firebase Doc
@@ -72,7 +72,8 @@ const FormikForm = ({
       );
       // Find User Id (Inviter) of the Shared Board
       const sharedBoardRef = currentUser?.sharedBoardRefs?.find(
-        (sharedBoardRef: SharedBoardRef) => sharedBoardRef?.board === boardId
+        (sharedBoardRef: SharedBoardRef) =>
+          sharedBoardRef?.board === activeBoardId
       );
 
       // Delete chosen Task

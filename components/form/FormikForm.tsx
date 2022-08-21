@@ -141,7 +141,7 @@ const FormikForm = ({ formik, columns, setShowAddTaskModal }: IndexProps) => {
             {/* Status */}
             <FormikControl
               control="select"
-              label="Status"
+              label="Column"
               name="status"
               placeholder="todo"
               options={dropdownOptions}

@@ -15,14 +15,14 @@ import { BoardSchema, SharedBoardRef, UserSchema } from "../lib/types";
 
 type IndexProps = {
   setShowShareModal: React.Dispatch<React.SetStateAction<boolean>>;
-  boardId: string | null | undefined;
+  activeBoardId: string | null | undefined;
   users: any; // *TypeScript* Should be "UserSchema[]"
   activeBoard: any; // *TypeScript* Should be "BoardSchema"
 };
 
 const ShareModal = ({
   setShowShareModal,
-  boardId,
+  activeBoardId,
   users,
   activeBoard,
 }: IndexProps) => {
@@ -54,7 +54,8 @@ const ShareModal = ({
       if (
         activeBoard?.collaborators.includes(values?.email) &&
         inviteeUser?.sharedBoardRefs?.find(
-          (sharedBoardRef: SharedBoardRef) => sharedBoardRef?.board === boardId
+          (sharedBoardRef: SharedBoardRef) =>
+            sharedBoardRef?.board === activeBoardId
         )
       ) {
         toast.error("This user has already been invited to this Board");
@@ -62,7 +63,13 @@ const ShareModal = ({
       }
 
       // 2. Add invitee's email to "collaborators" array in the inviter's Board doc
-      const boardRef = doc(db, "users", `${user?.uid}`, "boards", `${boardId}`);
+      const boardRef = doc(
+        db,
+        "users",
+        `${user?.uid}`,
+        "boards",
+        `${activeBoardId}`
+      );
       batch.update(boardRef, {
         collaborators: [
           ...(typeof activeBoard?.collaborators === "object" &&
@@ -71,14 +78,14 @@ const ShareModal = ({
         ],
       });
 
-      // 3. Add inviter's email, boardId & userId to "sharedBoards" array in the invitee's User doc
+      // 3. Add inviter's email, activeBoardId & userId to "sharedBoards" array in the invitee's User doc
       const inviteeUserRef = doc(db, "users", `${inviteeUser?.uid}`);
       batch.update(inviteeUserRef, {
         ...(typeof inviteeUser === "object" && inviteeUser),
         sharedBoardRefs: [
           ...(inviteeUser?.sharedBoardRefs && inviteeUser?.sharedBoardRefs),
           {
-            board: boardId,
+            board: activeBoardId,
             email: user?.email,
             user: user?.uid,
           },
@@ -90,14 +97,14 @@ const ShareModal = ({
     else {
       console.log("Invite sent to new user");
 
-      // 1. Create userDoc in Firebase (caveat: add isActive: false) + email, boardId & userId to "sharedBoards" array
+      // 1. Create userDoc in Firebase (caveat: add isActive: false) + email, activeBoardId & userId to "sharedBoards" array
       const uuid = uuidv4();
       batch.set(doc(db, "users", `${uuid}`), {
         email: values?.email,
         createdAt: serverTimestamp(),
         sharedBoardRefs: [
           {
-            board: boardId,
+            board: activeBoardId,
             email: user?.email,
             user: user?.uid,
           },
@@ -107,7 +114,13 @@ const ShareModal = ({
       });
 
       // 2. Add invitee's email to "collaborators" array in the inviter's Board doc
-      const boardRef = doc(db, "users", `${user?.uid}`, "boards", `${boardId}`);
+      const boardRef = doc(
+        db,
+        "users",
+        `${user?.uid}`,
+        "boards",
+        `${activeBoardId}`
+      );
       batch.update(boardRef, {
         collaborators: [
           ...(typeof activeBoard?.collaborators === "object" &&
