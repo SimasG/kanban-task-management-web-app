@@ -1,4 +1,4 @@
-import { Formik } from "formik";
+import { Formik, FormikHelpers } from "formik";
 import * as Yup from "yup";
 import { v4 as uuidv4 } from "uuid";
 import FormikForm from "./form/FormikForm";
@@ -26,7 +26,7 @@ type IndexProps = {
   activeBoardId: string | null | undefined;
   setShowAddTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
   tasks: TaskSchema[];
-  columns: ColumnSchema[];
+  columns: ColumnSchema[] | undefined;
   sharedBoardIds: (string | null | undefined)[];
   users: UserSchema[];
 };
@@ -51,8 +51,8 @@ const AddNewTaskModal = ({
         checked: false,
       },
     ],
-    status: undefined, // *TypeScript* Not too happy with the "undefined" default value
-    index: undefined, // *TypeScript* Not too happy with the "undefined" default value
+    status: undefined, // *TypeScript* Not too happy with the "undefined" default value | Probably change it to an empty string
+    index: undefined, // *TypeScript* Not too happy with the "undefined" default value | This should not be here because it's not a user input
   };
 
   const validationSchema = Yup.object({
@@ -67,14 +67,18 @@ const AddNewTaskModal = ({
   });
 
   // Add New Task
-  const onSubmit = async (values: FormikValuesSchema, actions: any) => {
+  const onSubmit = async (
+    values: initialValuesProps,
+    actions: FormikHelpers<initialValuesProps>
+  ) => {
     // *TypeScript* How do I get the "actions" type? It's fat and formik should provide it (they say they're TS-friendly)
     const { setSubmitting, resetForm } = actions;
 
     setSubmitting(true);
     // Identifying Column id, to which the Task should be added.
     const selectedColumn = columns?.find(
-      (column: ColumnSchema) => column?.status === parseInt(values?.status) // *TypeScript* Why does the status type has to be just "string" instead of "string | number"?
+      (column: ColumnSchema) =>
+        column?.status === parseInt(values?.status || "") // *TypeScript* Why does the status type has to be just "string" instead of "string | number"?
     );
 
     const uid = uuidv4();
@@ -85,7 +89,7 @@ const AddNewTaskModal = ({
 
       // Finding Current User (Invitee) Firebase Doc
       const currentUser = users?.find(
-        (currentUser: UserSchema) => currentUser.uid === user?.uid
+        (currentUser: UserSchema) => currentUser?.uid === user?.uid
       );
       // Find User Id (Inviter) of the Shared Board
       const sharedBoardRef = currentUser?.sharedBoardRefs?.find(
@@ -104,14 +108,14 @@ const AddNewTaskModal = ({
     }
 
     const chosenColumnTasks = tasks?.filter(
-      (task: TaskSchema) => task?.status === parseInt(values?.status)
+      (task: TaskSchema) => task?.status === parseInt(values?.status || "")
     );
 
     await setDoc(taskDocRef, {
       // Using type guard to ensure that we're always spreading an object
       ...(typeof values === "object" ? values : {}),
       index: chosenColumnTasks?.length,
-      status: parseInt(values?.status),
+      status: parseInt(values?.status || ""),
       uid: uid,
       createdAt: Timestamp.fromDate(new Date()),
       board: activeBoardId,

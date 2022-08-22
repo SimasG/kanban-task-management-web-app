@@ -1,4 +1,4 @@
-import { Formik } from "formik";
+import { Formik, FormikHelpers, FormikState } from "formik";
 import * as Yup from "yup";
 import { v4 as uuidv4 } from "uuid";
 import EditTaskFormikForm from "./form/EditTaskFormikForm";
@@ -16,6 +16,7 @@ import toast from "react-hot-toast";
 import {
   ColumnSchema,
   FormikValuesSchema,
+  initialValuesProps,
   SharedBoardRef,
   TaskSchema,
   UserSchema,
@@ -45,14 +46,6 @@ const EditTaskModal = ({
 
   const selectedTask = tasks?.find((task: TaskSchema) => task?.uid === taskId);
 
-  type initialValuesProps = {
-    title: string;
-    description?: string;
-    subtasks?: {}[];
-    status: number | undefined;
-    index: number | undefined;
-  };
-
   // Populating the state with the selected Task data
   useEffect(() => {
     if (!selectedTask) return;
@@ -62,6 +55,7 @@ const EditTaskModal = ({
   }, [selectedTask]);
 
   const initialValues: initialValuesProps = {
+    // **    title: data.title || "" <- look into this way of setting values
     title: "",
     description: "",
     subtasks: [
@@ -86,7 +80,10 @@ const EditTaskModal = ({
     status: Yup.string().required("Status is Required!"),
   });
 
-  const onSubmit = (values: FormikValuesSchema, actions: any) => {
+  const onSubmit = (
+    values: initialValuesProps,
+    actions: FormikHelpers<initialValuesProps>
+  ) => {
     const { setSubmitting, resetForm } = actions;
 
     // Why do I have to convert "values.status" to number? I thought it's supposed to be a number by default
@@ -94,9 +91,11 @@ const EditTaskModal = ({
   };
 
   const updateTask = async (
-    values: FormikValuesSchema,
-    setSubmitting: any, // *TypeScript* Would like to specify type once "actions" type is specified
-    resetForm: any // *TypeScript* Would like to specify type once "actions" type is specified
+    values: initialValuesProps,
+    setSubmitting: (isSubmitting: boolean) => void, // *TypeScript* Would like to specify type once "actions" type is specified
+    resetForm: (
+      nextState?: Partial<FormikState<initialValuesProps>> | undefined
+    ) => void // *TypeScript* Would like to specify type once "actions" type is specified
   ) => {
     setSubmitting(true);
     let taskDocRef: DocumentReference<DocumentData>;
@@ -106,7 +105,7 @@ const EditTaskModal = ({
 
       // Finding Current User (Invitee) Firebase Doc
       const currentUser = users?.find(
-        (currentUser: UserSchema) => currentUser.uid === user?.uid
+        (currentUser: UserSchema) => currentUser?.uid === user?.uid
       );
       // Find User Id (Inviter) of the Shared Board
       const sharedBoardRef = currentUser?.sharedBoardRefs?.find(
@@ -129,7 +128,7 @@ const EditTaskModal = ({
       // Using type guard to ensure that we're always spreading an object
       ...(typeof values === "object" ? values : {}),
       // Otherwise, status will be stored as an string
-      status: parseInt(values?.status),
+      status: parseInt(values?.status || ""),
       updatedAt: Timestamp.fromDate(new Date()),
     });
 

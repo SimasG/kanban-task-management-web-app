@@ -3,10 +3,11 @@ import { useContext } from "react";
 import { useCollectionData } from "react-firebase-hooks/firestore";
 import { UserContext } from "../context";
 import { db } from "../firebase";
+import { UserSchema } from "../types";
 
 const useFetchFsTasks = (
   activeBoardId: string | null | undefined,
-  users: DocumentData[] | undefined
+  users: UserSchema[] | undefined
 ) => {
   // User Object
   const user = useContext(UserContext);

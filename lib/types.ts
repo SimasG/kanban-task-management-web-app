@@ -1,14 +1,16 @@
 import { FieldValue } from "firebase/firestore";
 
-export type UserSchema = {
-  find(arg0: (user: UserSchema) => boolean): any;
-  createdAt: FieldValue;
-  email: string;
-  isActive: boolean;
-  photoURL: string;
-  sharedBoardRefs: SharedBoardRef[];
-  uid: string;
-};
+export type UserSchema =
+  | {
+      find(arg0: (user: UserSchema) => boolean): any;
+      createdAt: FieldValue;
+      email: string;
+      isActive: boolean;
+      photoURL: string;
+      sharedBoardRefs: SharedBoardRef[];
+      uid: string;
+    }
+  | undefined;
 
 export type BoardSchema = {
   find(arg0: (board: BoardSchema) => boolean): any;
@@ -19,14 +21,16 @@ export type BoardSchema = {
   uid: string;
 };
 
-export type ColumnSchema = {
-  board: string;
-  color: string;
-  index: number;
-  status: number;
-  title: string;
-  uid: string;
-};
+export type ColumnSchema =
+  | {
+      board: string;
+      color: string;
+      index: number;
+      status: number;
+      title: string;
+      uid: string;
+    }
+  | undefined;
 
 export type TaskSchema = {
   filter(arg0: (task: any) => boolean): TaskSchema[];
@@ -74,7 +78,7 @@ export type initialValuesProps = {
   title: string;
   description: string;
   subtasks: SubtaskSchema[];
-  status: number | undefined;
+  status: string | undefined;
   index: number | undefined;
 };
 
