@@ -24,18 +24,18 @@ const ShareModal = ({
   // Filtering users whose emails are in the collaborators' array
   let collaboratorUsers: UserSchema[] = [];
   users?.filter((user: UserSchema) => {
-    activeBoard?.collaborators.includes(user?.email) &&
+    activeBoard?.collaborators.includes(user?.email || "") &&
       collaboratorUsers.push(user);
   });
 
   const handleRemoveUser = async (
-    inviteeEmail: string,
-    inviteeUserId: string
+    inviteeEmail: string | undefined,
+    inviteeUserId: string | undefined
   ) => {
     const batch = writeBatch(db);
 
     // ** 1. Update collaborators array in the inviter's (current User) boardDoc
-    const filteredCollaborators = activeBoard.collaborators?.filter(
+    const filteredCollaborators = activeBoard?.collaborators?.filter(
       (collaborator: string) => collaborator !== inviteeEmail
     );
 

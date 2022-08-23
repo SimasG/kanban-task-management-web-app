@@ -20,9 +20,9 @@ type IndexProps = {
   activeBoardId: string | null | undefined;
   taskId: string | null | undefined;
   setShowEditTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
-  tasks: TaskSchema[];
+  tasks: TaskSchema[] | undefined;
   formik: FormikProps<initialValuesProps>;
-  columns: ColumnSchema[];
+  columns: ColumnSchema[] | undefined;
   sharedBoardIds: (string | null | undefined)[];
   users: UserSchema[];
 };
@@ -61,7 +61,7 @@ const FormikForm = ({
     const batch = writeBatch(db);
 
     const selectedColumnTasks = tasks?.filter(
-      (task: TaskSchema) => task?.status === initialValues?.status
+      (task: TaskSchema) => task?.status === parseInt(initialValues?.status)
     );
 
     if (sharedBoardIds.includes(activeBoardId)) {
@@ -69,7 +69,7 @@ const FormikForm = ({
 
       // Finding Current User (Invitee) Firebase Doc
       const currentUser = users?.find(
-        (currentUser: UserSchema) => currentUser.uid === user?.uid
+        (currentUser: UserSchema) => currentUser?.uid === user?.uid
       );
       // Find User Id (Inviter) of the Shared Board
       const sharedBoardRef = currentUser?.sharedBoardRefs?.find(
@@ -88,7 +88,8 @@ const FormikForm = ({
       batch.delete(taskRef);
 
       // Decrement indexes of Tasks that came after the deleted Task
-      selectedColumnTasks.map((task: TaskSchema) => {
+      selectedColumnTasks?.map((task: TaskSchema) => {
+        if (!task || !initialValues) return;
         if (task?.index <= initialValues?.index) return;
         const taskDocRef = doc(
           db,

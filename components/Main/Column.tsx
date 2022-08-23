@@ -11,6 +11,7 @@ import { UserContext } from "../../lib/context";
 import { db } from "../../lib/firebase";
 import { defaultColumns } from "../../lib/helpers";
 import {
+  ColumnSchema,
   SharedBoardRef,
   SubtaskSchema,
   TaskSchema,
@@ -20,27 +21,21 @@ import {
 type ColumnProps = {
   setTaskId: React.Dispatch<React.SetStateAction<string | null | undefined>>;
   setShowEditTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
-  tasks: TaskSchema[];
-  columnStatus: number;
-  columnTitle: string;
+  tasks: TaskSchema[] | undefined;
+  column: ColumnSchema;
   activeBoardId: string | null | undefined;
   index: number;
-  columnId: string;
-  columnColor: string;
   sharedBoardIds: (string | null | undefined)[];
-  users: UserSchema;
+  users: UserSchema[];
 };
 
 const Column = ({
   setTaskId,
   setShowEditTaskModal,
   tasks,
-  columnStatus,
-  columnTitle,
-  columnId,
+  column,
   activeBoardId,
   index,
-  columnColor,
   sharedBoardIds,
   users,
 }: ColumnProps) => {
@@ -49,7 +44,7 @@ const Column = ({
   const [hover, setHover] = useState(false);
 
   const taskCount = tasks?.filter(
-    (task: TaskSchema) => task?.status === columnStatus
+    (task: TaskSchema) => task?.status === column?.status
   ).length;
 
   const changeColumnTitle = async (newTitle: string) => {
@@ -57,7 +52,7 @@ const Column = ({
       console.log("Update shared Column Title");
       // Finding Current User (Invitee) Firebase Doc
       const currentUser = users?.find(
-        (currentUser: UserSchema) => currentUser.uid === user?.uid
+        (currentUser: UserSchema) => currentUser?.uid === user?.uid
       );
       // Find User Id (Inviter) of the Shared Board
       const sharedBoardRef = currentUser?.sharedBoardRefs?.find(
@@ -69,7 +64,7 @@ const Column = ({
         "users",
         `${sharedBoardRef?.user}`,
         "columns",
-        `${columnId}`
+        `${column?.uid}`
       );
       await updateDoc(columnDocRef, { title: newTitle });
     } else {
@@ -79,7 +74,7 @@ const Column = ({
         "users",
         `${user?.uid}`,
         "columns",
-        `${columnId}`
+        `${column?.uid}`
       );
       await updateDoc(columnDocRef, { title: newTitle });
     }
@@ -90,7 +85,7 @@ const Column = ({
       console.log("Delete Column in a shared Board");
       // Finding Current User (Invitee) Firebase Doc
       const currentUser = users?.find(
-        (currentUser: UserSchema) => currentUser.uid === user?.uid
+        (currentUser: UserSchema) => currentUser?.uid === user?.uid
       );
       // Find User Id (Inviter) of the Shared Board
       const sharedBoardRef = currentUser?.sharedBoardRefs?.find(
@@ -105,15 +100,15 @@ const Column = ({
         "users",
         `${sharedBoardRef?.user}`,
         "columns",
-        `${columnId}`
+        `${column?.uid}`
       );
       batch.delete(columnDocRef);
 
       const tasksToDelete = tasks?.filter(
-        (task: TaskSchema) => task?.status === columnStatus
+        (task: TaskSchema) => task?.status === column?.status
       );
 
-      tasksToDelete.map((task: TaskSchema) => {
+      tasksToDelete?.map((task: TaskSchema) => {
         const taskDocRef = doc(
           db,
           "users",
@@ -124,7 +119,7 @@ const Column = ({
         batch.delete(taskDocRef);
       });
       await batch.commit();
-      toast.success(`${columnTitle} Deleted!`);
+      toast.success(`${column?.title} Deleted!`);
     } else {
       console.log("Delete Column in a personal Board");
       // Deleting the Column & Tasks that are in the Column
@@ -134,15 +129,15 @@ const Column = ({
         "users",
         `${user?.uid}`,
         "columns",
-        `${columnId}`
+        `${column?.uid}`
       );
       batch.delete(columnDocRef);
 
       const tasksToDelete = tasks?.filter(
-        (task: TaskSchema) => task?.status === columnStatus
+        (task: TaskSchema) => task?.status === column?.status
       );
 
-      tasksToDelete.map((task: TaskSchema) => {
+      tasksToDelete?.map((task: TaskSchema) => {
         const taskDocRef = doc(
           db,
           "users",
@@ -153,7 +148,7 @@ const Column = ({
         batch.delete(taskDocRef);
       });
       await batch.commit();
-      toast.success(`${columnTitle} Deleted!`);
+      toast.success(`${column?.title} Deleted!`);
     }
   };
 
@@ -161,7 +156,7 @@ const Column = ({
     // ** It's important not to put index # as the draggableId (not sure why)
     // I'm already adding a key to the mapped <Column/> but if I
     // don't specify the key here, the Column DnD doesn't work. Not sure why.
-    <Draggable key={columnId} draggableId={columnId} index={index}>
+    <Draggable key={column?.uid} draggableId={column?.uid || ""} index={index}>
       {(provided) => (
         <div
           {...provided.draggableProps}
@@ -188,13 +183,13 @@ const Column = ({
                   {/* Colorful circle */}
                   <div
                     className={`h-3 w-3 xl:h-4 xl:w-4 rounded-full`}
-                    style={{ backgroundColor: columnColor }}
+                    style={{ backgroundColor: column?.color }}
                   ></div>
                   {/* Column Title + Task Count Container */}
                   <div className="flex justify-start items-center">
                     {/* Column Title */}
                     <input
-                      value={`${columnTitle}`}
+                      value={`${column?.title}`}
                       onChange={(e) => changeColumnTitle(e.target.value)}
                       className="w-[50px] sm:w-[60px] md:w-[70px] md:text-xs lg:w-[100px] xl:w-[140px] 2xl:w-[180px] uppercase text-fontSecondary font-bold bg-transparent cursor-pointer outline-none pr-2 hover:opacity-75"
                     />
@@ -229,11 +224,11 @@ const Column = ({
                   {/* Colorful Circle */}
                   <div
                     className={`h-3 w-3 xl:h-4 xl:w-4 rounded-full`}
-                    style={{ backgroundColor: columnColor }}
+                    style={{ backgroundColor: column?.color }}
                   ></div>
                   {/* Column Title */}
                   <input
-                    value={`${columnTitle}`}
+                    value={`${column?.title}`}
                     onChange={(e) => changeColumnTitle(e.target.value)}
                     className="w-[70px] sm:w-[80px] md:w-[100px] md:text-xs lg:w-[140px] xl:w-[160px] 2xl:w-[220px] uppercase text-fontSecondary font-bold bg-transparent cursor-pointer outline-none hover:opacity-75"
                   />
@@ -244,7 +239,7 @@ const Column = ({
             )}
           </div>
           {/* Task Container */}
-          <Droppable droppableId={columnId} type="task">
+          <Droppable droppableId={column?.uid || ""} type="task">
             {/* Are we using the render props pattern to display the Droppable component 
     because that's the ideal way to access Droppable's props (provided & snapshot)? */}
             {(provided: DroppableProvided) => {
@@ -257,17 +252,17 @@ const Column = ({
                 >
                   {tasks
                     ?.filter(
-                      (task: TaskSchema) => task?.status === columnStatus
+                      (task: TaskSchema) => task?.status === column?.status
                     )
                     ?.map((task: TaskSchema, index: number) => {
                       let checkedNumber = 0;
-                      task.subtasks.map((subtask: SubtaskSchema) => {
+                      task?.subtasks.map((subtask: SubtaskSchema) => {
                         subtask.checked && checkedNumber++;
                       });
                       return (
                         <Draggable
-                          key={task.uid}
-                          draggableId={task.uid}
+                          key={task?.uid}
+                          draggableId={task?.uid || ""}
                           index={index}
                         >
                           {(provided: DraggableProvided) => {
@@ -286,7 +281,7 @@ const Column = ({
                               >
                                 <h2 className="task-title">{task?.title}</h2>
                                 <span className="task-body">
-                                  {checkedNumber} of {task.subtasks.length}{" "}
+                                  {checkedNumber} of {task?.subtasks.length}{" "}
                                   subtasks
                                 </span>
                               </div>

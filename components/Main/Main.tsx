@@ -27,20 +27,20 @@ import {
 type MainProps = {
   activeBoard: BoardSchema;
   activeBoardId: string | null | undefined;
-  tasks: any; // *TypeScript* Why does "TaskSchema[]" make "draggedTask" be of type "TaskSchema | undefined"?
+  tasks: TaskSchema[] | undefined;
   setTaskId: React.Dispatch<React.SetStateAction<string | null | undefined>>;
   setShowAddTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
   setShowEditTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
-  updateBoardName: (uid: string, newName: string) => Promise<void>;
-  columns: ColumnSchema[]; // *TypeScript* Why am I not getting an error here, as with "tasks"?
+  updateBoardName: (uid: string | undefined, newName: string) => Promise<void>;
+  columns: ColumnSchema[] | undefined; // *TypeScript* Why am I not getting an error here, as with "tasks"?
   isOpen: boolean;
   setShowShareModal: React.Dispatch<React.SetStateAction<boolean>>;
   sharedBoardIds: (string | null | undefined)[];
-  users: any; // *TypeScript* Why does "UserSchema[]" become "UserSchema | undefined"?
+  users: UserSchema[];
   handleDeleteBoard: (
     activeBoardId: string | null | undefined
   ) => Promise<void>;
-  allBoards: BoardSchema[]; // *TypeScript* Why can I use "BoardSchema[]" this time tho?
+  allBoards: BoardSchema[];
 };
 
 const Main = ({
@@ -82,7 +82,7 @@ const Main = ({
       newColumns?.splice(destination.index, 0, add);
       // Updating DB state
       updateColumnsIndex(
-        newColumns[destination.index].uid,
+        newColumns?.[destination.index]?.uid || "",
         source.index,
         destination.index
       );
@@ -98,12 +98,12 @@ const Main = ({
           source.droppableId,
           source.index,
           destination.index,
-          draggedTask?.uid
+          draggedTask?.uid || ""
         );
       } else {
         updateTaskBetweenColumns(
           // Dragged Task's uid -> updatedTaskId
-          draggedTask?.uid,
+          draggedTask?.uid || "",
           // Source index -> Task's old index within Column -> sourceIndex
           source.index,
           // Destination index -> Tasks's new index within Column -> destinationIndex
@@ -128,7 +128,7 @@ const Main = ({
 
       // Finding Current User (Invitee) Firebase Doc
       const currentUser = users?.find(
-        (currentUser: UserSchema) => currentUser.uid === user?.uid
+        (currentUser: UserSchema) => currentUser?.uid === user?.uid
       );
       // Find User Id (Inviter) of the Shared Board
       const sharedBoardRef = currentUser?.sharedBoardRefs?.find(
@@ -138,9 +138,13 @@ const Main = ({
       const batch = writeBatch(db);
       // 1. Updating the indexes of affected Columns
       columns?.map((column: ColumnSchema) => {
-        if (column.uid === draggedColumnId) return;
+        if (column?.uid === draggedColumnId) return;
         if (destinationIndex > sourceIndex) {
-          if (column.index > sourceIndex && column.index <= destinationIndex) {
+          if (column?.index === undefined) return;
+          if (
+            column?.index > sourceIndex &&
+            column?.index <= destinationIndex
+          ) {
             const columnDocRef = doc(
               db,
               "users",
@@ -151,6 +155,7 @@ const Main = ({
             batch.update(columnDocRef, { index: increment(-1) });
           }
         } else if (destinationIndex < sourceIndex) {
+          if (column?.index === undefined) return;
           if (column.index < sourceIndex && column.index >= destinationIndex) {
             const columnDocRef = doc(
               db,
@@ -182,8 +187,9 @@ const Main = ({
       const batch = writeBatch(db);
       // 1. Updating the indexes of affected Columns
       columns?.map((column: ColumnSchema) => {
-        if (column.uid === draggedColumnId) return;
+        if (column?.uid === draggedColumnId) return;
         if (destinationIndex > sourceIndex) {
+          if (column?.index === undefined) return;
           if (column.index > sourceIndex && column.index <= destinationIndex) {
             const columnDocRef = doc(
               db,
@@ -195,6 +201,7 @@ const Main = ({
             batch.update(columnDocRef, { index: increment(-1) });
           }
         } else if (destinationIndex < sourceIndex) {
+          if (column?.index === undefined) return;
           if (column.index < sourceIndex && column.index >= destinationIndex) {
             const columnDocRef = doc(
               db,
@@ -245,7 +252,7 @@ const Main = ({
 
       // Finding Current User (Invitee) Firebase Doc
       const currentUser = users?.find(
-        (currentUser: UserSchema) => currentUser.uid === user?.uid
+        (currentUser: UserSchema) => currentUser?.uid === user?.uid
       );
       // Find User Id (Inviter) of the Shared Board
       const sharedBoardRef = currentUser?.sharedBoardRefs?.find(
@@ -254,6 +261,7 @@ const Main = ({
 
       columnTasks?.map((task: TaskSchema) => {
         if (destinationIndex > sourceIndex) {
+          if (task?.index === undefined) return;
           // Decrement Tasks
           if (task.index > sourceIndex && task.index <= destinationIndex) {
             const taskDocRef = doc(
@@ -266,6 +274,7 @@ const Main = ({
             batch.update(taskDocRef, { index: increment(-1) });
           }
         } else if (destinationIndex < sourceIndex) {
+          if (task?.index === undefined) return;
           // Increment Tasks
           if (task.index < sourceIndex && task.index >= destinationIndex) {
             const taskDocRef = doc(
@@ -297,6 +306,7 @@ const Main = ({
       // Task DnD in a personal Board (within Column)
       columnTasks?.map((task: TaskSchema) => {
         if (destinationIndex > sourceIndex) {
+          if (task?.index === undefined) return;
           // Decrement Tasks
           if (task.index > sourceIndex && task.index <= destinationIndex) {
             const taskDocRef = doc(
@@ -309,6 +319,7 @@ const Main = ({
             batch.update(taskDocRef, { index: increment(-1) });
           }
         } else if (destinationIndex < sourceIndex) {
+          if (task?.index === undefined) return;
           // Increment Tasks
           if (task.index < sourceIndex && task.index >= destinationIndex) {
             const taskDocRef = doc(
@@ -351,7 +362,7 @@ const Main = ({
 
       // Finding Current User (Invitee) Firebase Doc
       const currentUser = users?.find(
-        (currentUser: UserSchema) => currentUser.uid === user?.uid
+        (currentUser: UserSchema) => currentUser?.uid === user?.uid
       );
       // Find User Id (Inviter) of the Shared Board
       const sharedBoardRef = currentUser?.sharedBoardRefs?.find(
@@ -387,6 +398,7 @@ const Main = ({
           );
 
           sourceColumnTasks?.map((task: TaskSchema) => {
+            if (task?.index === undefined) return;
             if (task.index > sourceIndex) {
               if (task.uid === draggedTaskId) return;
               const taskDocRef = doc(
@@ -407,6 +419,7 @@ const Main = ({
           destinationColumnTasks?.map((task: TaskSchema) => {
             // |task.index reflects the Tasks' indexes before being updated with the dragged Task.
             // That's why the Task index at task.index === destinationIndex should still be incremented.
+            if (task?.index === undefined) return;
             if (task.index >= destinationIndex) {
               if (task.uid === draggedTaskId) return;
               const taskDocRef = doc(
@@ -454,6 +467,7 @@ const Main = ({
           );
 
           sourceColumnTasks?.map((task: TaskSchema) => {
+            if (task?.index === undefined) return;
             if (task.index > sourceIndex) {
               if (task.uid === draggedTaskId) return;
               const taskDocRef = doc(
@@ -472,6 +486,7 @@ const Main = ({
             (task: TaskSchema) => task?.status === destinationColumn?.status
           );
           destinationColumnTasks?.map((task: TaskSchema) => {
+            if (task?.index === undefined) return;
             // |task.index reflects the Tasks' indexes before being updated with the dragged Task.
             // That's why the Task index at task.index === destinationIndex should still be incremented.
             if (task.index >= destinationIndex) {
@@ -501,7 +516,7 @@ const Main = ({
     if (sharedBoardIds.includes(activeBoardId)) {
       // Finding Current User (Invitee) Firebase Doc
       const currentUser = users?.find(
-        (currentUser: UserSchema) => currentUser.uid === user?.uid
+        (currentUser: UserSchema) => currentUser?.uid === user?.uid
       );
       // Find User Id (Inviter) of the Shared Board
       const sharedBoardRef = currentUser?.sharedBoardRefs?.find(
@@ -569,10 +584,7 @@ const Main = ({
                     setTaskId={setTaskId}
                     setShowEditTaskModal={setShowEditTaskModal}
                     tasks={tasks}
-                    columnStatus={column?.status}
-                    columnTitle={column?.title}
-                    columnId={column?.uid}
-                    columnColor={column?.color}
+                    column={column}
                     activeBoardId={activeBoardId}
                     index={index}
                     sharedBoardIds={sharedBoardIds}

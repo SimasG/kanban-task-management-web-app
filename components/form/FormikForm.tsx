@@ -5,7 +5,7 @@ import { ColumnSchema, SubtaskSchema } from "../../lib/types";
 
 type IndexProps = {
   formik: any; // *TypeScript* Wish I could specify a type of the formik object
-  columns: ColumnSchema[];
+  columns: ColumnSchema[] | undefined;
   setShowAddTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
@@ -72,6 +72,7 @@ const FormikForm = ({ formik, columns, setShowAddTaskModal }: IndexProps) => {
               className="resize-none"
             />
             {/* Subtask Container */}
+            {/* @ts-ignore */}
             <FieldArray name="subtasks">
               {(fieldArrayProps) => {
                 const { push, remove, form } = fieldArrayProps;
@@ -113,6 +114,7 @@ const FormikForm = ({ formik, columns, setShowAddTaskModal }: IndexProps) => {
                             </svg>
                           </button>
                         </div>
+                        {/* @ts-ignore */}
                         <ErrorMessage
                           name={`subtasks[${index}].title`}
                           component="p"

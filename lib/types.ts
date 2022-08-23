@@ -2,20 +2,20 @@ import { FieldValue } from "firebase/firestore";
 
 export type UserSchema =
   | {
-      find(arg0: (user: UserSchema) => boolean): any;
+      find(arg0: (user: UserSchema) => boolean): UserSchema;
       createdAt: FieldValue;
       email: string;
       isActive: boolean;
       photoURL: string;
-      sharedBoardRefs: SharedBoardRef[];
+      sharedBoardRefs: SharedBoardRef[] | any;
       uid: string;
     }
   | undefined;
 
 export type BoardSchema =
   | {
-      find(arg0: (board: BoardSchema) => boolean): any;
-      collaborators: string[];
+      find(arg0: (board: BoardSchema) => boolean): BoardSchema;
+      collaborators: string[] | any; // Not happy with "any"
       createdAt: FieldValue;
       index: number;
       title: string;
@@ -34,31 +34,20 @@ export type ColumnSchema =
     }
   | undefined;
 
-export type TaskSchema = {
-  filter(arg0: (task: TaskSchema) => boolean): TaskSchema[];
-  board: string;
-  column: string;
-  createdAt: FieldValue;
-  description: string;
-  index: number;
-  status: number;
-  subtasks: SubtaskSchema[];
-  title: string;
-  uid: string;
-};
-
-export type FormikValuesSchema = {
-  filter(arg0: (task: TaskSchema) => boolean): FormikValuesSchema[];
-  board: string;
-  column: string;
-  createdAt: FieldValue;
-  description: string;
-  index: number | undefined;
-  status: string;
-  subtasks: SubtaskSchema[];
-  title: string;
-  uid: string;
-};
+export type TaskSchema =
+  | {
+      // filter(arg0: (task: TaskSchema) => boolean): TaskSchema[];
+      board: string;
+      column: string;
+      createdAt: FieldValue;
+      description: string;
+      index: number;
+      status: number | string;
+      subtasks: SubtaskSchema[];
+      title: string;
+      uid: string;
+    }
+  | undefined;
 
 export type SubtaskSchema = {
   checked: boolean;
@@ -80,8 +69,23 @@ export type initialValuesProps = {
   title: string;
   description: string;
   subtasks: SubtaskSchema[];
-  status: string | undefined;
-  index: number | undefined;
+  status: string;
+};
+
+export type existingValuesProps = {
+  board: string;
+  column: string;
+  createdAt: FieldValue;
+  description: string;
+  index: number;
+  status: number | string;
+  subtasks: SubtaskSchema[];
+  title: string;
+  uid: string;
+  // title: string;
+  // description: string;
+  // subtasks: SubtaskSchema[];
+  // status: string;
 };
 
 export type DefaultColumn = {

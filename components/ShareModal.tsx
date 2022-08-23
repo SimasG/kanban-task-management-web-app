@@ -1,10 +1,4 @@
-import {
-  doc,
-  DocumentData,
-  serverTimestamp,
-  setDoc,
-  writeBatch,
-} from "firebase/firestore";
+import { doc, serverTimestamp, writeBatch } from "firebase/firestore";
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import { useContext } from "react";
 import toast from "react-hot-toast";
@@ -16,8 +10,8 @@ import { BoardSchema, SharedBoardRef, UserSchema } from "../lib/types";
 type IndexProps = {
   setShowShareModal: React.Dispatch<React.SetStateAction<boolean>>;
   activeBoardId: string | null | undefined;
-  users: any; // *TypeScript* Should be "UserSchema[]"
-  activeBoard: any; // *TypeScript* Should be "BoardSchema"
+  users: UserSchema[];
+  activeBoard: BoardSchema; // *TypeScript* Should be "BoardSchema"
 };
 
 const ShareModal = ({
@@ -140,7 +134,7 @@ const ShareModal = ({
       } = {
         ...values,
         inviterEmail: user?.email,
-        boardTitle: activeBoard?.title,
+        boardTitle: activeBoard?.title || "",
       };
 
       // Sending a POST request to an API endpoint "api/mail" with a body where the form values are stored
@@ -209,6 +203,7 @@ const ShareModal = ({
               name="email"
               id="email"
             />
+            {/* @ts-ignore */}
             <ErrorMessage
               name="email"
               component="p"

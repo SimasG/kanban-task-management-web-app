@@ -16,6 +16,7 @@ const Input = ({ label, name, ...rest }: any) => {
         {...rest}
         className="textarea"
       />
+      {/* @ts-ignore */}
       <ErrorMessage
         name={name}
         component="p"

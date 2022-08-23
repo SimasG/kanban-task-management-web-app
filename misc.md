@@ -2784,3 +2784,16 @@ setSubmitting(true);
       // (column: any) => column?.status === parseInt(values?.status)
 
                 const { values, handleChange, errors } = form;
+
+// export type FormikValuesSchema = {
+// filter(arg0: (task: TaskSchema) => boolean): FormikValuesSchema[];
+// board: string;
+// column: string;
+// createdAt: FieldValue;
+// description: string;
+// index: number | undefined;
+// status: string;
+// subtasks: SubtaskSchema[];
+// title: string;
+// uid: string;
+// };
