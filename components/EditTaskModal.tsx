@@ -15,7 +15,6 @@ import { UserContext } from "../lib/context";
 import toast from "react-hot-toast";
 import {
   ColumnSchema,
-  FormikValuesSchema,
   initialValuesProps,
   SharedBoardRef,
   TaskSchema,
@@ -54,19 +53,19 @@ const EditTaskModal = ({
     });
   }, [selectedTask]);
 
-  const initialValues: initialValuesProps = {
-    // **    title: data.title || "" <- look into this way of setting values
-    title: "",
-    description: "",
-    subtasks: [
+  const existingValues: any = {
+    // *TypeScript* I give up here
+    ...(typeof data === "object" && data),
+    title: data?.title || "",
+    description: data?.description || "",
+    subtasks: data?.subtasks || [
       {
         uid: uuidv4(),
         title: "",
         checked: false,
       },
     ],
-    status: undefined,
-    index: undefined,
+    status: data?.status.toString() || "",
   };
 
   const validationSchema = Yup.object({
@@ -81,21 +80,20 @@ const EditTaskModal = ({
   });
 
   const onSubmit = (
-    values: initialValuesProps,
+    values: any,
     actions: FormikHelpers<initialValuesProps>
   ) => {
     const { setSubmitting, resetForm } = actions;
 
-    // Why do I have to convert "values.status" to number? I thought it's supposed to be a number by default
     updateTask(values, setSubmitting, resetForm);
   };
 
   const updateTask = async (
-    values: initialValuesProps,
-    setSubmitting: (isSubmitting: boolean) => void, // *TypeScript* Would like to specify type once "actions" type is specified
+    values: any,
+    setSubmitting: (isSubmitting: boolean) => void,
     resetForm: (
       nextState?: Partial<FormikState<initialValuesProps>> | undefined
-    ) => void // *TypeScript* Would like to specify type once "actions" type is specified
+    ) => void
   ) => {
     setSubmitting(true);
     let taskDocRef: DocumentReference<DocumentData>;
@@ -140,7 +138,7 @@ const EditTaskModal = ({
 
   return (
     <Formik
-      initialValues={data || initialValues}
+      initialValues={existingValues}
       validationSchema={validationSchema}
       onSubmit={onSubmit}
       enableReinitialize

@@ -21,12 +21,12 @@ import {
 type ColumnProps = {
   setTaskId: React.Dispatch<React.SetStateAction<string | null | undefined>>;
   setShowEditTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
-  tasks: TaskSchema[];
+  tasks: TaskSchema[] | undefined;
   column: ColumnSchema;
   activeBoardId: string | null | undefined;
   index: number;
   sharedBoardIds: (string | null | undefined)[];
-  users: UserSchema;
+  users: UserSchema[];
 };
 
 const Column = ({
@@ -108,7 +108,7 @@ const Column = ({
         (task: TaskSchema) => task?.status === column?.status
       );
 
-      tasksToDelete.map((task: TaskSchema) => {
+      tasksToDelete?.map((task: TaskSchema) => {
         const taskDocRef = doc(
           db,
           "users",
@@ -137,7 +137,7 @@ const Column = ({
         (task: TaskSchema) => task?.status === column?.status
       );
 
-      tasksToDelete.map((task: TaskSchema) => {
+      tasksToDelete?.map((task: TaskSchema) => {
         const taskDocRef = doc(
           db,
           "users",

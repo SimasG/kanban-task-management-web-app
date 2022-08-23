@@ -11,6 +11,7 @@ const Input = ({ label, name, type, ...rest }: any) => {
         {label}
       </label>
       <Field id={name} name={name} type={type} {...rest} className="input" />
+      {/* @ts-ignore */}
       <ErrorMessage
         name={name}
         component="p"

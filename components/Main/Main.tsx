@@ -27,20 +27,20 @@ import {
 type MainProps = {
   activeBoard: BoardSchema;
   activeBoardId: string | null | undefined;
-  tasks: any; // *TypeScript* Why does "TaskSchema[]" make "draggedTask" be of type "TaskSchema | undefined"?
+  tasks: TaskSchema[] | undefined;
   setTaskId: React.Dispatch<React.SetStateAction<string | null | undefined>>;
   setShowAddTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
   setShowEditTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
-  updateBoardName: (uid: string, newName: string) => Promise<void>;
+  updateBoardName: (uid: string | undefined, newName: string) => Promise<void>;
   columns: ColumnSchema[] | undefined; // *TypeScript* Why am I not getting an error here, as with "tasks"?
   isOpen: boolean;
   setShowShareModal: React.Dispatch<React.SetStateAction<boolean>>;
   sharedBoardIds: (string | null | undefined)[];
-  users: any; // *TypeScript* Why does "UserSchema[]" become "UserSchema | undefined"?
+  users: UserSchema[];
   handleDeleteBoard: (
     activeBoardId: string | null | undefined
   ) => Promise<void>;
-  allBoards: BoardSchema[]; // *TypeScript* Why can I use "BoardSchema[]" this time tho?
+  allBoards: BoardSchema[];
 };
 
 const Main = ({
@@ -98,12 +98,12 @@ const Main = ({
           source.droppableId,
           source.index,
           destination.index,
-          draggedTask?.uid
+          draggedTask?.uid || ""
         );
       } else {
         updateTaskBetweenColumns(
           // Dragged Task's uid -> updatedTaskId
-          draggedTask?.uid,
+          draggedTask?.uid || "",
           // Source index -> Task's old index within Column -> sourceIndex
           source.index,
           // Destination index -> Tasks's new index within Column -> destinationIndex

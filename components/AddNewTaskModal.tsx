@@ -15,7 +15,6 @@ import { UserContext } from "../lib/context";
 import toast from "react-hot-toast";
 import {
   ColumnSchema,
-  FormikValuesSchema,
   initialValuesProps,
   SharedBoardRef,
   TaskSchema,
@@ -51,8 +50,7 @@ const AddNewTaskModal = ({
         checked: false,
       },
     ],
-    status: undefined, // *TypeScript* Not too happy with the "undefined" default value | Probably change it to an empty string
-    index: undefined, // *TypeScript* Not too happy with the "undefined" default value | This should not be here because it's not a user input
+    status: "",
   };
 
   const validationSchema = Yup.object({
@@ -130,7 +128,7 @@ const AddNewTaskModal = ({
 
   return (
     <Formik
-      initialValues={initialValues} // *TypeScript* Pls fix
+      initialValues={initialValues}
       validationSchema={validationSchema}
       onSubmit={onSubmit}
     >

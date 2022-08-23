@@ -407,62 +407,66 @@ const SideNav = ({
                             ref={provided.innerRef}
                             // className="overflow-auto"
                           >
-                            {sharedBoards.map((board: any, index: number) => {
-                              return (
-                                <Draggable
-                                  key={board.uid}
-                                  draggableId={board.uid}
-                                  index={index}
-                                >
-                                  {(provided, snapshot) => {
-                                    return (
-                                      // Single Board
-                                      <div
-                                        onClick={() => {
-                                          setActiveBoardId(board.uid);
-                                        }}
-                                        ref={provided.innerRef}
-                                        {...provided.draggableProps}
-                                        {...provided.dragHandleProps}
-                                        className={`board rounded-r-full ${
-                                          board.uid === activeBoardId
-                                            ? snapshot.isDragging
-                                              ? " bg-fontTertiary bg-opacity-60 select-none text-fontPrimaryDark drop-shadow-lg hover:drop-shadow-xl"
-                                              : " bg-fontTertiary text-fontPrimaryDark opacity-100 drop-shadow-lg hover:drop-shadow-xl"
-                                            : " active:bg-fontTertiary active:bg-opacity-60 active:text-fontPrimaryDark"
-                                        }}`}
-                                      >
-                                        <TbLayoutBoardSplit />
-                                        <input
-                                          className="bg-transparent cursor-pointer outline-none w-[80%] grow"
-                                          type="text"
-                                          value={board.title}
-                                          onChange={(e) => {
-                                            updateBoardName(
-                                              board.uid,
-                                              e.target.value
-                                            );
+                            {sharedBoards.map(
+                              (board: BoardSchema, index: number) => {
+                                return (
+                                  <Draggable
+                                    key={board?.uid}
+                                    draggableId={board?.uid || ""}
+                                    index={index}
+                                  >
+                                    {(provided, snapshot) => {
+                                      return (
+                                        // Single Board
+                                        <div
+                                          onClick={() => {
+                                            setActiveBoardId(board?.uid);
                                           }}
-                                        />
-                                        <Popover shadow="md">
-                                          <Popover.Target>
-                                            <BsThreeDots className="shrink-0 w-6 h-6 p-1 hover:bg-[#7c78d2] rounded cursor-pointer" />
-                                          </Popover.Target>
-                                          <Popover.Dropdown className="top-12 right-0 z-[9999] w-[185px]">
-                                            <button
-                                              onClick={() => handleLeaveBoard()}
-                                              className="w-[100%] text-left hover:bg-[#eef2f7] cursor-pointer block p-2 text-fontPrimary"
-                                            >
-                                              Leave Board
-                                            </button>
-                                          </Popover.Dropdown>
-                                        </Popover>
-                                      </div>
-                                    );
-                                  }}
-                                </Draggable>
-                              );
-                            })}
+                                          ref={provided.innerRef}
+                                          {...provided.draggableProps}
+                                          {...provided.dragHandleProps}
+                                          className={`board rounded-r-full ${
+                                            board?.uid === activeBoardId
+                                              ? snapshot.isDragging
+                                                ? " bg-fontTertiary bg-opacity-60 select-none text-fontPrimaryDark drop-shadow-lg hover:drop-shadow-xl"
+                                                : " bg-fontTertiary text-fontPrimaryDark opacity-100 drop-shadow-lg hover:drop-shadow-xl"
+                                              : " active:bg-fontTertiary active:bg-opacity-60 active:text-fontPrimaryDark"
+                                          }}`}
+                                        >
+                                          <TbLayoutBoardSplit />
+                                          <input
+                                            className="bg-transparent cursor-pointer outline-none w-[80%] grow"
+                                            type="text"
+                                            value={board?.title}
+                                            onChange={(e) => {
+                                              updateBoardName(
+                                                board?.uid,
+                                                e.target.value
+                                              );
+                                            }}
+                                          />
+                                          <Popover shadow="md">
+                                            <Popover.Target>
+                                              <BsThreeDots className="shrink-0 w-6 h-6 p-1 hover:bg-[#7c78d2] rounded cursor-pointer" />
+                                            </Popover.Target>
+                                            <Popover.Dropdown className="top-12 right-0 z-[9999] w-[185px]">
+                                              <button
+                                                onClick={() =>
+                                                  handleLeaveBoard()
+                                                }
+                                                className="w-[100%] text-left hover:bg-[#eef2f7] cursor-pointer block p-2 text-fontPrimary"
+                                              >
+                                                Leave Board
+                                              </button>
+                                            </Popover.Dropdown>
+                                          </Popover>
+                                        </div>
+                                      );
+                                    }}
+                                  </Draggable>
+                                );
+                              }
+                            )}
                             {provided.placeholder}
                           </div>
                         );
