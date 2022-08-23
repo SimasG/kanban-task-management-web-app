@@ -24,16 +24,20 @@ import { PropagateLoader } from "react-spinners";
 import useFetchFsSharedBoards from "../lib/hooks/useFetchFsSharedBoards";
 import useFetchFsUsers from "../lib/hooks/useFetchFsUsers";
 import toast from "react-hot-toast";
-import { BoardSchema, SharedBoardRef } from "../lib/types";
+import {
+  BoardSchema,
+  ColumnSchema,
+  SharedBoardRef,
+  UserSchema,
+} from "../lib/types";
 
 const Home: NextPage = () => {
   const user = useContext(UserContext);
-  // ** How could I change "users" & "boards" type from "DocumentData[] | undefined" (coming from
-  // ** useCollectionData hook) to "UserSchema[] | undefined" "BoardSchema[] | undefined" respectively?
-  const users: any = useFetchFsUsers(); // *TypeScript* HACKED
-  const boards: any = useFetchFsBoards(user?.uid); // Personal Boards // *TypeScript*
-  const sharedBoards: any = useFetchFsSharedBoards(); // Boards are fetched from the *owner's* Firebase doc path
-  const allBoards: any = boards?.concat(sharedBoards); // *TypeScript* why "BoardSchema[]" throws errors + why "BoardSchema" doesn't?
+
+  const users = useFetchFsUsers(); // *TypeScript* HACKED
+  const boards = useFetchFsBoards(user?.uid); // Personal Boards // *TypeScript*
+  const sharedBoards = useFetchFsSharedBoards(); // Boards are fetched from the *owner's* Firebase doc path
+  const allBoards = boards?.concat(sharedBoards); // *TypeScript* why "BoardSchema[]" throws errors + why "BoardSchema" doesn't?
 
   // ** STATES
   const [showAddTaskModal, setShowAddTaskModal] = useState(false);
@@ -74,7 +78,7 @@ const Home: NextPage = () => {
   }, [boards, sharedBoards]);
 
   // ** Do these hooks re-fetch *all* the documents on each re-render (not just the new/updated ones)?
-  const columns: any = useFetchFsColumns(activeBoardId, users); // *TypeScript*
+  const columns = useFetchFsColumns(activeBoardId, users); // *TypeScript*
   const tasks: any = useFetchFsTasks(activeBoardId, users); // *TypeScript*
 
   const updateBoardName = async (uid: string, newName: string) => {
@@ -85,12 +89,13 @@ const Home: NextPage = () => {
       // Updating shared Board Name
       // Finding Current User (Invitee) Firebase Doc
       const currentUser = users?.find(
-        (currentUser: any) => currentUser.uid === user?.uid
+        (currentUser: UserSchema) => currentUser?.uid === user?.uid
       );
 
       // Find User Id (Inviter) of the Shared Board
       const sharedBoardRef = currentUser?.sharedBoardRefs?.find(
-        (board: any) => board?.board === activeBoardId
+        (sharedBoardRef: SharedBoardRef) =>
+          sharedBoardRef?.board === activeBoardId
       );
       boardDocRef = doc(db, "users", `${sharedBoardRef?.user}`, "boards", uid);
     } else {
@@ -125,9 +130,9 @@ const Home: NextPage = () => {
 
     // 2. Delete Columns in the Board
     const columnsToDelete = columns?.filter(
-      (column: any) => column?.board === activeBoardId
+      (column: ColumnSchema) => column?.board === activeBoardId
     );
-    columnsToDelete?.map((column: any) => {
+    columnsToDelete?.map((column: ColumnSchema) => {
       const columnDocRef = doc(
         db,
         "users",
@@ -139,7 +144,9 @@ const Home: NextPage = () => {
     });
 
     // 3. Decrement indexes of Boards that come after deleted Board
-    boards?.map((board: any) => {
+    boards?.map((board: BoardSchema) => {
+      if (board?.index === undefined || activeBoard?.index === undefined)
+        return;
       if (board?.index <= activeBoard?.index) return;
       const boardDocRef = doc(
         db,
@@ -152,10 +159,10 @@ const Home: NextPage = () => {
     });
 
     // 4. Delete Board reference from sharedBoardRefs array for every invitee (if there are invitees)
-    users?.map((user: any) => {
+    users?.map((user: UserSchema) => {
       // *TypeScript* why can't "user" type be "UserSchema"?
       user?.sharedBoardRefs?.map((sharedBoardRef: SharedBoardRef) => {
-        if (!sharedBoardRef?.board.includes(activeBoard?.uid)) return;
+        if (!sharedBoardRef?.board.includes(activeBoard?.uid || "")) return;
 
         const filteredSharedBoardRefs = user?.sharedBoardRefs?.filter(
           (sharedBoardRef: SharedBoardRef) =>

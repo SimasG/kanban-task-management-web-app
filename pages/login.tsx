@@ -3,8 +3,9 @@ import { doc, serverTimestamp, setDoc, writeBatch } from "firebase/firestore";
 import toast from "react-hot-toast";
 import { FcGoogle } from "react-icons/fc";
 import { auth, db } from "../lib/firebase";
+import { UserSchema } from "../lib/types";
 
-const Login = (users: any) => {
+const Login = ({ users }: { users: UserSchema[] }) => {
   const handleGoogleLogin = () => {
     const provider = new GoogleAuthProvider();
     signInWithPopup(auth, provider)
@@ -13,8 +14,8 @@ const Login = (users: any) => {
         const user = result.user;
 
         // Finding userDoc of the user with the specified email
-        const userDoc = users?.users?.find(
-          (existingUser: any) => existingUser?.email === user?.email
+        const userDoc = users?.find(
+          (existingUser: UserSchema) => existingUser?.email === user?.email
         );
 
         // ** If an *active* existing user signs in

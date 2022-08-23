@@ -386,7 +386,7 @@ const Main = ({
             (task: TaskSchema) => task?.status === sourceColumn?.status
           );
 
-          sourceColumnTasks?.map((task: any) => {
+          sourceColumnTasks?.map((task: TaskSchema) => {
             if (task.index > sourceIndex) {
               if (task.uid === draggedTaskId) return;
               const taskDocRef = doc(
@@ -404,7 +404,7 @@ const Main = ({
           const destinationColumnTasks = tasks?.filter(
             (task: TaskSchema) => task?.status === destinationColumn?.status
           );
-          destinationColumnTasks?.map((task: any) => {
+          destinationColumnTasks?.map((task: TaskSchema) => {
             // |task.index reflects the Tasks' indexes before being updated with the dragged Task.
             // That's why the Task index at task.index === destinationIndex should still be incremented.
             if (task.index >= destinationIndex) {
@@ -471,7 +471,7 @@ const Main = ({
           const destinationColumnTasks = tasks?.filter(
             (task: TaskSchema) => task?.status === destinationColumn?.status
           );
-          destinationColumnTasks?.map((task: any) => {
+          destinationColumnTasks?.map((task: TaskSchema) => {
             // |task.index reflects the Tasks' indexes before being updated with the dragged Task.
             // That's why the Task index at task.index === destinationIndex should still be incremented.
             if (task.index >= destinationIndex) {

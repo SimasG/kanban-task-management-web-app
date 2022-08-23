@@ -1,35 +1,41 @@
 import { FieldValue } from "firebase/firestore";
 
-export type UserSchema = {
-  find(arg0: (user: UserSchema) => boolean): any;
-  createdAt: FieldValue;
-  email: string;
-  isActive: boolean;
-  photoURL: string;
-  sharedBoardRefs: SharedBoardRef[];
-  uid: string;
-};
+export type UserSchema =
+  | {
+      find(arg0: (user: UserSchema) => boolean): any;
+      createdAt: FieldValue;
+      email: string;
+      isActive: boolean;
+      photoURL: string;
+      sharedBoardRefs: SharedBoardRef[];
+      uid: string;
+    }
+  | undefined;
 
-export type BoardSchema = {
-  find(arg0: (board: BoardSchema) => boolean): any;
-  collaborators: string[];
-  createdAt: FieldValue;
-  index: number;
-  title: string;
-  uid: string;
-};
+export type BoardSchema =
+  | {
+      find(arg0: (board: BoardSchema) => boolean): any;
+      collaborators: string[];
+      createdAt: FieldValue;
+      index: number;
+      title: string;
+      uid: string;
+    }
+  | undefined;
 
-export type ColumnSchema = {
-  board: string;
-  color: string;
-  index: number;
-  status: number;
-  title: string;
-  uid: string;
-};
+export type ColumnSchema =
+  | {
+      board: string;
+      color: string;
+      index: number;
+      status: number;
+      title: string;
+      uid: string;
+    }
+  | undefined;
 
 export type TaskSchema = {
-  filter(arg0: (task: any) => boolean): TaskSchema[];
+  filter(arg0: (task: TaskSchema) => boolean): TaskSchema[];
   board: string;
   column: string;
   createdAt: FieldValue;
@@ -42,7 +48,7 @@ export type TaskSchema = {
 };
 
 export type FormikValuesSchema = {
-  filter(arg0: (task: any) => boolean): FormikValuesSchema[];
+  filter(arg0: (task: TaskSchema) => boolean): FormikValuesSchema[];
   board: string;
   column: string;
   createdAt: FieldValue;
@@ -74,7 +80,7 @@ export type initialValuesProps = {
   title: string;
   description: string;
   subtasks: SubtaskSchema[];
-  status: number | undefined;
+  status: string | undefined;
   index: number | undefined;
 };
 

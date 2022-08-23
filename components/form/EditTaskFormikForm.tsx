@@ -1,4 +1,4 @@
-import { ErrorMessage, Field, FieldArray, Form } from "formik";
+import { ErrorMessage, Field, FieldArray, Form, FormikProps } from "formik";
 import FormikControl from "./FormikControl";
 import { v4 as uuidv4 } from "uuid";
 import { doc, increment, writeBatch } from "firebase/firestore";
@@ -9,6 +9,7 @@ import toast from "react-hot-toast";
 import { Checkbox } from "@mantine/core";
 import {
   ColumnSchema,
+  initialValuesProps,
   SharedBoardRef,
   SubtaskSchema,
   TaskSchema,
@@ -20,7 +21,7 @@ type IndexProps = {
   taskId: string | null | undefined;
   setShowEditTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
   tasks: TaskSchema[];
-  formik: any;
+  formik: FormikProps<initialValuesProps>;
   columns: ColumnSchema[];
   sharedBoardIds: (string | null | undefined)[];
   users: UserSchema[];
@@ -49,7 +50,7 @@ const FormikForm = ({
     });
   });
 
-  const { initialValues, values }: any = formik;
+  const { initialValues, values } = formik;
 
   // Identifying source Column id, from which the Task should be removed
   const sourceColumn = columns?.find(
