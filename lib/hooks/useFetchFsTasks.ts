@@ -9,7 +9,7 @@ import { useContext } from "react";
 import { useCollectionData } from "react-firebase-hooks/firestore";
 import { UserContext } from "../context";
 import { db } from "../firebase";
-import { SharedBoardRef, UserSchema } from "../types";
+import { SharedBoardRef, TaskSchema, UserSchema } from "../types";
 
 const useFetchFsTasks = (
   activeBoardId: string | null | undefined,
@@ -60,12 +60,10 @@ const useFetchFsTasks = (
 
   const tasks = useCollectionData(q)[0];
 
-  const indexSortedTasks = tasks?.sort((a, b) => a.index - b.index);
+  const indexSortedTasks = tasks?.sort((a, b) => a?.index - b?.index);
   const statusIndexSortedTasks = indexSortedTasks?.sort(
-    (a, b) => a.status - b.status
-  );
-
-  // console.log("freshly fetched tasks:", statusIndexSortedTasks);
+    (a, b) => a?.status - b?.status
+  ) as TaskSchema[] | undefined;
 
   return statusIndexSortedTasks;
 };

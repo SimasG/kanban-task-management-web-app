@@ -32,7 +32,7 @@ type MainProps = {
   setShowAddTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
   setShowEditTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
   updateBoardName: (uid: string, newName: string) => Promise<void>;
-  columns: ColumnSchema[]; // *TypeScript* Why am I not getting an error here, as with "tasks"?
+  columns: ColumnSchema[] | undefined; // *TypeScript* Why am I not getting an error here, as with "tasks"?
   isOpen: boolean;
   setShowShareModal: React.Dispatch<React.SetStateAction<boolean>>;
   sharedBoardIds: (string | null | undefined)[];
@@ -82,7 +82,7 @@ const Main = ({
       newColumns?.splice(destination.index, 0, add);
       // Updating DB state
       updateColumnsIndex(
-        newColumns[destination.index].uid,
+        newColumns?.[destination.index]?.uid || "",
         source.index,
         destination.index
       );
@@ -138,9 +138,13 @@ const Main = ({
       const batch = writeBatch(db);
       // 1. Updating the indexes of affected Columns
       columns?.map((column: ColumnSchema) => {
-        if (column.uid === draggedColumnId) return;
+        if (column?.uid === draggedColumnId) return;
         if (destinationIndex > sourceIndex) {
-          if (column.index > sourceIndex && column.index <= destinationIndex) {
+          if (column?.index === undefined) return;
+          if (
+            column?.index > sourceIndex &&
+            column?.index <= destinationIndex
+          ) {
             const columnDocRef = doc(
               db,
               "users",

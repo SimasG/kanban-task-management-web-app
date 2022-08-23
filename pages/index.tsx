@@ -35,9 +35,9 @@ const Home: NextPage = () => {
   const user = useContext(UserContext);
 
   const users = useFetchFsUsers(); // *TypeScript* HACKED
-  const boards = useFetchFsBoards(user?.uid); // Personal Boards // *TypeScript*
+  const boards = useFetchFsBoards(user?.uid); // Personal Boards
   const sharedBoards = useFetchFsSharedBoards(); // Boards are fetched from the *owner's* Firebase doc path
-  const allBoards = boards?.concat(sharedBoards); // *TypeScript* why "BoardSchema[]" throws errors + why "BoardSchema" doesn't?
+  const allBoards = [...(boards || []), ...(sharedBoards || [])];
 
   // ** STATES
   const [showAddTaskModal, setShowAddTaskModal] = useState(false);
@@ -78,8 +78,8 @@ const Home: NextPage = () => {
   }, [boards, sharedBoards]);
 
   // ** Do these hooks re-fetch *all* the documents on each re-render (not just the new/updated ones)?
-  const columns = useFetchFsColumns(activeBoardId, users); // *TypeScript*
-  const tasks: any = useFetchFsTasks(activeBoardId, users); // *TypeScript*
+  const columns = useFetchFsColumns(activeBoardId, users);
+  const tasks = useFetchFsTasks(activeBoardId, users);
 
   const updateBoardName = async (uid: string, newName: string) => {
     if (newName === "") return;

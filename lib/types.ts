@@ -34,18 +34,20 @@ export type ColumnSchema =
     }
   | undefined;
 
-export type TaskSchema = {
-  filter(arg0: (task: TaskSchema) => boolean): TaskSchema[];
-  board: string;
-  column: string;
-  createdAt: FieldValue;
-  description: string;
-  index: number;
-  status: number;
-  subtasks: SubtaskSchema[];
-  title: string;
-  uid: string;
-};
+export type TaskSchema =
+  | {
+      filter(arg0: (task: TaskSchema) => boolean): TaskSchema[];
+      board: string;
+      column: string;
+      createdAt: FieldValue;
+      description: string;
+      index: number;
+      status: number;
+      subtasks: SubtaskSchema[];
+      title: string;
+      uid: string;
+    }
+  | undefined;
 
 export type FormikValuesSchema = {
   filter(arg0: (task: TaskSchema) => boolean): FormikValuesSchema[];

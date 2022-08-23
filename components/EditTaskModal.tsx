@@ -26,8 +26,8 @@ type IndexProps = {
   activeBoardId: string | null | undefined;
   taskId: string | null | undefined;
   setShowEditTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
-  tasks: TaskSchema[];
-  columns: ColumnSchema[];
+  tasks: TaskSchema[] | undefined;
+  columns: ColumnSchema[] | undefined;
   sharedBoardIds: (string | null | undefined)[];
   users: UserSchema[];
 };
