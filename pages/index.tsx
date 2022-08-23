@@ -1,3 +1,5 @@
+import type { NextPage } from "next";
+import React, { useContext, useEffect, useState } from "react";
 import {
   doc,
   DocumentData,
@@ -6,8 +8,7 @@ import {
   updateDoc,
   writeBatch,
 } from "firebase/firestore";
-import type { NextPage } from "next";
-import React, { useContext, useEffect, useState } from "react";
+import Login from "./login";
 import AddNewTaskModal from "../components/AddNewTaskModal";
 import EditTaskModal from "../components/EditTaskModal";
 import EditCollaboratorsModal from "../components/EditCollaboratorsModal";
@@ -16,27 +17,29 @@ import ShareModal from "../components/ShareModal";
 import SideNav from "../components/SideNav";
 import { UserContext } from "../lib/context";
 import { db } from "../lib/firebase";
-import useFetchFsBoards from "../lib/hooks/useFetchFsBoards";
-import useFetchFsColumns from "../lib/hooks/useFetchFsColumns";
-import useFetchFsTasks from "../lib/hooks/useFetchFsTasks";
-import Login from "./login";
+// import useFetchUsers from "../lib/hooks/useFetchUsers";
+import useFetchUser from "../lib/hooks/useFetchUser";
+import useFetchBoards from "../lib/hooks/useFetchBoards";
+import useFetchSharedBoards from "../lib/hooks/useFetchSharedBoards";
+import useFetchColumns from "../lib/hooks/useFetchColumns";
+import useFetchTasks from "../lib/hooks/useFetchTasks";
 import { PropagateLoader } from "react-spinners";
-import useFetchFsSharedBoards from "../lib/hooks/useFetchFsSharedBoards";
-import useFetchFsUsers from "../lib/hooks/useFetchFsUsers";
 import toast from "react-hot-toast";
 import {
   BoardSchema,
   ColumnSchema,
   SharedBoardRef,
+  TaskSchema,
   UserSchema,
 } from "../lib/types";
 
 const Home: NextPage = () => {
   const user = useContext(UserContext);
 
-  const users = useFetchFsUsers(); // *TypeScript* HACKED
-  const boards = useFetchFsBoards(user?.uid); // Personal Boards
-  const sharedBoards = useFetchFsSharedBoards(); // Boards are fetched from the *owner's* Firebase doc path
+  // const users = useFetchUsers(); // *TypeScript* HACKED
+  const currentUserDoc = useFetchUser(user?.email || ""); // Current user doc
+  const boards = useFetchBoards(user?.uid); // Personal Boards
+  const sharedBoards = useFetchSharedBoards(); // Boards are fetched from the *owner's* Firebase doc path
   const allBoards = [...(boards || []), ...(sharedBoards || [])];
 
   // ** STATES
@@ -78,14 +81,15 @@ const Home: NextPage = () => {
   }, [boards, sharedBoards]);
 
   // ** Do these hooks re-fetch *all* the documents on each re-render (not just the new/updated ones)?
-  const columns = useFetchFsColumns(activeBoardId, users);
-  const tasksDB = useFetchFsTasks(activeBoardId, users);
+  const columns = useFetchColumns(activeBoardId, currentUserDoc);
+  console.log("columns:", columns);
+  const tasksDB = useFetchTasks(activeBoardId, currentUserDoc);
 
-  const [tasks, setTasks] = useState<any>([]);
+  // const [tasks, setTasks] = useState<TaskSchema[] | undefined>([]);
 
-  useEffect(() => {
-    setTasks(tasksDB);
-  }, [tasksDB]);
+  // useEffect(() => {
+  //   setTasks(tasksDB);
+  // }, [tasksDB]);
 
   const updateBoardName = async (uid: string | undefined, newName: string) => {
     if (newName === "") return;
@@ -122,7 +126,7 @@ const Home: NextPage = () => {
 
   let handleDeleteBoard: (
     activeBoardId: string | null | undefined
-  ) => Promise<void>; // *TypeScript* is there a way to export this type declaration instead of writing it here?
+  ) => Promise<void>;
   handleDeleteBoard = async (activeBoardId: string | null | undefined) => {
     const batch = writeBatch(db);
     // 1. Delete Board

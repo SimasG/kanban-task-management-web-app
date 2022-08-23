@@ -4,7 +4,7 @@ import { db } from "../firebase";
 import { BoardSchema } from "../types";
 
 // WHen is uid null?
-const useFetchFsBoards = (uid: string | null | undefined) => {
+const useFetchBoards = (uid: string | null | undefined) => {
   const q = query(
     collection(db, "users", `${uid}`, "boards"),
     orderBy("index", "asc")
@@ -17,4 +17,4 @@ const useFetchFsBoards = (uid: string | null | undefined) => {
   return data;
 };
 
-export default useFetchFsBoards;
+export default useFetchBoards;

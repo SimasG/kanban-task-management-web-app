@@ -3,7 +3,7 @@ import { useCollectionData } from "react-firebase-hooks/firestore";
 import { db } from "../firebase";
 import { UserSchema } from "../types";
 
-const useFetchFsUsers = () => {
+const useFetchUsers = () => {
   // Fetch Users Collection
   const q = query(collection(db, "users"));
 
@@ -12,4 +12,4 @@ const useFetchFsUsers = () => {
   return users;
 };
 
-export default useFetchFsUsers;
+export default useFetchUsers;

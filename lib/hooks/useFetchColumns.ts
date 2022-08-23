@@ -11,28 +11,28 @@ import { UserContext } from "../context";
 import { db } from "../firebase";
 import { ColumnSchema, SharedBoardRef, UserSchema } from "../types";
 
-const useFetchFsColumns = (
+const useFetchColumns = (
   activeBoardId: string | null | undefined,
-  users: UserSchema[] | undefined
+  currentUserDoc: UserSchema
 ) => {
   // User Object
   const user = useContext(UserContext);
 
-  // Finding Current User Firebase Doc
-  const currentUser = users?.find(
-    (currentUser) => currentUser?.uid === user?.uid
-  );
+  // // Finding Current User Firebase Doc
+  // const currentUser = users?.find(
+  //   (currentUser) => currentUser?.uid === user?.uid
+  // );
 
   let sharedBoardIds: (string | null | undefined)[] = [];
-  currentUser?.sharedBoardRefs?.map((board) =>
-    sharedBoardIds.push(board?.board)
+  currentUserDoc?.sharedBoardRefs?.map((sharedBoardRef: SharedBoardRef) =>
+    sharedBoardIds.push(sharedBoardRef?.board)
   );
 
   let q: Query<DocumentData>;
 
   if (sharedBoardIds.includes(activeBoardId)) {
     // Fetch Columns from a shared Board
-    const sharedBoardRef = currentUser?.sharedBoardRefs?.find(
+    const sharedBoardRef = currentUserDoc?.sharedBoardRefs?.find(
       (board: SharedBoardRef) => board?.board === activeBoardId
     );
     const columnsCollectionRef = collection(
@@ -53,10 +53,11 @@ const useFetchFsColumns = (
     q = query(columnsCollectionRef, where("board", "==", `${activeBoardId}`));
   }
 
-  const columnData = useCollectionData(q)[0] as ColumnSchema[] | undefined;
-  const sortedColumnData = columnData?.sort((a, b) => a.index - b.index);
+  const columnData = useCollectionData(q)[0];
+  const sortedColumnData = columnData?.sort((a, b) => a?.index - b?.index) as
+    | ColumnSchema[];
 
   return sortedColumnData;
 };
 
-export default useFetchFsColumns;
+export default useFetchColumns;

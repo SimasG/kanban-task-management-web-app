@@ -5,7 +5,7 @@ import { UserContext } from "../context";
 import { db } from "../firebase";
 import { BoardSchema } from "../types";
 
-const useFetchFsSharedBoards = () => {
+const useFetchSharedBoards = () => {
   const user = useContext(UserContext);
 
   const sharedBoardsQuery = query(
@@ -20,4 +20,4 @@ const useFetchFsSharedBoards = () => {
   return data;
 };
 
-export default useFetchFsSharedBoards;
+export default useFetchSharedBoards;
