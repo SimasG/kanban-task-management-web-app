@@ -35,7 +35,7 @@ type SideNavProps = {
   setActiveBoardId: React.Dispatch<
     React.SetStateAction<string | null | undefined>
   >;
-  updateBoardName: (uid: string, newName: string) => Promise<void>;
+  updateBoardName: (uid: string | undefined, newName: string) => Promise<void>;
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
   sharedBoards: BoardSchema[];
@@ -118,7 +118,7 @@ const SideNav = ({
       newBoards.splice(destination.index, 0, add);
       // Reflecting UI changes in Firestore
       updateBoardsIndex(
-        newBoards[destination.index].uid,
+        newBoards?.[destination.index]?.uid || "",
         source.index,
         destination.index
       );
@@ -142,8 +142,9 @@ const SideNav = ({
 
     // ** Changing indexes of Boards affected
     boards?.map((board: BoardSchema) => {
-      if (board.uid === activeBoardId) return;
+      if (board?.uid === activeBoardId) return;
       if (destinationIndex > sourceIndex) {
+        if (board?.index === undefined) return;
         // Decrement Boards
         if (board.index > sourceIndex && board.index <= destinationIndex) {
           // DECREMENT THE INDEX OF EACH BOARD THAT FITS THIS CRITERIA
@@ -157,6 +158,7 @@ const SideNav = ({
           batch.update(boardDocRef, { index: increment(-1) });
         }
       } else if (destinationIndex < sourceIndex) {
+        if (board?.index === undefined) return;
         // Increment Boards
         if (board.index < sourceIndex && board.index >= destinationIndex) {
           // INCREMENT THE INDEX OF EACH BOARD THAT FITS THIS CRITERIA
@@ -224,7 +226,7 @@ const SideNav = ({
         sharedBoardRef?.board === activeBoardId
     );
 
-    const filteredCollaborators = activeBoard.collaborators?.filter(
+    const filteredCollaborators = activeBoard?.collaborators?.filter(
       (collaborator: string) => collaborator !== user?.email
     );
 
@@ -241,7 +243,7 @@ const SideNav = ({
     });
 
     await batch.commit();
-    toast.success(`Left ${activeBoard.title}`);
+    toast.success(`Left ${activeBoard?.title}`);
   };
 
   return (
@@ -302,8 +304,8 @@ const SideNav = ({
                                 (board: BoardSchema, index: number) => {
                                   return (
                                     <Draggable
-                                      key={board.uid}
-                                      draggableId={board.uid}
+                                      key={board?.uid}
+                                      draggableId={board?.uid || ""}
                                       index={index}
                                     >
                                       {(provided, snapshot) => {
@@ -311,14 +313,14 @@ const SideNav = ({
                                           // Single Board
                                           <div
                                             onClick={() => {
-                                              setActiveBoardId(board.uid);
+                                              setActiveBoardId(board?.uid);
                                             }}
                                             ref={provided.innerRef}
                                             {...provided.draggableProps}
                                             {...provided.dragHandleProps}
                                             // hover:static hover:z-[-1]
                                             className={`board rounded-r-full ${
-                                              board.uid === activeBoardId
+                                              board?.uid === activeBoardId
                                                 ? snapshot.isDragging
                                                   ? " bg-fontTertiary bg-opacity-60 select-none text-fontPrimaryDark drop-shadow-lg hover:drop-shadow-xl"
                                                   : " bg-fontTertiary text-fontPrimaryDark opacity-100 drop-shadow-lg hover:drop-shadow-xl"
@@ -329,10 +331,10 @@ const SideNav = ({
                                             <input
                                               className="bg-transparent cursor-pointer outline-none w-[80%] grow"
                                               type="text"
-                                              value={board.title}
+                                              value={board?.title}
                                               onChange={(e) => {
                                                 updateBoardName(
-                                                  board.uid,
+                                                  board?.uid,
                                                   e.target.value
                                                 );
                                               }}
@@ -342,19 +344,20 @@ const SideNav = ({
                                                 <BsThreeDots className="shrink-0 w-6 h-6 p-1 hover:bg-[#7c78d2] rounded cursor-pointer" />
                                               </Popover.Target>
                                               <Popover.Dropdown className="top-12 right-0 z-[9999] w-[185px]">
-                                                {board?.collaborators?.length >
-                                                  0 && (
-                                                  <button
-                                                    className="w-[100%] text-left hover:bg-[#eef2f7] cursor-pointer block p-2 text-fontPrimary"
-                                                    onClick={() =>
-                                                      setShowEditCollabsModal(
-                                                        true
-                                                      )
-                                                    }
-                                                  >
-                                                    Remove Collaborators
-                                                  </button>
-                                                )}
+                                                {board?.collaborators.length &&
+                                                  board.collaborators.length >
+                                                    0 && (
+                                                    <button
+                                                      className="w-[100%] text-left hover:bg-[#eef2f7] cursor-pointer block p-2 text-fontPrimary"
+                                                      onClick={() =>
+                                                        setShowEditCollabsModal(
+                                                          true
+                                                        )
+                                                      }
+                                                    >
+                                                      Remove Collaborators
+                                                    </button>
+                                                  )}
                                                 <button
                                                   className="w-[100%] text-left hover:bg-[#eef2f7] cursor-pointer block p-2 text-fontPrimary"
                                                   onClick={() => {

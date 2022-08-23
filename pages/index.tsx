@@ -81,7 +81,7 @@ const Home: NextPage = () => {
   const columns = useFetchFsColumns(activeBoardId, users);
   const tasks = useFetchFsTasks(activeBoardId, users);
 
-  const updateBoardName = async (uid: string, newName: string) => {
+  const updateBoardName = async (uid: string | undefined, newName: string) => {
     if (newName === "") return;
     let boardDocRef: DocumentReference<DocumentData>; // *TypeScript* Should I even include "<DocumentData>"?
 
@@ -97,10 +97,16 @@ const Home: NextPage = () => {
         (sharedBoardRef: SharedBoardRef) =>
           sharedBoardRef?.board === activeBoardId
       );
-      boardDocRef = doc(db, "users", `${sharedBoardRef?.user}`, "boards", uid);
+      boardDocRef = doc(
+        db,
+        "users",
+        `${sharedBoardRef?.user}`,
+        "boards",
+        `${uid}`
+      );
     } else {
       // Updating personal Board Name
-      boardDocRef = doc(db, "users", `${user?.uid}`, "boards", uid);
+      boardDocRef = doc(db, "users", `${user?.uid}`, "boards", `${uid}`);
     }
 
     await updateDoc(boardDocRef, {
