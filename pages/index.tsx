@@ -79,7 +79,13 @@ const Home: NextPage = () => {
 
   // ** Do these hooks re-fetch *all* the documents on each re-render (not just the new/updated ones)?
   const columns = useFetchFsColumns(activeBoardId, users);
-  const tasks = useFetchFsTasks(activeBoardId, users);
+  const tasksDB = useFetchFsTasks(activeBoardId, users);
+
+  const [tasks, setTasks] = useState<any>([]);
+
+  useEffect(() => {
+    setTasks(tasksDB);
+  }, [tasksDB]);
 
   const updateBoardName = async (uid: string | undefined, newName: string) => {
     if (newName === "") return;
@@ -222,6 +228,7 @@ const Home: NextPage = () => {
               activeBoard={activeBoard}
               activeBoardId={activeBoardId}
               tasks={tasks}
+              setTasks={setTasks}
               setTaskId={setTaskId}
               setShowAddTaskModal={setShowAddTaskModal}
               setShowEditTaskModal={setShowEditTaskModal}

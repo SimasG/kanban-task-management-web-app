@@ -47,6 +47,7 @@ const Main = ({
   activeBoard,
   activeBoardId,
   tasks,
+  setTasks,
   setTaskId,
   setShowAddTaskModal,
   setShowEditTaskModal,
@@ -69,6 +70,7 @@ const Main = ({
       destination.droppableId === source.droppableId
     )
       return;
+
     console.log("onDragEnd ran successfully:", result);
 
     // Column DnD logic

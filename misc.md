@@ -2797,3 +2797,11 @@ setSubmitting(true);
 // title: string;
 // uid: string;
 // };
+
+const tasksDB: any = useFetchFsTasks(activeBoardId, users); // _TypeScript_
+
+const [tasks, setTasks] = useState<any>([]);
+
+useEffect(() => {
+setTasks(tasksDB);
+}, [tasksDB]);
