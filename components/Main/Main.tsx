@@ -47,7 +47,6 @@ const Main = ({
   activeBoard,
   activeBoardId,
   tasks,
-  setTasks,
   setTaskId,
   setShowAddTaskModal,
   setShowEditTaskModal,

@@ -228,7 +228,6 @@ const Home: NextPage = () => {
               activeBoard={activeBoard}
               activeBoardId={activeBoardId}
               tasks={tasks}
-              setTasks={setTasks}
               setTaskId={setTaskId}
               setShowAddTaskModal={setShowAddTaskModal}
               setShowEditTaskModal={setShowEditTaskModal}

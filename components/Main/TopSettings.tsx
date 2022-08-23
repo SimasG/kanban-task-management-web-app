@@ -60,10 +60,9 @@ const TopSettings = ({
       {allBoards?.length > 0 && (
         <div className="flex justify-center items-center gap-1 sm:gap-2 md:gap-3 lg:gap-4">
           {/* Displaying Collaborators */}
-          {activeBoard?.collaborators.length &&
-            activeBoard.collaborators.length > 0 && (
-              <Collaborators activeBoard={activeBoard} users={users} />
-            )}
+          {activeBoard?.collaborators.length > 0 && (
+            <Collaborators activeBoard={activeBoard} users={users} />
+          )}
           {/* Desktop Add New Task Btn */}
           <button
             onClick={(e) => {

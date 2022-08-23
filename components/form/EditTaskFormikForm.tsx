@@ -21,7 +21,7 @@ type IndexProps = {
   taskId: string | null | undefined;
   setShowEditTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
   tasks: TaskSchema[] | undefined;
-  formik: FormikProps<initialValuesProps>;
+  formik: FormikProps<any>;
   columns: ColumnSchema[] | undefined;
   sharedBoardIds: (string | null | undefined)[];
   users: UserSchema[];
@@ -108,8 +108,8 @@ const FormikForm = ({
       batch.delete(taskRef);
 
       // Decrement indexes of Tasks that came after the deleted Task
-      selectedColumnTasks.map((task: TaskSchema) => {
-        if (task?.index <= initialValues?.index) return;
+      selectedColumnTasks?.map((task: TaskSchema) => {
+        if (task?.index && task.index <= initialValues?.index) return;
         const taskDocRef = doc(
           db,
           "users",
@@ -143,6 +143,7 @@ const FormikForm = ({
                   name="title"
                   className="text-fontPrimary dark:text-fontPrimaryDark bg-transparent py-2 px-3 outline-0 text-lg font-bold"
                 />
+                {/* @ts-ignore */}
                 <ErrorMessage
                   name="title"
                   component="p"
@@ -174,6 +175,7 @@ const FormikForm = ({
                 name="description"
                 className="bg-transparent py-2 px-3 outline-0 opacity-60 resize-none w-full h-24 text-fontPrimary dark:text-fontPrimaryDark"
               />
+              {/* @ts-ignore */}
               <ErrorMessage
                 name="description"
                 component="p"
@@ -181,6 +183,7 @@ const FormikForm = ({
               />
             </div>
             {/* Subtask Container */}
+            {/* @ts-ignore */}
             <FieldArray name="subtasks">
               {(fieldArrayProps) => {
                 const { push, remove, form } = fieldArrayProps;
@@ -240,6 +243,7 @@ const FormikForm = ({
                               </svg>
                             </button>
                           </div>
+                          {/* @ts-ignore */}
                           <ErrorMessage
                             name={`subtasks[${index}].title`}
                             component="p"
