@@ -15,7 +15,7 @@ const Login = ({ users }: { users: UserSchema[] }) => {
 
         // Finding userDoc of the user with the specified email
         const userDoc = users?.find(
-          (existingUser: any) => existingUser?.email === user?.email
+          (existingUser: UserSchema) => existingUser?.email === user?.email
         );
 
         // ** If an *active* existing user signs in

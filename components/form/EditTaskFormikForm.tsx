@@ -50,7 +50,7 @@ const FormikForm = ({
     });
   });
 
-  const { initialValues, values }: any = formik;
+  const { initialValues, values } = formik;
 
   // Identifying source Column id, from which the Task should be removed
   const sourceColumn = columns?.find(

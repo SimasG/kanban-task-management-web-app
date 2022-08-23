@@ -12,14 +12,16 @@ export type UserSchema =
     }
   | undefined;
 
-export type BoardSchema = {
-  find(arg0: (board: BoardSchema) => boolean): any;
-  collaborators: string[];
-  createdAt: FieldValue;
-  index: number;
-  title: string;
-  uid: string;
-};
+export type BoardSchema =
+  | {
+      find(arg0: (board: BoardSchema) => boolean): any;
+      collaborators: string[];
+      createdAt: FieldValue;
+      index: number;
+      title: string;
+      uid: string;
+    }
+  | undefined;
 
 export type ColumnSchema =
   | {
@@ -33,7 +35,7 @@ export type ColumnSchema =
   | undefined;
 
 export type TaskSchema = {
-  filter(arg0: (task: any) => boolean): TaskSchema[];
+  filter(arg0: (task: TaskSchema) => boolean): TaskSchema[];
   board: string;
   column: string;
   createdAt: FieldValue;
@@ -46,7 +48,7 @@ export type TaskSchema = {
 };
 
 export type FormikValuesSchema = {
-  filter(arg0: (task: any) => boolean): FormikValuesSchema[];
+  filter(arg0: (task: TaskSchema) => boolean): FormikValuesSchema[];
   board: string;
   column: string;
   createdAt: FieldValue;

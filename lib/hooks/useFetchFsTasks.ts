@@ -1,9 +1,15 @@
-import { collection, DocumentData, query, where } from "firebase/firestore";
+import {
+  collection,
+  DocumentData,
+  Query,
+  query,
+  where,
+} from "firebase/firestore";
 import { useContext } from "react";
 import { useCollectionData } from "react-firebase-hooks/firestore";
 import { UserContext } from "../context";
 import { db } from "../firebase";
-import { UserSchema } from "../types";
+import { SharedBoardRef, UserSchema } from "../types";
 
 const useFetchFsTasks = (
   activeBoardId: string | null | undefined,
@@ -14,22 +20,23 @@ const useFetchFsTasks = (
 
   // Finding Current User Firebase Doc
   const currentUser = users?.find(
-    (currentUser: any) => currentUser.uid === user?.uid
+    (currentUser: UserSchema) => currentUser?.uid === user?.uid
   );
 
   // Utilising sharedBoardIds & sharedBoards (Boards current user has been invited to)
   // array to fetch the correct Tasks
-  let sharedBoardIds: any = [];
-  currentUser?.sharedBoardRefs?.map((board: any) =>
-    sharedBoardIds.push(board?.board)
+  let sharedBoardIds: (string | null | undefined)[] = [];
+  currentUser?.sharedBoardRefs?.map((sharedBoardRef: SharedBoardRef) =>
+    sharedBoardIds.push(sharedBoardRef?.board)
   );
 
-  let q: any;
+  let q: Query<DocumentData>;
 
   if (sharedBoardIds.includes(activeBoardId)) {
     // Fetching Tasks from shared Board
     const sharedBoardRef = currentUser?.sharedBoardRefs?.find(
-      (board: any) => board?.board === activeBoardId
+      (sharedBoardRef: SharedBoardRef) =>
+        sharedBoardRef?.board === activeBoardId
     );
     const columnsCollectionRef = collection(
       db,
@@ -53,9 +60,9 @@ const useFetchFsTasks = (
 
   const tasks = useCollectionData(q)[0];
 
-  const indexSortedTasks = tasks?.sort((a: any, b: any) => a.index - b.index);
+  const indexSortedTasks = tasks?.sort((a, b) => a.index - b.index);
   const statusIndexSortedTasks = indexSortedTasks?.sort(
-    (a: any, b: any) => a.status - b.status
+    (a, b) => a.status - b.status
   );
 
   // console.log("freshly fetched tasks:", statusIndexSortedTasks);

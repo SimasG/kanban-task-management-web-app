@@ -13,7 +13,6 @@ const Index = () => {
   const selectedBoard = boards?.find(
     (board: any) => board?.uid === router.query.activeBoardId
   );
-  console.log("selectedBoard:", selectedBoard);
 
   return <div>Board id: *will be implemented soon*</div>;
 };

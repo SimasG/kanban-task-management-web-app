@@ -289,7 +289,7 @@ const SideNav = ({
                   </h3>
                   {/* Personal Boards Subcontainer */}
                   <Droppable droppableId="personalBoards" type="personalBoards">
-                    {(provided: DroppableProvided, snapshot: any) => {
+                    {(provided: DroppableProvided) => {
                       return (
                         // ref allows react-beautiful-dnd to control the div
                         <div
@@ -298,83 +298,82 @@ const SideNav = ({
                           // className="overflow-auto"
                         >
                           {boards
-                            ? boards.map((board: any, index: number) => {
-                                return (
-                                  <Draggable
-                                    key={board.uid}
-                                    draggableId={board.uid}
-                                    index={index}
-                                  >
-                                    {(
-                                      provided: DraggableProvided,
-                                      snapshot: any
-                                    ) => {
-                                      return (
-                                        // Single Board
-                                        <div
-                                          onClick={() => {
-                                            setActiveBoardId(board.uid);
-                                          }}
-                                          ref={provided.innerRef}
-                                          {...provided.draggableProps}
-                                          {...provided.dragHandleProps}
-                                          // hover:static hover:z-[-1]
-                                          className={`board rounded-r-full ${
-                                            board.uid === activeBoardId
-                                              ? snapshot.isDragging
-                                                ? " bg-fontTertiary bg-opacity-60 select-none text-fontPrimaryDark drop-shadow-lg hover:drop-shadow-xl"
-                                                : " bg-fontTertiary text-fontPrimaryDark opacity-100 drop-shadow-lg hover:drop-shadow-xl"
-                                              : " active:bg-fontTertiary active:bg-opacity-60 active:text-fontPrimaryDark"
-                                          }}`}
-                                        >
-                                          <TbLayoutBoardSplit className="shrink-0" />
-                                          <input
-                                            className="bg-transparent cursor-pointer outline-none w-[80%] grow"
-                                            type="text"
-                                            value={board.title}
-                                            onChange={(e) => {
-                                              updateBoardName(
-                                                board.uid,
-                                                e.target.value
-                                              );
+                            ? boards.map(
+                                (board: BoardSchema, index: number) => {
+                                  return (
+                                    <Draggable
+                                      key={board.uid}
+                                      draggableId={board.uid}
+                                      index={index}
+                                    >
+                                      {(provided, snapshot) => {
+                                        return (
+                                          // Single Board
+                                          <div
+                                            onClick={() => {
+                                              setActiveBoardId(board.uid);
                                             }}
-                                          />
-                                          <Popover shadow="md">
-                                            <Popover.Target>
-                                              <BsThreeDots className="shrink-0 w-6 h-6 p-1 hover:bg-[#7c78d2] rounded cursor-pointer" />
-                                            </Popover.Target>
-                                            <Popover.Dropdown className="top-12 right-0 z-[9999] w-[185px]">
-                                              {board?.collaborators?.length >
-                                                0 && (
+                                            ref={provided.innerRef}
+                                            {...provided.draggableProps}
+                                            {...provided.dragHandleProps}
+                                            // hover:static hover:z-[-1]
+                                            className={`board rounded-r-full ${
+                                              board.uid === activeBoardId
+                                                ? snapshot.isDragging
+                                                  ? " bg-fontTertiary bg-opacity-60 select-none text-fontPrimaryDark drop-shadow-lg hover:drop-shadow-xl"
+                                                  : " bg-fontTertiary text-fontPrimaryDark opacity-100 drop-shadow-lg hover:drop-shadow-xl"
+                                                : " active:bg-fontTertiary active:bg-opacity-60 active:text-fontPrimaryDark"
+                                            }}`}
+                                          >
+                                            <TbLayoutBoardSplit className="shrink-0" />
+                                            <input
+                                              className="bg-transparent cursor-pointer outline-none w-[80%] grow"
+                                              type="text"
+                                              value={board.title}
+                                              onChange={(e) => {
+                                                updateBoardName(
+                                                  board.uid,
+                                                  e.target.value
+                                                );
+                                              }}
+                                            />
+                                            <Popover shadow="md">
+                                              <Popover.Target>
+                                                <BsThreeDots className="shrink-0 w-6 h-6 p-1 hover:bg-[#7c78d2] rounded cursor-pointer" />
+                                              </Popover.Target>
+                                              <Popover.Dropdown className="top-12 right-0 z-[9999] w-[185px]">
+                                                {board?.collaborators?.length >
+                                                  0 && (
+                                                  <button
+                                                    className="w-[100%] text-left hover:bg-[#eef2f7] cursor-pointer block p-2 text-fontPrimary"
+                                                    onClick={() =>
+                                                      setShowEditCollabsModal(
+                                                        true
+                                                      )
+                                                    }
+                                                  >
+                                                    Remove Collaborators
+                                                  </button>
+                                                )}
                                                 <button
                                                   className="w-[100%] text-left hover:bg-[#eef2f7] cursor-pointer block p-2 text-fontPrimary"
-                                                  onClick={() =>
-                                                    setShowEditCollabsModal(
-                                                      true
-                                                    )
-                                                  }
+                                                  onClick={() => {
+                                                    handleDeleteBoard(
+                                                      activeBoardId
+                                                    );
+                                                  }}
                                                 >
-                                                  Remove Collaborators
+                                                  Delete Board
                                                 </button>
-                                              )}
-                                              <button
-                                                className="w-[100%] text-left hover:bg-[#eef2f7] cursor-pointer block p-2 text-fontPrimary"
-                                                onClick={() => {
-                                                  handleDeleteBoard(
-                                                    activeBoardId
-                                                  );
-                                                }}
-                                              >
-                                                Delete Board
-                                              </button>
-                                            </Popover.Dropdown>
-                                          </Popover>
-                                        </div>
-                                      );
-                                    }}
-                                  </Draggable>
-                                );
-                              })
+                                              </Popover.Dropdown>
+                                            </Popover>
+                                          </div>
+                                        );
+                                      }}
+                                    </Draggable>
+                                  );
+                                }
+                              )
                             : "There is nothing bro :(!"}
                           {provided.placeholder}
                         </div>
@@ -397,7 +396,7 @@ const SideNav = ({
                       {`Shared Boards (${sharedBoards?.length})`}
                     </h3>
                     <Droppable droppableId="sharedBoards" type="sharedBoards">
-                      {(provided: DroppableProvided, snapshot: any) => {
+                      {(provided: DroppableProvided) => {
                         return (
                           // ref allows react-beautiful-dnd to control the div
                           <div
@@ -412,10 +411,7 @@ const SideNav = ({
                                   draggableId={board.uid}
                                   index={index}
                                 >
-                                  {(
-                                    provided: DraggableProvided,
-                                    snapshot: any
-                                  ) => {
+                                  {(provided, snapshot) => {
                                     return (
                                       // Single Board
                                       <div
