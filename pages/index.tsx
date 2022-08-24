@@ -157,7 +157,22 @@ const Home: NextPage = () => {
       batch.delete(columnDocRef);
     });
 
-    // 3. Decrement indexes of Boards that come after deleted Board
+    // 3. Delete Tasks in the Board
+    const tasksToDelete = tasks?.filter(
+      (task: TaskSchema) => task?.board === activeBoardId
+    );
+    tasksToDelete?.map((task: TaskSchema) => {
+      const taskDocRef = doc(
+        db,
+        "users",
+        `${user?.uid}`,
+        "tasks",
+        `${task?.uid}`
+      );
+      batch.delete(taskDocRef);
+    });
+
+    // 4. Decrement indexes of Boards that come after deleted Board
     boards?.map((board: BoardSchema) => {
       if (board?.index === undefined || activeBoard?.index === undefined)
         return;
@@ -172,7 +187,7 @@ const Home: NextPage = () => {
       batch.update(boardDocRef, { index: increment(-1) });
     });
 
-    // 4. Delete Board reference from sharedBoardRefs array for every invitee (if there are invitees)
+    // 5. Delete Board reference from sharedBoardRefs array for every invitee (if there are invitees)
     users?.map((user: UserSchema) => {
       user?.sharedBoardRefs?.map((sharedBoardRef: SharedBoardRef) => {
         if (!sharedBoardRef?.board.includes(activeBoard?.uid || "")) return;

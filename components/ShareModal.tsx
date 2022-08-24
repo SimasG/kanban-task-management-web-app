@@ -33,12 +33,6 @@ const ShareModal = ({
       (existingUser: UserSchema) => existingUser?.email === values?.email
     );
 
-    console.log("userDoc:", userDoc);
-    console.log(
-      "activeBoard?.collaborators.includes(values?.email):",
-      activeBoard?.collaborators.includes(values?.email)
-    );
-
     // ** Logic for active existing users OR passive invited users who've been invited to join >=1 Board before
     if (userDoc || activeBoard?.collaborators.includes(values?.email)) {
       console.log("Specified email is already in the database");

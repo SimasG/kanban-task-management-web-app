@@ -90,6 +90,11 @@ const Main = ({
     }
     // Task DnD logic
     else if (type === "task") {
+      // let add: TaskSchema;
+
+      // let newTasks = tasks;
+      // add = newTasks
+
       const draggedTask = tasks?.find(
         (task: TaskSchema) => task?.uid === draggableId
       );
