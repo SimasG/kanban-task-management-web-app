@@ -18,11 +18,11 @@ import SideNav from "../components/SideNav";
 import { UserContext } from "../lib/context";
 import { db } from "../lib/firebase";
 // import useFetchUsers from "../lib/hooks/useFetchUsers";
-import useFetchUser from "../lib/hooks/useFetchUser";
 import useFetchBoards from "../lib/hooks/useFetchBoards";
 import useFetchSharedBoards from "../lib/hooks/useFetchSharedBoards";
 import useFetchColumns from "../lib/hooks/useFetchColumns";
 import useFetchTasks from "../lib/hooks/useFetchTasks";
+import useFetchUsers from "../lib/hooks/useFetchUsers";
 import { PropagateLoader } from "react-spinners";
 import toast from "react-hot-toast";
 import {
@@ -36,8 +36,7 @@ import {
 const Home: NextPage = () => {
   const user = useContext(UserContext);
 
-  // const users = useFetchUsers(); // *TypeScript* HACKED
-  const currentUserDoc = useFetchUser(user?.email || ""); // Current user doc
+  const users = useFetchUsers(); // *TypeScript* HACKED
   const boards = useFetchBoards(user?.uid); // Personal Boards
   const sharedBoards = useFetchSharedBoards(); // Boards are fetched from the *owner's* Firebase doc path
   const allBoards = [...(boards || []), ...(sharedBoards || [])];
@@ -81,19 +80,18 @@ const Home: NextPage = () => {
   }, [boards, sharedBoards]);
 
   // ** Do these hooks re-fetch *all* the documents on each re-render (not just the new/updated ones)?
-  const columns = useFetchColumns(activeBoardId, currentUserDoc);
-  console.log("columns:", columns);
-  const tasksDB = useFetchTasks(activeBoardId, currentUserDoc);
+  const columns = useFetchColumns(activeBoardId, users);
+  const tasksDB = useFetchTasks(activeBoardId, users);
 
-  // const [tasks, setTasks] = useState<TaskSchema[] | undefined>([]);
+  const [tasks, setTasks] = useState<TaskSchema[] | undefined>([]);
 
-  // useEffect(() => {
-  //   setTasks(tasksDB);
-  // }, [tasksDB]);
+  useEffect(() => {
+    setTasks(tasksDB);
+  }, [tasksDB]);
 
   const updateBoardName = async (uid: string | undefined, newName: string) => {
     if (newName === "") return;
-    let boardDocRef: DocumentReference<DocumentData>; // *TypeScript* Should I even include "<DocumentData>"?
+    let boardDocRef: DocumentReference<DocumentData>;
 
     if (sharedBoardIds.includes(activeBoardId)) {
       // Updating shared Board Name
@@ -176,7 +174,6 @@ const Home: NextPage = () => {
 
     // 4. Delete Board reference from sharedBoardRefs array for every invitee (if there are invitees)
     users?.map((user: UserSchema) => {
-      // *TypeScript* why can't "user" type be "UserSchema"?
       user?.sharedBoardRefs?.map((sharedBoardRef: SharedBoardRef) => {
         if (!sharedBoardRef?.board.includes(activeBoard?.uid || "")) return;
 

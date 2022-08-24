@@ -69,7 +69,6 @@ const AddNewTaskModal = ({
     values: initialValuesProps,
     actions: FormikHelpers<initialValuesProps>
   ) => {
-    // *TypeScript* How do I get the "actions" type? It's fat and formik should provide it (they say they're TS-friendly)
     const { setSubmitting, resetForm } = actions;
 
     setSubmitting(true);

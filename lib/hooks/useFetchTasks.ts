@@ -13,20 +13,20 @@ import { SharedBoardRef, TaskSchema, UserSchema } from "../types";
 
 const useFetchTasks = (
   activeBoardId: string | null | undefined,
-  currentUserDoc: UserSchema
+  users: UserSchema[]
 ) => {
   // User Object
   const user = useContext(UserContext);
 
-  // // Finding Current User Firebase Doc
-  // const currentUser = users?.find(
-  //   (currentUser: UserSchema) => currentUser?.uid === user?.uid
-  // );
+  // Finding Current User Firebase Doc
+  const currentUser = users?.find(
+    (currentUser: UserSchema) => currentUser?.uid === user?.uid
+  );
 
   // Utilising sharedBoardIds & sharedBoards (Boards current user has been invited to)
   // array to fetch the correct Tasks
   let sharedBoardIds: (string | null | undefined)[] = [];
-  currentUserDoc?.sharedBoardRefs?.map((sharedBoardRef: SharedBoardRef) =>
+  currentUser?.sharedBoardRefs?.map((sharedBoardRef: SharedBoardRef) =>
     sharedBoardIds.push(sharedBoardRef?.board)
   );
 
@@ -34,7 +34,7 @@ const useFetchTasks = (
 
   if (sharedBoardIds.includes(activeBoardId)) {
     // Fetching Tasks from shared Board
-    const sharedBoardRef = currentUserDoc?.sharedBoardRefs?.find(
+    const sharedBoardRef = currentUser?.sharedBoardRefs?.find(
       (sharedBoardRef: SharedBoardRef) =>
         sharedBoardRef?.board === activeBoardId
     );

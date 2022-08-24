@@ -32,7 +32,7 @@ type MainProps = {
   setShowAddTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
   setShowEditTaskModal: React.Dispatch<React.SetStateAction<boolean>>;
   updateBoardName: (uid: string | undefined, newName: string) => Promise<void>;
-  columns: ColumnSchema[] | undefined; // *TypeScript* Why am I not getting an error here, as with "tasks"?
+  columns: ColumnSchema[] | undefined;
   isOpen: boolean;
   setShowShareModal: React.Dispatch<React.SetStateAction<boolean>>;
   sharedBoardIds: (string | null | undefined)[];

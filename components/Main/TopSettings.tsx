@@ -13,7 +13,7 @@ type MainProps = {
   handleDeleteBoard: (
     activeBoardId: string | null | undefined
   ) => Promise<void>;
-  users: UserSchema[]; // *TypeScript* Why can I use "UserSchema[]" this time tho?
+  users: UserSchema[];
   allBoards: BoardSchema[];
 };
 

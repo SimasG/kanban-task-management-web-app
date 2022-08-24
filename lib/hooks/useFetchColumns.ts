@@ -13,18 +13,18 @@ import { ColumnSchema, SharedBoardRef, UserSchema } from "../types";
 
 const useFetchColumns = (
   activeBoardId: string | null | undefined,
-  currentUserDoc: UserSchema
+  users: UserSchema[]
 ) => {
   // User Object
   const user = useContext(UserContext);
 
-  // // Finding Current User Firebase Doc
-  // const currentUser = users?.find(
-  //   (currentUser) => currentUser?.uid === user?.uid
-  // );
+  // Finding Current User Firebase Doc
+  const currentUser = users?.find(
+    (currentUser) => currentUser?.uid === user?.uid
+  );
 
   let sharedBoardIds: (string | null | undefined)[] = [];
-  currentUserDoc?.sharedBoardRefs?.map((sharedBoardRef: SharedBoardRef) =>
+  currentUser?.sharedBoardRefs?.map((sharedBoardRef: SharedBoardRef) =>
     sharedBoardIds.push(sharedBoardRef?.board)
   );
 
@@ -32,7 +32,7 @@ const useFetchColumns = (
 
   if (sharedBoardIds.includes(activeBoardId)) {
     // Fetch Columns from a shared Board
-    const sharedBoardRef = currentUserDoc?.sharedBoardRefs?.find(
+    const sharedBoardRef = currentUser?.sharedBoardRefs?.find(
       (board: SharedBoardRef) => board?.board === activeBoardId
     );
     const columnsCollectionRef = collection(
